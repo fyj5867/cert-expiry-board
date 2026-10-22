@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<title>安規認證效期看板</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1f4d5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="安規工具">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root{
+    --bg:#f4f1ea;
+    --surface:#ffffff;
+    --surface-2:#faf8f3;
+    --ink:#211d17;
+    --sub:#6f6656;
+    --border:#e6e0d3;
+    --accent:#1f4d5c;
+    --accent-soft:#e4eef0;
+
+    --crit-bg:#fbe4e2;
+    --crit-ink:#7a1f16;
+    --crit-strong:#b3261e;
+    --crit-stripe:#7a1f16;
+
+    --warn-bg:#fdecdc;
+    --warn-ink:#8a4210;
+    --warn-strong:#c1621a;
+    --warn-stripe:#c1621a;
+
+    --mid-bg:#fdf3d7;
+    --mid-ink:#7a5b06;
+    --mid-strong:#b48a11;
+    --mid-stripe:#b48a11;
+
+    --ok-bg:#e2f0e4;
+    --ok-ink:#215c33;
+    --ok-strong:#2f7d45;
+    --ok-stripe:#2f7d45;
+
+    --cat-adapter:#2f6690;
+    --cat-adapter-bg:#e3edf4;
+    --cat-system:#5b4a8a;
+    --cat-system-bg:#ece7f5;
+    --cat-battery:#8a5a2a;
+    --cat-battery-bg:#f4e9dc;
+
+    --shadow: 0 1px 2px rgba(33,29,23,.06), 0 8px 24px -12px rgba(33,29,23,.18);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17140f;
+      --surface:#211c15;
+      --surface-2:#271f17;
+      --ink:#f1ece0;
+      --sub:#b3a891;
+      --border:#3a3225;
+      --accent:#8fc2cf;
+      --accent-soft:#243437;
+
+      --crit-bg:#3a1712;
+      --crit-ink:#f7c8c0;
+      --crit-strong:#f0897b;
+      --crit-stripe:#f0897b;
+
+      --warn-bg:#3a2510;
+      --warn-ink:#f6d3ac;
+      --warn-strong:#e79a4f;
+      --warn-stripe:#e79a4f;
+
+      --mid-bg:#332a0c;
+      --mid-ink:#f2e2a0;
+      --mid-strong:#dcb63f;
+      --mid-stripe:#dcb63f;
+
+      --ok-bg:#12271a;
+      --ok-ink:#bfe6c7;
+      --ok-strong:#6cbf83;
+      --ok-stripe:#6cbf83;
+
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17140f;
+    --surface:#211c15;
+    --surface-2:#271f17;
+    --ink:#f1ece0;
+    --sub:#b3a891;
+    --border:#3a3225;
+    --accent:#8fc2cf;
+    --accent-soft:#243437;
+
+    --crit-bg:#3a1712;
+    --crit-ink:#f7c8c0;
+    --crit-strong:#f0897b;
+    --crit-stripe:#f0897b;
+
+    --warn-bg:#3a2510;
+    --warn-ink:#f6d3ac;
+    --warn-strong:#e79a4f;
+    --warn-stripe:#e79a4f;
+
+    --mid-bg:#332a0c;
+    --mid-ink:#f2e2a0;
+    --mid-strong:#dcb63f;
+    --mid-stripe:#dcb63f;
+
+    --ok-bg:#12271a;
+    --ok-ink:#bfe6c7;
+    --ok-strong:#6cbf83;
+    --ok-stripe:#6cbf83;
+
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:1160px;
+    margin:0 auto;
+    padding-inline:20px;
+    padding-block:32px 56px;
+  }
+  header.page{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    margin-bottom:24px;
+  }
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:.12em;
+    font-weight:700;
+    color:var(--accent);
+    text-transform:uppercase;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(22px,3.4vw,30px);
+    font-weight:900;
+    letter-spacing:-.01em;
+    text-wrap:balance;
+  }
+  .meta-line{
+    font-size:13px;
+    color:var(--sub);
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px 14px;
+  }
+  .meta-line b{ color:var(--ink); font-weight:600; }
+
+  /* summary tiles */
+  .tiles{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:22px 0 28px;
+  }
+  @media (max-width:640px){ .tiles{ grid-template-columns:repeat(2,1fr); } }
+  .tile{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .tile::before{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:4px;
+  }
+  .tile.crit::before{background:var(--crit-stripe);}
+  .tile.warn::before{background:var(--warn-stripe);}
+  .tile.mid::before{background:var(--mid-stripe);}
+  .tile.ok::before{background:var(--ok-stripe);}
+  .tile .num{
+    font-family:"JetBrains Mono",monospace;
+    font-variant-numeric:tabular-nums;
+    font-size:28px;
+    font-weight:700;
+    line-height:1.1;
+  }
+  .tile.crit .num{color:var(--crit-strong);}
+  .tile.warn .num{color:var(--warn-strong);}
+  .tile.mid .num{color:var(--mid-strong);}
+  .tile.ok .num{color:var(--ok-strong);}
+  .tile .lbl{
+    margin-top:4px;
+    font-size:12.5px;
+    color:var(--sub);
+    font-weight:500;
+  }
+
+  section.group{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    margin-bottom:18px;
+    overflow:hidden;
+  }
+  .group-head{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:13px 18px;
+    border-bottom:1px solid var(--border);
+  }
+  .group-head .stripe{
+    width:10px; height:10px; border-radius:3px;
+    flex:none;
+  }
+  .group.adapter .stripe{background:var(--cat-adapter);}
+  .group.system .stripe{background:var(--cat-system);}
+  .group.battery .stripe{background:var(--cat-battery);}
+  .group-head h2{
+    margin:0;
+    font-size:15px;
+    font-weight:700;
+  }
+  .group.adapter h2{color:var(--cat-adapter);}
+  .group.system h2{color:var(--cat-system);}
+  .group.battery h2{color:var(--cat-battery);}
+  .group-head .count{
+    margin-left:auto;
+    font-family:"JetBrains Mono",monospace;
+    font-size:12.5px;
+    color:var(--sub);
+  }
+  .group-head .rule{
+    font-size:12px;
+    color:var(--sub);
+  }
+
+  .tbl-wrap{ overflow-x:auto; }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13.5px;
+  }
+  thead th{
+    text-align:left;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--sub);
+    font-weight:600;
+    padding:8px 18px;
+    background:var(--surface-2);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:9px 18px;
+    border-top:1px solid var(--border);
+    white-space:nowrap;
+  }
+  tbody tr:hover td{ background:var(--surface-2); }
+  td.proj{ font-weight:700; }
+  td.cert{ color:var(--ink); }
+  td.due, td.days{
+    font-family:"JetBrains Mono",monospace;
+    font-variant-numeric:tabular-nums;
+  }
+  td.days.neg{ color:var(--crit-strong); font-weight:700; }
+  td.days.pos{ color:var(--sub); }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:3px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .badge.crit{ background:var(--crit-bg); color:var(--crit-ink); }
+  .badge.warn{ background:var(--warn-bg); color:var(--warn-ink); }
+  .badge.mid{ background:var(--mid-bg); color:var(--mid-ink); }
+  .badge.ok{ background:var(--ok-bg); color:var(--ok-ink); }
+
+  td.days.warn{ color:var(--warn-strong); font-weight:700; }
+  td.days.mid{ color:var(--mid-strong); font-weight:700; }
+
+  td.proj-list{ font-weight:700; white-space:normal; max-width:280px; }
+  .cat-tiles{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:22px 0 28px;
+  }
+  @media (max-width:640px){ .cat-tiles{ grid-template-columns:1fr; } }
+  .cat-tile{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .cat-tile::before{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:4px;
+  }
+  .cat-tile.adapter::before{background:var(--cat-adapter);}
+  .cat-tile.system::before{background:var(--cat-system);}
+  .cat-tile.battery::before{background:var(--cat-battery);}
+  .cat-tile .num{
+    font-family:"JetBrains Mono",monospace;
+    font-variant-numeric:tabular-nums;
+    font-size:26px;
+    font-weight:700;
+    line-height:1.1;
+  }
+  .cat-tile.adapter .num{color:var(--cat-adapter);}
+  .cat-tile.system .num{color:var(--cat-system);}
+  .cat-tile.battery .num{color:var(--cat-battery);}
+  .cat-tile .lbl{
+    margin-top:4px;
+    font-size:12.5px;
+    color:var(--sub);
+    font-weight:500;
+  }
+  .cat-tile .flags{
+    margin-top:8px;
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+  }
+  .cat-tile .flags span{
+    font-size:11px;
+    font-weight:700;
+    padding:2px 7px;
+    border-radius:999px;
+  }
+
+  footer{
+    margin-top:22px;
+    font-size:12px;
+    color:var(--sub);
+    line-height:1.7;
+  }
+  footer .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:14px;
+    margin-bottom:8px;
+  }
+  footer .legend span{ display:inline-flex; align-items:center; gap:6px; }
+  footer .legend i{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+
+  /* PWA：避開 iPhone 瀏海與底部安全區（做法同行動祕書／Healthy Care） */
+  body{
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  a.back{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:12.5px; color:var(--sub); text-decoration:none;
+    margin-bottom:10px;
+  }
+  a.back:hover{ color:var(--accent); }
+
+  /* 匯入列 */
+  .bar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:18px 0 0; }
+  .btn{
+    font:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
+    padding:7px 14px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface); color:var(--ink);
+  }
+  .btn:hover{ border-color:var(--accent); color:var(--accent); }
+  .btn.primary{ background:var(--accent); border-color:var(--accent); color:var(--surface); }
+  .btn.primary:hover{ opacity:.88; color:var(--surface); }
+  .bar .hint{ font-size:12px; color:var(--sub); }
+
+  /* 還沒有資料時 */
+  .empty{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    padding:28px 22px; box-shadow:var(--shadow); text-align:center;
+  }
+  .empty h2{ margin:0 0 8px; font-size:16px; font-weight:700; }
+  .empty p{ margin:0 auto 6px; font-size:13px; color:var(--sub); line-height:1.8; max-width:30em; }
+  .empty code{ font-size:11.5px; word-break:break-all; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a class="back" href="./index.html">‹ 安規工具</a>
+  <header class="page">
+    <div class="eyebrow">TWINHEAD · 安規認證效期管理</div>
+    <h1>認證效期審查看板</h1>
+    <div class="meta-line">
+      審查基準日：<b id="baseline-date">—</b>　·　資料來源：<span id="src-sheets">效期管理 Excel 的「系統效期管理」＋「Adapter 效期管理」＋「Battery 效期管理」三個分頁</span>　·　主分類：ADAPTER / 系統本身 / 電池
+    </div>
+  </header>
+
+  <div class="bar">
+    <button type="button" class="btn primary" id="btn-import">匯入效期資料</button>
+    <button type="button" class="btn" id="btn-export" hidden>匯出備份</button>
+    <button type="button" class="btn" id="btn-clear" hidden>清除這台裝置的資料</button>
+    <span class="hint" id="bar-hint"></span>
+    <input type="file" id="file-input" accept=".json,application/json" hidden>
+  </div>
+
+  <div class="cat-tiles" id="cat-tiles"></div>
+
+  <div id="groups"></div>
+
+  <footer>
+    <div class="legend">
+      <span><i style="background:var(--crit-strong)"></i>已過期 — 需立即處理</span>
+      <span><i style="background:var(--warn-strong)"></i>3 個月內到期 — 依規則提前通知</span>
+      <span><i style="background:var(--mid-strong)"></i>6 個月內到期 — 持續追蹤</span>
+      <span><i style="background:var(--ok-strong)"></i>正常 — 效期 &gt; 6 個月</span>
+    </div>
+    <b>資料來源</b>：由效期管理用的 Excel 以 <code>update-cert-board.ps1</code> 擷取「系統效期管理」「Adapter 效期管理」「Battery 效期管理」三個分頁後匯入，其餘分頁不納入效期管控。目前這台裝置的資料：<span id="src-stamp">尚未匯入</span>。<br>
+    <b>這個頁面不內含任何證書資料。</b>網站是公開的，資料只存在你自己的裝置上（<code>localStorage</code>），不會上傳到任何地方。<br>
+    天數與狀態依瀏覽當日即時計算；到期日來源為各分頁中已填日期者，未取得日期者不列入本表。<b>CB</b> 證書本身無有效期欄位，以發證日 +5 年推算；<b>UL／C-UL、CAS、CEL、ATEX、C1D2、CE DoC</b> 無到期日，歸「版本效期監控」不列入本表。<br>
+    <b>ADAPTER 以型號為主體</b>：一顆型號一列、各國效期獨立、不做合併；「適用機型」是備查註記，僅供人看、不參與比對。系統本身與電池證書常由多個機型共用同一張證書與到期日，因此同一張證書合併為一行、列出所有適用機型。
+  </footer>
+</div>
+
+<script>
+(function(){
+  // ── 資料層 ───────────────────────────────────────────────
+  // 程式碼裡刻意不放任何真實資料。GitHub Pages 是公開網址，而且就算用 private repo，
+  // 發布出去的站台本身仍是公開可存取的（private 只保護原始碼，不保護網站）。
+  // 資料一律由使用者自己匯入，只存在這台裝置的 localStorage。
+  const LS_KEY = 'safety.certs.v1';
+  let DATA = [], STAMP = '';
+
+  function load(){
+    try{
+      const o = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+      if(o && Array.isArray(o.items)){ DATA = o.items; STAMP = o.stamp || ''; return true; }
+    }catch(e){}
+    DATA = []; STAMP = ''; return false;
+  }
+  function save(){
+    try{ localStorage.setItem(LS_KEY, JSON.stringify({v:1, stamp:STAMP, items:DATA})); return true; }
+    catch(e){ return false; }
+  }
+
+  // 兩種來源都收：看板自己的匯出檔（純陣列），或 update-cert-board.ps1 -Json 的輸出（{items:[{model,…}]}）
+  function normalise(raw){
+    let arr = null, stamp = '';
+    if(Array.isArray(raw)) arr = raw;
+    else if(raw && Array.isArray(raw.items)){
+      arr = raw.items;
+      stamp = raw.sourceStamp || raw.asOf || raw.stamp || '';
+    }
+    if(!arr) return null;
+    const out = arr.map(r => ({
+      project: String(r.project != null ? r.project : (r.model || '')).trim(),
+      cert:    String(r.cert || '').trim(),
+      kind:    r.kind || '',
+      due:     String(r.due || '').trim().replace(/-/g, '/'),
+      spec:    r.spec,
+      applies: r.applies
+    })).filter(r => r.project && r.cert && /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(r.due));
+    return out.length ? { items: out, stamp } : null;
+  }
+
+  // ── 共用 ─────────────────────────────────────────────────
+  // kind 由 update-cert-board.ps1 依「來源分頁」決定，不再用認證項目名稱去猜
+  // （adapter 與系統的 CB 同名，靠名稱分類會把 adapter 的 CB 歸錯類）
+  const CATS=[
+    {key:'ADAPTER',cls:'adapter',title:'ADAPTER',kind:'adapter'},
+    {key:'SYSTEM', cls:'system', title:'系統本身',kind:'system'},
+    {key:'BATTERY',cls:'battery',title:'電池',    kind:'battery'}
+  ];
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  // 「適用機型」欄填 ? / NA 的，顯示成（待補），不要把佔位符直接攤在看板上
+  const applyTxt=s=>{const v=String(s==null?'':s).trim();
+    return (!v||/^(NA|N\/A|ongoing|\?|-|—)$/i.test(v))?'（待補）':esc(v);};
+  const slug={'已過期':'crit','3個月內到期':'warn','6個月內到期':'mid','正常':'ok'};
+  const statusOf=d=>d<0?'已過期':d<=90?'3個月內到期':d<=180?'6個月內到期':'正常';
+
+  const $ = id => document.getElementById(id);
+  const tiles=$('cat-tiles'), box=$('groups');
+
+  // ── 繪製 ─────────────────────────────────────────────────
+  function render(){
+    const today=new Date(); today.setHours(0,0,0,0);
+    $('baseline-date').textContent=today.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
+    $('src-stamp').textContent = STAMP ? ('擷取自 ' + STAMP + ' 版本') : '尚未匯入';
+    tiles.innerHTML=''; box.innerHTML='';
+    $('btn-export').hidden = !DATA.length;
+    $('btn-clear').hidden  = !DATA.length;
+    $('bar-hint').textContent = DATA.length ? (DATA.length + ' 筆') : '';
+
+    if(!DATA.length){
+      box.innerHTML = '<div class="empty">'
+        + '<h2>尚未匯入效期資料</h2>'
+        + '<p>這個頁面不內含任何證書資料 —— 網站是公開的，資料只存在你自己的裝置上。</p>'
+        + '<p>在電腦上跑 <code>update-cert-board.ps1 -Json</code> 產生 JSON，傳到這台裝置後按上面的「匯入效期資料」。</p>'
+        + '</div>';
+      return;
+    }
+
+    DATA.forEach(r=>{
+      // 沒有 kind 的舊資料，依認證項目名稱補一個，避免整頁空白
+      if(!r.kind) r.kind=/Adapter/.test(r.cert)?'adapter':/Battery/.test(r.cert)?'battery':'system';
+      const p=r.due.split('/').map(Number);
+      r.days=Math.round((new Date(p[0],p[1]-1,p[2])-today)/864e5);
+      r.status=statusOf(r.days);
+    });
+
+    CATS.forEach(c=>{
+      const rows=DATA.filter(r=>r.kind===c.kind);
+      if(!rows.length) return;
+
+      // ADAPTER 一旦改以型號為主體（資料帶 spec），就停用合併：有型號當主鍵不必猜，
+      // 兩顆不同 adapter 剛好同天到期也不會被誤併。
+      const adpByModel = (c.key==='ADAPTER') && rows.some(r=>r.spec!==undefined);
+
+      let list;
+      if(adpByModel){
+        list=rows.map(r=>({cert:r.cert,due:r.due,days:r.days,status:r.status,
+                           projects:[r.project],spec:r.spec,applies:r.applies}));
+      }else{
+        const m={}; rows.forEach(r=>{const k=r.cert+'|'+r.due;(m[k]=m[k]||{cert:r.cert,due:r.due,days:r.days,status:r.status,projects:[]}).projects.push(r.project);});
+        list=Object.values(m);
+      }
+      list.sort((a,b)=>a.days-b.days);
+
+      const flags=['已過期','3個月內到期','6個月內到期'].map(s=>{const n=list.filter(x=>x.status===s).length;return n?`<span class="badge ${slug[s]}">${s} ${n}</span>`:''}).join('')||'<span class="badge ok">全部正常</span>';
+
+      const models=new Set(rows.map(r=>r.project));
+      const tileNum = adpByModel ? models.size : list.length;
+      const tileLbl = adpByModel ? `${c.title}（顆）· ${list.length} 張證書` : `${c.title}（張證書）`;
+      const headCnt = adpByModel ? `${models.size} 顆 Adapter / ${list.length} 張證書`
+                                 : `${list.length} 張證書 / ${rows.length} 筆`;
+      tiles.insertAdjacentHTML('beforeend',`<div class="cat-tile ${c.cls}"><div class="num">${tileNum}</div><div class="lbl">${tileLbl}</div><div class="flags">${flags}</div></div>`);
+
+      const dCls=x=>x.days<0?'neg':slug[x.status]==='warn'?'warn':slug[x.status]==='mid'?'mid':'pos';
+      const dTxt=x=>(x.days<0?'逾期 '+(-x.days):x.days)+' 天';
+      const head = adpByModel
+        ? '<tr><th>Adapter 型號</th><th>規格</th><th>認證項目</th><th>到期日</th><th>剩餘天數</th><th>狀態</th><th>適用機型（備查）</th></tr>'
+        : '<tr><th>適用機型 / 型號</th><th>認證項目</th><th>到期日</th><th>剩餘天數</th><th>狀態</th></tr>';
+      const body = list.map(x=> adpByModel
+        ? `<tr><td class="proj-list">${esc(x.projects[0])}</td><td>${esc(x.spec)||'—'}</td><td class="cert">${esc(x.cert)}</td><td class="due">${esc(x.due)}</td><td class="days ${dCls(x)}">${dTxt(x)}</td><td><span class="badge ${slug[x.status]}">${x.status}</span></td><td class="proj-list">${applyTxt(x.applies)}</td></tr>`
+        : `<tr><td class="proj-list">${esc(x.projects.join('、'))}</td><td class="cert">${esc(x.cert)}</td><td class="due">${esc(x.due)}</td><td class="days ${dCls(x)}">${dTxt(x)}</td><td><span class="badge ${slug[x.status]}">${x.status}</span></td></tr>`
+      ).join('');
+
+      const sec=document.createElement('section');sec.className='group '+c.cls;
+      sec.innerHTML=`<div class="group-head"><span class="stripe"></span><h2>${c.title}</h2><span class="count">${headCnt}</span></div>
+      <div class="tbl-wrap"><table><thead>${head}</thead><tbody>${body}</tbody></table></div>`;
+      box.appendChild(sec);
+    });
+  }
+
+  // ── 匯入 / 匯出 / 清除 ───────────────────────────────────
+  $('btn-import').addEventListener('click', ()=> $('file-input').click());
+  $('file-input').addEventListener('change', e=>{
+    const f=e.target.files && e.target.files[0];
+    e.target.value='';
+    if(!f) return;
+    if(f.size > 8*1024*1024){ alert('檔案太大了，請確認選的是效期資料 JSON。'); return; }
+    const fr=new FileReader();
+    fr.onerror=()=>alert('讀取檔案失敗。');
+    fr.onload=()=>{
+      let raw;
+      try{ raw=JSON.parse(String(fr.result).replace(/^﻿/,'')); }
+      catch(err){ alert('讀不懂這個檔案，請選 .json。'); return; }
+      const norm=normalise(raw);
+      if(!norm){ alert('這個檔案裡沒有可以用的效期資料。\n需要 project（或 model）、cert、due 三個欄位，due 格式 yyyy/MM/dd。'); return; }
+      DATA=norm.items; STAMP=norm.stamp;
+      if(!save()) alert('資料已載入，但沒能存進這台裝置（瀏覽器可能擋住了儲存空間），重新整理後會消失。');
+      render();
+    };
+    fr.readAsText(f);
+  });
+
+  $('btn-export').addEventListener('click', ()=>{
+    const blob=new Blob([JSON.stringify({v:1,stamp:STAMP,items:DATA},null,1)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='安規認證效期_'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  });
+
+  $('btn-clear').addEventListener('click', ()=>{
+    if(!confirm('確定清除這台裝置上的效期資料？\n（只影響這台裝置，來源 Excel 不受影響）')) return;
+    try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    DATA=[]; STAMP=''; render();
+  });
+
+  load();
+  render();
+})();
+</script>
+
+
+<script>
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>

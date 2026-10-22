@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<title>安規工具</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1f4d5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="安規工具">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+  :root{
+    --bg:#f4f1ea; --card:#fff; --ink:#211d17; --sub:#6f6656;
+    --line:#e6e0d3; --accent:#1f4d5c;
+    --shadow:0 1px 2px rgba(33,29,23,.06), 0 8px 24px -12px rgba(33,29,23,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#17140f; --card:#211c15; --ink:#f1ece0; --sub:#b3a891;
+      --line:#3a3225; --accent:#8fc2cf;
+      --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17140f; --card:#211c15; --ink:#f1ece0; --sub:#b3a891;
+    --line:#3a3225; --accent:#8fc2cf;
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .wrap{max-width:720px; margin:0 auto; padding:32px 16px 56px}
+  .eyebrow{font-size:12px; letter-spacing:.12em; font-weight:700; color:var(--accent); text-transform:uppercase}
+  h1{margin:6px 0 4px; font-size:clamp(22px,5vw,28px); font-weight:900; letter-spacing:-.01em}
+  .lede{margin:0 0 24px; font-size:13.5px; color:var(--sub); line-height:1.7}
+  .tools{display:grid; gap:12px}
+  a.tool{
+    display:block; text-decoration:none; color:inherit;
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; box-shadow:var(--shadow);
+    position:relative; overflow:hidden;
+  }
+  a.tool::before{content:""; position:absolute; inset:0 auto 0 0; width:4px; background:var(--accent)}
+  a.tool[aria-disabled="true"]{opacity:.5; pointer-events:none}
+  a.tool[aria-disabled="true"]::before{background:var(--line)}
+  .tool h2{margin:0 0 4px; font-size:15.5px; font-weight:700}
+  .tool p{margin:0; font-size:12.5px; color:var(--sub); line-height:1.6}
+  .tag{
+    display:inline-block; margin-left:8px; padding:2px 8px; border-radius:999px;
+    font-size:11px; font-weight:700; background:var(--line); color:var(--sub); vertical-align:2px;
+  }
+  footer{margin-top:28px; font-size:12px; color:var(--sub); line-height:1.8}
+  code{font-size:11.5px; word-break:break-all}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">TWINHEAD · 系統技術處 安規</div>
+    <h1>安規工具</h1>
+    <p class="lede">認證效期、報價試算與前置作業準備。資料存在這台裝置上，不經過任何第三方伺服器。</p>
+  </header>
+
+  <nav class="tools">
+    <a class="tool" href="./expiry-board.html">
+      <h2>認證效期看板</h2>
+      <p>系統／Adapter／電池三類證書的到期日與剩餘天數，依到期日排序。</p>
+    </a>
+
+    <a class="tool" href="#" aria-disabled="true">
+      <h2>報價試算器<span class="tag">尚未搬移</span></h2>
+      <p>安規認證費用、樣品需求、文件需求與時程試算。</p>
+    </a>
+
+    <a class="tool" href="#" aria-disabled="true">
+      <h2>認證作業注意事項<span class="tag">尚未搬移</span></h2>
+      <p>送測前置作業的準備清單與 SOP。</p>
+    </a>
+  </nav>
+
+  <footer>
+    <b>第一階段（架構驗證）</b>：目前只有效期看板，資料是跑 <code>update-cert-board.ps1</code> 產生的快照。<br>
+    跨裝置同步與加密尚未接上 —— 那是第二階段，做法比照行動祕書（AES-GCM，金鑰由同步密語衍生，沒有金鑰絕不上傳）。
+  </footer>
+</div>
+
+<script>
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  }
+</script>
+</body>
+</html>

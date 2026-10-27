@@ -59,6 +59,37 @@
   }
   footer{margin-top:28px; font-size:12px; color:var(--sub); line-height:1.8}
   code{font-size:11.5px; word-break:break-all}
+
+  /* ── 同步 ── */
+  .sync{background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:16px 18px; box-shadow:var(--shadow); margin-top:20px}
+  .sync-h{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .sync-h h2{margin:0; font-size:15.5px; font-weight:700; flex:1}
+  .dot{display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
+    padding:3px 10px; border-radius:999px; background:var(--line); color:var(--sub)}
+  .dot::before{content:""; width:7px; height:7px; border-radius:50%; background:currentColor}
+  .dot.ok{background:#d7ece4; color:#0d5c4a}
+  .dot.busy{background:#fdf0d2; color:#7a5500}
+  .dot.err{background:#f6dcd9; color:#8a2c26}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .dot.ok{background:#15332a;color:#6fdcbe}
+    :root:not([data-theme="light"]) .dot.busy{background:#3a2c16;color:#e0b063}
+    :root:not([data-theme="light"]) .dot.err{background:#3b211f;color:#f0a19a}}
+  .sync p{margin:10px 0 0; font-size:12.5px; color:var(--sub); line-height:1.7}
+  .sync .row{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap}
+  .sync input{flex:1; min-width:180px; font:inherit; font-size:13px; color:var(--ink);
+    background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:8px 11px}
+  .sync input:focus-visible{outline:2px solid var(--accent); outline-offset:1px}
+  .btn{font:inherit; font-size:13px; font-weight:700; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); border-radius:8px; padding:8px 15px; cursor:pointer}
+  .btn:hover{border-color:var(--sub)}
+  .btn.pri{background:var(--accent); border-color:var(--accent); color:var(--bg)}
+  .btn[disabled]{opacity:.5; cursor:default}
+  .note{margin-top:12px; padding:10px 13px; border-radius:8px; font-size:12px; line-height:1.7;
+    background:var(--bg); border-left:3px solid var(--accent); color:var(--sub)}
+  .note b{color:var(--ink)}
+  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
+    background:var(--ink); color:var(--bg); font-size:13px; padding:10px 18px; border-radius:999px;
+    box-shadow:var(--shadow); z-index:9; max-width:calc(100vw - 32px)}
 </style>
 </head>
 <body>
@@ -86,16 +117,116 @@
     </a>
   </nav>
 
+  <section class="sync" id="sync"></section>
+
   <footer>
     <b>第一階段（架構驗證）</b>：目前只有效期看板，資料是跑 <code>update-cert-board.ps1</code> 產生的快照。<br>
-    跨裝置同步與加密尚未接上 —— 那是第二階段，做法比照行動祕書（AES-GCM，金鑰由同步密語衍生，沒有金鑰絕不上傳）。
+    <b>第二階段（跨裝置同步）已接上</b>：資料存在你自己 GitHub 帳號的私密 Gist，AES-GCM 加密，金鑰由同步密語衍生。<b>沒有金鑰絕不上傳。</b>
   </footer>
 </div>
 
+<script src="./sync.js"></script>
 <script>
+(() => {
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
   }
+
+  /* 首頁只負責「連線／狀態／配對」，資料本身由各工具各自同步。
+     這裡掛一個 probe 集合，純粹用來驗證跨裝置真的通。 */
+  const KEY = 'sq.home.v1';
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
+  const save = d => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} };
+
+  let snap = Object.assign({ probe: [], deleted: {} }, load());
+
+  function toast(msg) {
+    if (!msg) return;
+    const el = document.createElement('div');
+    el.className = 'toast'; el.textContent = msg; document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3600);
+  }
+
+  SQSync.init({
+    cols: ['probe'],
+    readLocal: () => snap,
+    writeLocal: d => { snap = d; save(snap); },
+    onChange: () => paint(),
+    onPair: code => { const i = document.getElementById('in'); if (i) { i.value = code; toast('已帶入配對碼，請按「連線」'); } },
+    toast
+  });
+
+  function paint() {
+    const box = document.getElementById('sync');
+    const st = SQSync.status(), info = SQSync.info();
+    const H = [`<div class="sync-h"><h2>跨裝置同步</h2><span class="dot ${st.cls}">${esc(st.txt)}</span></div>`];
+
+    if (!SQSync.connected()) {
+      H.push(`<p>資料存在<b>你自己 GitHub 帳號的私密 Gist</b>，不經過第三方伺服器。
+        第一次要建立一把只勾 <code>gist</code> 權限的金鑰。</p>`);
+      H.push(`<div class="row">
+        <input id="in" type="password" placeholder="貼上 ghp_ 金鑰，或 ${SQSync.PAIR_TAG} 配對碼" autocomplete="off">
+      </div><div class="row">
+        <input id="pw" type="password" placeholder="同步密語（這份資料的加密金鑰）" autocomplete="off">
+        <button class="btn pri" id="go">連線</button>
+        <a class="btn" href="${SQSync.TOKEN_URL}" target="_blank" rel="noopener">建立金鑰</a>
+      </div>`);
+      H.push(`<div class="note"><b>同步密語請自己記住，沒有地方可以找回。</b>
+        它是 AES-GCM 的金鑰來源 —— secret Gist 知道網址就讀得到，所以牌價與報價履歷一律加密後才上傳。
+        忘記密語等於雲端那份永遠解不開（本機這份還在）。</div>`);
+    } else if (SQSync.needsPassphrase()) {
+      H.push(`<p>這台已連上 <b>${esc(info.login)}</b>，但雲端資料是用<b>另一組密語</b>加密的。
+        輸入同一組密語，這台才會開始同步。</p>`);
+      H.push(`<div class="row">
+        <input id="pw2" type="password" placeholder="同步密語" autocomplete="off">
+        <button class="btn pri" id="setpw">確定</button></div>`);
+    } else {
+      H.push(`<p>已連線到 <b>${esc(info.login)}</b> 的 GitHub${info.encrypted ? '，資料<b>已加密</b>' : ''}。
+        ${info.lastSync ? '最後同步 ' + esc(info.lastSync.slice(0, 16).replace('T', ' ')) : ''}</p>`);
+      H.push(`<div class="row">
+        <button class="btn pri" id="now">立即同步</button>
+        <button class="btn" id="pair">顯示配對碼</button>
+        <button class="btn" id="probe">加一筆測試資料（${snap.probe.length}）</button>
+        <button class="btn" id="off">中斷</button></div>`);
+      if (snap.probe.length) H.push(`<div class="note">${snap.probe.slice(-5).map(p =>
+        esc(p.text) + '　' + esc((p.updatedAt || '').slice(5, 16).replace('T', ' '))).join('<br>')}</div>`);
+    }
+    box.innerHTML = H.join('');
+  }
+
+  document.addEventListener('click', async e => {
+    const id = e.target.id;
+    if (id === 'go') {
+      const tok = document.getElementById('in').value.trim();
+      const pw  = document.getElementById('pw').value;
+      if (!tok) return toast('請先貼上金鑰或配對碼');
+      if (!tok.startsWith(SQSync.PAIR_TAG) && !pw) return toast('請設定同步密語 —— 沒有密語不會上傳任何資料');
+      e.target.disabled = true; e.target.textContent = '連線中…';
+      try { const r = await SQSync.connect(tok, pw);
+            toast(r.created ? `已在 ${r.login} 建立同步空間` : `已連線到 ${r.login}`); }
+      catch (err) { toast(err.status === 401 ? '金鑰無效或已過期'
+                        : err.status === 403 ? '金鑰權限不足：建立時要勾選 gist'
+                        : err.message || '連線失敗'); paint(); }
+    }
+    if (id === 'setpw') {
+      const pw = document.getElementById('pw2').value;
+      if (!pw) return toast('請輸入密語');
+      try { await SQSync.setPassphrase(pw); } catch (err) { toast('密語不正確'); }
+    }
+    if (id === 'now')  SQSync.now(true);
+    if (id === 'off')  { if (confirm('中斷這台裝置的同步？資料仍保留在這台與雲端。')) SQSync.disconnect(); }
+    if (id === 'pair') { const c = SQSync.pairCode();
+      try { await navigator.clipboard.writeText(c); toast('配對碼已複製，到另一台貼上'); }
+      catch (err) { prompt('複製這段配對碼，到另一台貼上：', c); } }
+    if (id === 'probe') {
+      SQSync.Store.set(snap, 'probe', { id: 'p' + Date.now().toString(36),
+        text: '測試 @ ' + (navigator.platform || 'device') });
+      save(snap); paint(); SQSync.schedule(300);
+    }
+  });
+})();
 </script>
 </body>
 </html>

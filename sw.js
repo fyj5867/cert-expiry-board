@@ -1,8 +1,8 @@
 // 安規工具 Service Worker — App 外殼離線快取（同源 network-first，字型 cache-first）
 // 改版時把 CACHE 版本號 +1，手機才會拿到新版（做法同行動祕書）
-const CACHE = 'safety-v1';
+const CACHE = 'safety-v2';
 const SHELL = [
-  './', './index.html', './expiry-board.html', './manifest.json',
+  './', './index.html', './expiry-board.html', './sync.js', './manifest.json',
   './icon-192.png', './icon-512.png'
 ];
 

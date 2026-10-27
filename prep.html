@@ -625,6 +625,8 @@ button.x:hover{color:var(--alert)}
 
 </div></div></div>
 
+<script src="./sync.js"></script>
+<script src="./store.js"></script>
 <script>
 "use strict";
 
@@ -2976,6 +2978,14 @@ document.addEventListener("click", e => {
   if (p) return doExportSection(p.dataset.expp, "p");
 });
 
+if (window.SQStore) {
+  SQStore.migrate([
+    { from: "twinhead-cert-prep-v1", col: "preps",
+      toDocs: v => (v && typeof v === "object")
+        ? Object.keys(v).map(k => Object.assign({ id: k, name: k }, v[k])) : [] },
+    { from: "sq.prepdata.v1", col: "config", toDocs: v => v ? [{ id: "prepdata", data: v }] : [] }
+  ]);
+}
 coInit();          /* 基礎資料要在第一次繪製之前就位 */
 syncStatic(); render();
 
@@ -3471,7 +3481,8 @@ function coBanner(show){
       let d; try { d = JSON.parse(fr.result); }
       catch(err){ note("這個檔案不是有效的 JSON。"); return; }
       if (!applyCo(d)){ note("檔案裡找不到 ITEMS／CCL_SEED 等欄位，確認是不是基礎資料檔。"); return; }
-      try { localStorage.setItem("sq.prepdata.v1", JSON.stringify(d)); } catch(err){}
+      if (window.SQStore) SQStore.setConfig("prepdata", d);
+      else try { localStorage.setItem("sq.prepdata.v1", JSON.stringify(d)); } catch(err){}
       coBanner(false);
       if (typeof render === "function") render();
       note("基礎資料已匯入並記住，下次打開不用再匯一次。");
@@ -3483,7 +3494,8 @@ function coBanner(show){
 
 function coInit(){
   let d = null;
-  try { d = JSON.parse(localStorage.getItem("sq.prepdata.v1") || "null"); } catch(e){}
+  if (window.SQStore) d = SQStore.getConfig("prepdata");
+  if (!d) { try { d = JSON.parse(localStorage.getItem("sq.prepdata.v1") || "null"); } catch(e){} }
   const ok = applyCo(d);
   coBanner(!ok);
   return ok;
@@ -3504,4 +3516,8 @@ gdInit().then(ok => {
     note(gdMsg(gdErr) + " 已暫時改用" + STORE_NAME[store] + "。");
   }
 });
+
+/* 接上跨裝置同步。放在最後 —— sync.js 的 init 會同步呼叫一次 onChange，
+   太早呼叫的話裡面用到的 renderSaves／render 還在 TDZ。 */
+if (window.SQStore) SQStore.attach(() => { coInit(); renderSaves(); render(); }, m => note(m));
 </script>

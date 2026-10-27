@@ -462,6 +462,8 @@
   </footer>
 </div>
 
+<script src="./sync.js"></script>
+<script src="./store.js"></script>
 <script>
 (function(){
   // ── 資料層 ───────────────────────────────────────────────
@@ -472,6 +474,12 @@
   let DATA = [], STAMP = '';
 
   function load(){
+    // 先讀三支工具共用的快照（sq.data.v1）—— 那一份才會跨裝置同步。
+    // 讀不到才退回這個頁面自己的舊鍵，舊鍵的資料由下面的 migrate 搬過來。
+    try{
+      const c = window.SQStore && SQStore.getConfig('board');
+      if(c && Array.isArray(c.items)){ DATA = c.items; STAMP = c.stamp || ''; return true; }
+    }catch(e){}
     try{
       const o = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
       if(o && Array.isArray(o.items)){ DATA = o.items; STAMP = o.stamp || ''; return true; }
@@ -479,6 +487,8 @@
     DATA = []; STAMP = ''; return false;
   }
   function save(){
+    // 兩邊都寫：共用快照負責跨裝置，舊鍵留著當這台的備援
+    try{ if(window.SQStore) SQStore.setConfig('board', {stamp:STAMP, items:DATA}); }catch(e){}
     try{ localStorage.setItem(LS_KEY, JSON.stringify({v:1, stamp:STAMP, items:DATA})); return true; }
     catch(e){ return false; }
   }
@@ -672,11 +682,18 @@
   $('btn-clear').addEventListener('click', ()=>{
     if(!confirm('確定清除這台裝置上的效期資料？\n（只影響這台裝置，來源 Excel 不受影響）')) return;
     try{ localStorage.removeItem(LS_KEY); }catch(e){}
+    try{ if(window.SQStore) SQStore.del('config', 'board'); }catch(e){}
     DATA=[]; STAMP=''; render();
   });
 
+  // 舊鍵搬進共用快照，只搬一次；搬完不刪舊鍵
+  if(window.SQStore) SQStore.migrate([{ from: LS_KEY, col: 'config',
+    toDocs: v => (v && Array.isArray(v.items)) ? [{ id:'board', data:{ stamp:v.stamp||'', items:v.items } }] : [] }]);
   load();
   render();
+
+  // 接上跨裝置同步。必須放在 IIFE 內 —— load／render 是這個閉包裡的區域函式。
+  if(window.SQStore) SQStore.attach(()=>{ load(); render(); });
 })();
 </script>
 

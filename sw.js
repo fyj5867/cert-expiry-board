@@ -3,7 +3,7 @@
 const CACHE = 'safety-v5';
 const SHELL = [
   './', './index.html', './expiry-board.html', './quote.html', './prep.html',
-  './sync.js', './manifest.json',
+  './sync.js', './store.js', './manifest.json',
   './icon-192.png', './icon-512.png'
 ];
 

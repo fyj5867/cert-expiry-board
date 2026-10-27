@@ -664,6 +664,8 @@ button.x:hover{color:var(--alert)}
 </div></div>
 
 
+<script src="./sync.js"></script>
+<script src="./store.js"></script>
 <script>
 "use strict";
 
@@ -3430,6 +3432,13 @@ document.addEventListener("drop", e => {
   if (f) loadSpec(f);
 });
 
+if (window.SQStore) {
+  /* 舊鍵搬進共用快照，只搬一次 */
+  SQStore.migrate([
+    { from: "twinhead-safety-quote-v2", col: "quotes", toDocs: v => Array.isArray(v) ? v : [] },
+    { from: "sq.rates.v1", col: "config", toDocs: v => v ? [{ id: "rates", data: v }] : [] }
+  ]);
+}
 coInit();          /* 牌價要在第一次繪製之前就位 */
 syncStatic(); render();
 /* ══════════════════════════════════════════════
@@ -3674,11 +3683,13 @@ let unsubSaves = null;
 const LS_KEY = "twinhead-safety-quote-v2";
 const LS_OK = (function(){ try { localStorage.setItem("__probe","1");
   localStorage.removeItem("__probe"); return true; } catch(e){ return false; } })();
-const lsAll = () => { if (!LS_OK) return [];
-  try { const o = JSON.parse(localStorage.getItem(LS_KEY) || "[]");
-        return Array.isArray(o) ? o : []; } catch(e){ return []; } };
-const lsPut = rows => { try { localStorage.setItem(LS_KEY, JSON.stringify(rows)); return true; }
-  catch(e){ note("瀏覽器儲存空間已滿。請改用「匯出 JSON 檔」。"); return false; } };
+/* 存檔改放共用快照 sq.data.v1 的 quotes 集合 —— 三支工具同一份，sync.js
+   同步那一份，報價存檔就自動跨裝置了。舊鍵 ${LS_KEY} 的資料由 SQStore.migrate 搬過來，
+   搬完不刪舊鍵，萬一這層有問題舊資料還在原地。 */
+const lsAll = () => (window.SQStore ? SQStore.all("quotes") : []);
+const lsPut = rows => { if (!window.SQStore) return false;
+  if (SQStore.putAll("quotes", rows)) return true;
+  note("瀏覽器儲存空間已滿。請改用「匯出 JSON 檔」。"); return false; };
 const lsLoad = () => { saveRows = lsAll().sort((a,b) =>
   String(b.savedAt||"").localeCompare(String(a.savedAt||""))); };
 
@@ -4333,7 +4344,8 @@ function coBanner(show){
       let d; try { d = JSON.parse(fr.result); }
       catch(err){ note("這個檔案不是有效的 JSON。"); return; }
       if (!applyCo(d)){ note("檔案裡找不到 ITEMS／RATES 等欄位，確認是不是牌價檔。"); return; }
-      try { localStorage.setItem("sq.rates.v1", JSON.stringify(d)); } catch(err){}
+      if (window.SQStore) SQStore.setConfig("rates", d);
+      else try { localStorage.setItem("sq.rates.v1", JSON.stringify(d)); } catch(err){}
       coBanner(false);
       if (typeof render === "function") render();
       note("牌價已匯入並記住，下次打開不用再匯一次。");
@@ -4345,13 +4357,18 @@ function coBanner(show){
 
 function coInit(){
   let d = null;
-  try { d = JSON.parse(localStorage.getItem("sq.rates.v1") || "null"); } catch(e){}
+  if (window.SQStore) d = SQStore.getConfig("rates");
+  if (!d) { try { d = JSON.parse(localStorage.getItem("sq.rates.v1") || "null"); } catch(e){} }
   const ok = applyCo(d);
   coBanner(!ok);
   return ok;
 }
 
 /* db 是主存檔；Google Drive 只在階段一保留，單純當搬家來源（唯讀） */
+/* 接上跨裝置同步。一定要放在檔案最後 —— sync.js 的 init 會同步呼叫一次
+   onChange，太早呼叫的話裡面用到的 lsLoad／renderSaves 還在 TDZ。 */
+if (window.SQStore) SQStore.attach(() => { coInit(); lsLoad(); renderSaves(); render(); }, m => note(m));
+
 dbInit();
 gdInit().then(ok => {
   if (ok) renderSaves();          /* 讓「匯入舊存檔」按鈕出現 */

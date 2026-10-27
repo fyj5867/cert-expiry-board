@@ -126,21 +126,22 @@
 </div>
 
 <script src="./sync.js"></script>
+<script src="./store.js"></script>
 <script>
 (() => {
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
   }
 
-  /* 首頁只負責「連線／狀態／配對」，資料本身由各工具各自同步。
-     這裡掛一個 probe 集合，純粹用來驗證跨裝置真的通。 */
-  const KEY = 'sq.home.v1';
+  /* 三支工具都把資料寫進共用快照 sq.data.v1（見 store.js），首頁同步的就是
+     那一份 —— 所以報價存檔、準備頁存檔、效期看板、牌價會一起跨裝置。 */
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c =>
     ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } };
-  const save = d => { try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} };
 
-  let snap = Object.assign({ probe: [], deleted: {} }, load());
+  const COUNT_LABEL = { quotes: '報價存檔', preps: '準備頁存檔', certs: '效期資料', config: '參考資料' };
+  const counts = () => SQStore.COLS
+    .map(c => COUNT_LABEL[c] + ' ' + SQStore.all(c).length)
+    .join('　·　');
 
   function toast(msg) {
     if (!msg) return;
@@ -150,9 +151,9 @@
   }
 
   SQSync.init({
-    cols: ['probe'],
-    readLocal: () => snap,
-    writeLocal: d => { snap = d; save(snap); },
+    cols: SQStore.COLS,
+    readLocal: SQStore.read,
+    writeLocal: d => { SQStore.write(d); },
     onChange: () => paint(),
     onPair: code => { const i = document.getElementById('in'); if (i) { i.value = code; toast('已帶入配對碼，請按「連線」'); } },
     toast
@@ -188,10 +189,8 @@
       H.push(`<div class="row">
         <button class="btn pri" id="now">立即同步</button>
         <button class="btn" id="pair">顯示配對碼</button>
-        <button class="btn" id="probe">加一筆測試資料（${snap.probe.length}）</button>
         <button class="btn" id="off">中斷</button></div>`);
-      if (snap.probe.length) H.push(`<div class="note">${snap.probe.slice(-5).map(p =>
-        esc(p.text) + '　' + esc((p.updatedAt || '').slice(5, 16).replace('T', ' '))).join('<br>')}</div>`);
+      H.push(`<div class="note">這台目前有：${esc(counts())}</div>`);
     }
     box.innerHTML = H.join('');
   }
@@ -220,11 +219,6 @@
     if (id === 'pair') { const c = SQSync.pairCode();
       try { await navigator.clipboard.writeText(c); toast('配對碼已複製，到另一台貼上'); }
       catch (err) { prompt('複製這段配對碼，到另一台貼上：', c); } }
-    if (id === 'probe') {
-      SQSync.Store.set(snap, 'probe', { id: 'p' + Date.now().toString(36),
-        text: '測試 @ ' + (navigator.platform || 'device') });
-      save(snap); paint(); SQSync.schedule(300);
-    }
   });
 })();
 </script>

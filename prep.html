@@ -1,0 +1,3507 @@
+<title>認證作業注意事項</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --fs-micro:14px; --fs-xs:16px; --fs-sm:17px; --fs-md:19px;
+  --fs-base:22px;  --fs-lg:23px; --fs-xl:29px; --fs-num:27px;
+  --sp-1:6px; --sp-2:10px; --sp-3:14px; --sp-4:20px; --sp-5:26px; --sp-6:34px;
+
+  --ground:#E9ECEA; --surface:#FAFBFA; --surface-2:#DFE4E1; --inset:#F1F4F2;
+  --ink:#151B1C; --ink-2:#46524F; --ink-3:#737E79;
+  --rule:#C9D1CD; --rule-soft:#DCE2DF;
+  --accent:#0E5A52; --accent-soft:#D3E4DF;
+  --hazard:#8F5310; --hazard-soft:#F0E1CB;
+  --alert:#8A2C26; --alert-soft:#EEDAD7;
+  --title:#B3241A;
+  --shadow:0 1px 2px rgba(21,27,28,.06), 0 10px 30px -18px rgba(21,27,28,.26);
+  --f-display:"Archivo","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Noto Sans TC","Archivo",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"Noto Sans TC",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#101617; --surface:#181F21; --surface-2:#212A2C; --inset:#141B1C;
+    --ink:#E7EDEA; --ink-2:#A7B3AF; --ink-3:#7C8883;
+    --rule:#2C3739; --rule-soft:#232D2F;
+    --accent:#54C6B1; --accent-soft:#1A3733;
+    --hazard:#DDA25A; --hazard-soft:#3A2C16;
+    --alert:#E59A92; --alert-soft:#3B211F;
+    --title:#FF9E92;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#101617; --surface:#181F21; --surface-2:#212A2C; --inset:#141B1C;
+  --ink:#E7EDEA; --ink-2:#A7B3AF; --ink-3:#7C8883;
+  --rule:#2C3739; --rule-soft:#232D2F;
+  --accent:#54C6B1; --accent-soft:#1A3733;
+  --hazard:#DDA25A; --hazard-soft:#3A2C16;
+  --alert:#E59A92; --alert-soft:#3B211F;
+    --title:#FF9E92;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);
+  font-size:var(--fs-base);line-height:1.75;-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;font-family:var(--f-display);text-wrap:balance;line-height:1.3}
+.wrap{max-width:1780px;margin:0 auto;padding:0 var(--sp-6) 96px}
+
+.masthead{border-bottom:1px solid var(--rule);background:var(--surface)}
+.masthead .wrap{padding-block:var(--sp-5) var(--sp-4);display:flex;flex-wrap:wrap;
+  gap:var(--sp-4) var(--sp-6);align-items:flex-end;justify-content:space-between}
+.eyebrow{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:var(--sp-2)}
+h1{font-size:clamp(32px,4vw,44px);font-weight:700;letter-spacing:-.015em}
+.sub{color:var(--ink-2);font-size:var(--fs-md);margin-top:var(--sp-2);max-width:52ch;line-height:1.7}
+.stamp{font-family:var(--f-mono);font-size:var(--fs-xs);color:var(--ink-3);text-align:right;
+  line-height:1.9;white-space:nowrap}
+.stamp b{color:var(--ink-2);font-weight:500}
+
+.readout{position:sticky;top:0;z-index:20;background:var(--surface);
+  border-bottom:1px solid var(--rule);box-shadow:var(--shadow)}
+.readout .wrap{padding-block:var(--sp-3);display:grid;gap:1px;
+  grid-template-columns:repeat(2,1fr);background:var(--rule-soft)}
+@media (min-width:760px){.readout .wrap{grid-template-columns:repeat(4,1fr)}}
+.tile{background:var(--surface);padding:var(--sp-2) var(--sp-3)}
+.tile .k{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;letter-spacing:.14em;
+  color:var(--ink-3);line-height:1.5}
+.tile .v{font-family:var(--f-mono);font-variant-numeric:tabular-nums;
+  font-size:clamp(21px,1.62vw,var(--fs-xl));font-weight:600;letter-spacing:-.025em;
+  margin-top:3px;line-height:1.2}
+.tile .n{font-size:var(--fs-xs);color:var(--ink-3);font-family:var(--f-mono);line-height:1.5;margin-top:3px}
+.tile.total{background:var(--accent-soft)} .tile.total .v{color:var(--accent)}
+.tile.risk .v{color:var(--hazard)}
+
+.cols{display:grid;grid-template-columns:520px minmax(0,1fr);gap:var(--sp-5);
+  margin-top:var(--sp-5);align-items:start}
+@media (max-width:1440px){.cols{grid-template-columns:1fr}}
+.rail,.stack{display:flex;flex-direction:column;gap:var(--sp-4);min-width:0}
+
+/* ★ 面板標題、摘要列標籤、欄位 label、表頭、文件小標與列印小標一律不加
+   text-transform:uppercase —— 會把 ErP 變 ERP、dGfx 變 DGFX、kWh 變 KWH、
+   Based on 變 BASED ON。標籤感靠 letter-spacing 與字重做，不靠大寫。 */
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:4px}
+.panel > header{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-3);
+  padding:var(--sp-3) var(--sp-4);border-bottom:1px solid var(--rule-soft);flex-wrap:wrap}
+.panel > header h2{font-size:var(--fs-md);font-weight:700;letter-spacing:.08em;
+  color:var(--title)}
+.panel > header .hint{font-size:var(--fs-xs);color:var(--ink-3);font-family:var(--f-mono)}
+.panel.lead{border-color:var(--accent);border-width:2px}
+.panel.lead > header{background:var(--accent-soft);border-bottom-color:var(--accent-soft)}
+.panel.lead > header h2{color:var(--title)}
+.panel .body{padding:var(--sp-4)}
+.subhead{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;letter-spacing:.13em;
+  color:var(--ink-3);padding-top:var(--sp-4);margin-top:var(--sp-3);
+  border-top:1px solid var(--rule-soft)}
+.subhead.first{padding-top:0;margin-top:0;border-top:0;margin-bottom:var(--sp-2)}
+
+.field{display:flex;flex-direction:column;gap:var(--sp-1);margin-bottom:var(--sp-3)}
+.field:last-child{margin-bottom:0}
+.field > label{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;
+  letter-spacing:.12em;color:var(--ink-3)}
+select,input[type="number"],input[type="text"]{font-family:var(--f-mono);font-size:var(--fs-md);
+  color:var(--ink);background:var(--inset);border:1px solid var(--rule);border-radius:3px;
+  padding:9px 11px;width:100%;font-variant-numeric:tabular-nums}
+input[type="text"]{font-family:var(--f-body)}
+textarea{font-family:var(--f-body);font-size:var(--fs-sm);color:var(--ink);
+  background:var(--inset);border:1px solid var(--rule);border-radius:3px;padding:8px 10px;width:100%;
+  line-height:1.5;resize:vertical;overflow-wrap:anywhere;white-space:pre-wrap;display:block}
+textarea.wrapf{min-height:0;overflow:hidden}
+.minilbl{display:block;font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;
+  letter-spacing:.11em;color:var(--ink-3);margin-bottom:3px}
+select{font-family:var(--f-body);font-size:var(--fs-md);padding:10px 11px}
+input::placeholder{color:var(--ink-3);opacity:.8}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.seg button{flex:1;font-family:var(--f-body);font-size:var(--fs-sm);padding:10px 6px;
+  background:var(--inset);color:var(--ink-2);border:0;cursor:pointer;border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface);font-weight:500}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2)}
+.chk{display:flex;align-items:flex-start;gap:var(--sp-2);padding:var(--sp-1) 0;cursor:pointer;
+  font-size:var(--fs-md);line-height:1.55}
+.chk input{margin:5px 0 0;accent-color:var(--accent);flex:none;width:19px;height:19px}
+.chk .cap{color:var(--ink-3);font-size:var(--fs-xs);display:block;line-height:1.55}
+
+.slot{border:1px solid var(--rule-soft);border-radius:3px;padding:var(--sp-2) var(--sp-3);
+  margin-bottom:var(--sp-2);background:var(--inset)}
+.slot:last-child{margin-bottom:0}
+.slot.on{border-color:var(--accent);background:var(--surface)}
+.slot .top{display:flex;align-items:center;gap:var(--sp-2)}
+.slot .top input[type="checkbox"]{accent-color:var(--accent);width:19px;height:19px;flex:none;margin:0}
+.slot .nm{font-size:var(--fs-md);font-weight:500;flex:1}
+.slot .detail{display:none;margin-top:var(--sp-2)}
+.slot.on .detail{display:grid;gap:var(--sp-2)}
+.appr{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-3);font-size:var(--fs-xs);
+  color:var(--ink-2);align-items:center}
+.appr label{display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
+.appr input{accent-color:var(--accent);width:17px;height:17px;margin:0}
+.appr .ttl{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3);margin-right:3px}
+.unappr{color:var(--hazard);font-weight:500}
+
+.tblwrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-md)}
+th,td{padding:var(--sp-2) var(--sp-3);text-align:left;vertical-align:top}
+thead th{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;letter-spacing:.12em;
+  color:var(--ink-3);border-bottom:1px solid var(--rule);white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--rule-soft)}
+tbody tr:last-child{border-bottom:0}
+tbody tr.sect td{background:var(--inset);font-family:var(--f-display);font-size:var(--fs-micro);
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.num input{width:126px;text-align:right;padding:6px 8px;font-size:var(--fs-sm)}
+.itm{font-weight:500}
+.std{display:block;font-size:var(--fs-xs);color:var(--ink-3);font-weight:400;
+  font-family:var(--f-mono);line-height:1.55;margin-top:2px}
+tfoot td{padding-top:var(--sp-2);border-top:1px solid var(--rule-soft);font-family:var(--f-mono);
+  font-variant-numeric:tabular-nums}
+tfoot tr:last-child td{border-top:2px solid var(--rule);font-weight:600;font-size:var(--fs-lg)}
+tfoot .lbl{font-family:var(--f-display);font-size:var(--fs-xs);letter-spacing:.11em;
+  text-transform:uppercase;text-align:right;font-weight:600}
+
+.chip{display:inline-block;font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;padding:3px 8px;border-radius:3px;white-space:nowrap}
+.chip.ok{background:var(--accent-soft);color:var(--accent)}
+.chip.list{background:var(--hazard-soft);color:var(--hazard)}
+.chip.derived{background:var(--alert-soft);color:var(--alert)}
+.chip.todo{background:var(--surface-2);color:var(--ink-3)}
+
+/* 報價履歷 */
+.hist{display:flex;flex-direction:column;gap:var(--sp-3)}
+.q{border:1px solid var(--rule);border-radius:3px;background:var(--inset);overflow:hidden}
+.q.signed{border-left:4px solid var(--accent)}
+.q.unsigned{border-left:4px solid var(--hazard)}
+.qh{display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-3);align-items:baseline;
+  padding:var(--sp-2) var(--sp-3);border-bottom:1px solid var(--rule-soft);background:var(--surface)}
+.qh .qid{font-family:var(--f-mono);font-weight:600;font-size:var(--fs-md)}
+.qh .qmeta{font-family:var(--f-mono);font-size:var(--fs-xs);color:var(--ink-3)}
+.qh .qtot{margin-left:auto;font-family:var(--f-mono);font-variant-numeric:tabular-nums;
+  font-weight:600;font-size:var(--fs-md)}
+.qb{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:var(--sp-3) var(--sp-4);
+  padding:var(--sp-3)}
+@media (max-width:900px){.qb{grid-template-columns:1fr}}
+.qb h4{margin:0 0 var(--sp-1);font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.qb ul{margin:0;padding-left:var(--sp-4);font-size:var(--fs-sm);color:var(--ink-2);line-height:1.7}
+.qb table{font-size:var(--fs-sm)}
+.qb td{padding:3px var(--sp-2) 3px 0}
+.qmemo{padding:0 var(--sp-3) var(--sp-3);font-size:var(--fs-xs);color:var(--ink-3)}
+
+.groups{display:grid;gap:var(--sp-3);grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.grp{border:1px solid var(--rule);border-radius:3px;padding:var(--sp-3);background:var(--inset)}
+.grp.off{opacity:.42}
+.grp .gh{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-2)}
+.grp .gn{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3)}
+.grp .qty{font-family:var(--f-mono);font-size:var(--fs-num);font-weight:600;color:var(--accent)}
+.grp .qty small{font-size:var(--fs-xs);color:var(--ink-3);font-weight:400}
+.grp ul{margin:var(--sp-2) 0 0;padding-left:var(--sp-4);font-size:var(--fs-sm);color:var(--ink-2);line-height:1.75}
+
+.tl{display:flex;flex-direction:column;gap:var(--sp-2)}
+.tlrow{display:grid;grid-template-columns:270px minmax(0,1fr) 118px;gap:var(--sp-3);
+  align-items:center;font-size:var(--fs-md)}
+.tlname{color:var(--ink-2);line-height:1.45} .tlname b{color:var(--ink);font-weight:500}
+.tlname small{font-size:var(--fs-xs);color:var(--ink-3)}
+.bar{height:26px;background:var(--inset);border:1px solid var(--rule-soft);border-radius:3px;
+  position:relative;overflow:hidden}
+.bar i{position:absolute;top:0;bottom:0;background:var(--accent);opacity:.82}
+.bar i.dep{background:var(--hazard);opacity:.75}
+.bar i.ind{background:var(--accent);opacity:.48}
+.bar i.ppr{background:var(--alert);opacity:.7}
+.tlwk{font-family:var(--f-mono);font-size:var(--fs-sm);color:var(--ink-2);text-align:right;
+  font-variant-numeric:tabular-nums}
+.tlaxis{display:grid;grid-template-columns:270px minmax(0,1fr) 118px;gap:var(--sp-3);
+  font-family:var(--f-mono);font-size:var(--fs-micro);color:var(--ink-3);margin-top:var(--sp-1)}
+.tlaxis div:nth-child(2){display:flex;justify-content:space-between}
+
+.diff{display:flex;flex-direction:column;gap:1px;background:var(--rule-soft)}
+.drow{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:var(--sp-3);align-items:baseline;
+  background:var(--surface);padding:var(--sp-2) var(--sp-3);font-size:var(--fs-md)}
+.drow .mk{font-family:var(--f-mono);font-weight:600;text-align:center}
+.drow.cov .mk{color:var(--accent)} .drow.qtd .mk{color:var(--hazard)} .drow.new .mk{color:var(--alert)}
+.drow .why{display:block;font-size:var(--fs-xs);color:var(--ink-3);font-family:var(--f-mono);line-height:1.55}
+.drow .amt{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:var(--fs-sm);white-space:nowrap}
+.dsum{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--rule-soft);margin-bottom:var(--sp-3)}
+.dsum div{background:var(--inset);padding:var(--sp-2) var(--sp-3)}
+.dsum .dk{font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3);line-height:1.5}
+.dsum .dv{font-family:var(--f-mono);font-size:var(--fs-lg);font-weight:600;margin-top:2px}
+
+.docs{columns:2;column-gap:var(--sp-6)}
+@media (max-width:900px){.docs{columns:1}}
+.docs section{break-inside:avoid;margin-bottom:var(--sp-4)}
+.docs h3{font-size:var(--fs-sm);font-weight:600;letter-spacing:.1em;
+  color:var(--accent);margin-bottom:var(--sp-1)}
+.docs ul{margin:0;padding-left:var(--sp-4);font-size:var(--fs-md);color:var(--ink-2);line-height:1.8}
+.rules{font-size:var(--fs-md);color:var(--ink-2)}
+.rules p{margin:0 0 var(--sp-3);max-width:78ch} .rules p:last-child{margin-bottom:0}
+.rules b{color:var(--ink);font-weight:500}
+.rules code,.mono{font-family:var(--f-mono);font-size:var(--fs-sm);background:var(--inset);
+  padding:2px 6px;border-radius:3px;color:var(--ink)}
+.proof{border-left:3px solid var(--accent);background:var(--inset);padding:var(--sp-3) var(--sp-4);
+  margin:0 0 var(--sp-3);font-size:var(--fs-md)}
+.proof.warn{border-left-color:var(--hazard)}
+.proof table{font-size:var(--fs-sm)} .proof td,.proof th{padding:4px var(--sp-3) 4px 0}
+.proof ul{margin:var(--sp-2) 0 0;padding-left:var(--sp-4);line-height:1.75}
+.proof li{margin-bottom:var(--sp-1)}
+.footnote{font-size:var(--fs-sm);color:var(--ink-3);margin-top:var(--sp-3);line-height:1.7;max-width:82ch}
+.legend{display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-4);font-size:var(--fs-xs);
+  color:var(--ink-3);align-items:center}
+button.ghost{font-family:var(--f-body);font-size:var(--fs-sm);background:var(--inset);color:var(--ink-2);
+  border:1px solid var(--rule);border-radius:3px;padding:7px 13px;cursor:pointer}
+button.ghost:hover{background:var(--surface-2);color:var(--ink)}
+button.x{background:none;border:0;color:var(--ink-3);cursor:pointer;font-size:var(--fs-lg);
+  line-height:1;padding:2px 7px}
+button.x:hover{color:var(--alert)}
+.acc{border:1px solid var(--rule-soft);border-radius:3px;padding:var(--sp-2) var(--sp-3);
+  margin-bottom:var(--sp-2);background:var(--inset)}
+.acc .top{display:flex;align-items:center;gap:var(--sp-2);margin-bottom:var(--sp-2)}
+.acc .top input[type="checkbox"]{accent-color:var(--accent);width:19px;height:19px;margin:0;flex:none}
+.acc .g{display:grid;gap:var(--sp-1)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* 分頁 */
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--rule)}
+.tabs button{font-family:var(--f-display);font-size:var(--fs-md);font-weight:700;
+  letter-spacing:.06em;padding:10px 22px;border:1px solid var(--rule);border-bottom:0;
+  border-radius:4px 4px 0 0;background:var(--inset);color:var(--ink-3);cursor:pointer;
+  margin-bottom:-2px}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--title);
+  border-color:var(--rule);border-bottom:2px solid var(--surface)}
+.tabs button:hover{color:var(--ink)}
+/* 分頁內容：.stack 用 flex + gap 排面板，包一層之後這一層也要是 flex，
+   否則面板之間的間距會消失。[hidden] 必須贏過 display:flex，所以另外寫一條。 */
+.tabpane{display:flex;flex-direction:column;gap:var(--sp-4)}
+.tabpane[hidden]{display:none}
+/* ══════ 手機（窄螢幕）══════
+   摘要列在窄螢幕會變成 2 欄 × 4 列，幾乎吃掉整個畫面；
+   若又是 sticky 就永遠滑不走、看不到下面的內容。
+   所以窄螢幕改為不置頂並壓縮尺寸，讓它跟著頁面捲走。 */
+@media (max-width:759px){
+  .readout{position:static;box-shadow:none}
+  .readout .wrap{padding-block:var(--sp-2)}
+  .wrap{padding-left:var(--sp-3);padding-right:var(--sp-3);padding-bottom:48px}
+  .tile{padding:6px 10px}
+  .tile .k{font-size:11px;letter-spacing:.08em;line-height:1.35}
+  .tile .v{font-size:18px;margin-top:1px}
+  .tile .n{font-size:11px;line-height:1.35;margin-top:1px}
+  .masthead .wrap{padding-block:var(--sp-3) var(--sp-2)}
+  h1{font-size:24px}
+  .tabs button{font-size:var(--fs-sm);padding:8px 14px}
+  .panel > header{padding:var(--sp-2) var(--sp-3)}
+  .panel .body{padding:var(--sp-3)}
+  .row2{grid-template-columns:1fr}
+  .tlrow,.tlaxis{grid-template-columns:1fr;gap:4px}
+  .bar{height:18px}
+  .dsum{grid-template-columns:1fr}
+  .docs{columns:1}
+}
+/* SPEC 判讀 */
+.drop{border:2px dashed var(--rule);border-radius:10px;padding:var(--sp-4);text-align:center;
+  background:var(--inset);cursor:pointer;transition:border-color .12s,background .12s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop b{font-family:var(--f-display);font-size:var(--fs-md);color:var(--ink-2)}
+.drop span{display:block;font-size:var(--fs-sm);color:var(--ink-3);margin-top:4px}
+.fnd{border:1px solid var(--rule-soft);border-radius:8px;padding:var(--sp-3);margin-bottom:var(--sp-2);
+  background:var(--surface)}
+.fnd.hit{border-left:3px solid var(--accent)}
+.fnd.miss{border-left:3px solid var(--alert);background:var(--alert-soft)}
+.fnd.info{border-left:3px solid var(--rule)}
+.fnd .cat{font-family:var(--f-display);font-size:var(--fs-sm);font-weight:700;color:var(--ink)}
+.fnd .hits{font-family:var(--f-mono);font-size:var(--fs-xs);color:var(--accent);
+  margin:4px 0 0;word-break:break-word}
+.dates{display:flex;gap:var(--sp-3);flex-wrap:wrap;margin-bottom:var(--sp-2)}
+.dates .field{min-width:210px;flex:1 1 210px}
+.fnd .why{font-size:var(--fs-sm);color:var(--ink-2);margin:6px 0 0;line-height:1.65}
+.fnd .act{font-size:var(--fs-sm);color:var(--ink-3);margin:4px 0 0;line-height:1.65}
+.fnd .bar{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.applied{border:1px solid var(--accent);border-radius:8px;padding:var(--sp-3);
+  background:var(--accent-soft);margin-bottom:var(--sp-3);font-size:var(--fs-sm)}
+.applied b{font-family:var(--f-display);color:var(--accent)}
+.applied ul{margin:6px 0;padding-left:var(--sp-4);line-height:1.7;color:var(--ink)}
+.applied span{color:var(--ink-2)}
+.spectxt{font-family:var(--f-mono);font-size:var(--fs-micro);line-height:1.6;white-space:pre-wrap;
+  max-height:340px;overflow:auto;background:var(--inset);border:1px solid var(--rule-soft);
+  border-radius:8px;padding:var(--sp-3);color:var(--ink-2)}
+.exp{display:inline-flex;gap:6px;margin-left:auto}
+.exp button{font-size:var(--fs-xs);padding:5px 11px}
+/* 存檔清單 */
+.sv{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:var(--sp-2);align-items:center;
+  border:1px solid var(--rule-soft);border-radius:3px;padding:var(--sp-2) var(--sp-3);
+  margin-bottom:var(--sp-2);background:var(--inset)}
+.sv .svn{font-size:var(--fs-md);font-weight:500;overflow-wrap:anywhere}
+.sv .svm{display:block;font-size:var(--fs-xs);color:var(--ink-3);font-family:var(--f-mono);line-height:1.5}
+/* ══════ 列印／輸出 PDF ══════ */
+.printonly{display:none}
+#printhead .ph{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 18px;
+  font-size:10pt;margin:0 0 10pt}
+#printhead .ph div b{font-weight:600}
+#printhead h3{font-size:10pt;font-weight:700;letter-spacing:.08em;
+  margin:10pt 0 4pt;border-bottom:1px solid #999;padding-bottom:2pt}
+#printhead ul{margin:0;padding-left:16pt;font-size:10pt;line-height:1.5;columns:2;column-gap:18pt}
+#printhead li{break-inside:avoid}
+
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  :root{--ground:#fff;--surface:#fff;--surface-2:#fff;--inset:#fff;
+        --ink:#000;--ink-2:#222;--ink-3:#555;--rule:#888;--rule-soft:#bbb;
+        --accent:#0b4a43;--accent-soft:#eef4f2;--hazard:#7a4508;--hazard-soft:#f7efe2;
+        --alert:#7a2620;--alert-soft:#f7e8e6;--shadow:none}
+  body{background:#fff;font-size:10pt;line-height:1.45}
+  .wrap{max-width:none;padding:0}
+  .noprint,.readout,.rail{display:none!important}
+  .printonly{display:block}
+  .masthead{border-bottom:2px solid #000}
+  .masthead .wrap{padding-block:0 6pt}
+  h1{font-size:18pt}
+  .eyebrow{font-size:8pt;margin-bottom:2pt}
+  .cols{display:block;margin-top:0}
+  .stack{display:block}
+  .panel{border:0;border-radius:0;margin-bottom:10pt;break-inside:auto}
+  .panel.lead{border:0}
+  .panel > header{padding:0 0 3pt;background:none!important;border-bottom:1px solid #888}
+  .panel.lead > header{background:none!important}
+  .panel > header h2{font-size:11pt;color:#000!important}
+  .panel .body{padding:6pt 0 0}
+  /* 表單控件在紙上以純文字呈現 */
+  select,input[type="text"],input[type="number"],textarea{border:0!important;background:none!important;
+    padding:0!important;font-size:9.5pt!important;width:auto!important;
+    -webkit-appearance:none;appearance:none;color:#000}
+  table{font-size:9.5pt}
+  th,td{padding:3pt 5pt}
+  thead{display:table-header-group}
+  tr{break-inside:avoid}
+  .std{font-size:8pt}
+  .footnote{font-size:8.5pt;max-width:none}
+  .groups{grid-template-columns:repeat(4,1fr);gap:6pt}
+  .grp{padding:5pt}
+  .grp .qty{font-size:14pt}
+  .tlrow,.tlaxis{grid-template-columns:200pt 1fr 70pt}
+  .bar{height:12pt}
+  .docs{columns:3;column-gap:14pt}
+  .docs ul{font-size:9pt;line-height:1.45}
+  .subhead{padding-top:6pt;margin-top:6pt}
+}
+</style>
+
+<p class="noprint" style="max-width:1180px;margin:14px auto 0;padding:0 22px;font-size:13px"><a href="./" style="color:inherit;text-decoration:none;opacity:.7">← 回安規工具首頁</a></p>
+<header class="masthead">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Twinhead · 系統技術處 · Safety</span>
+      <h1>認證作業注意事項</h1>
+      <p class="sub">送審文件需求、送測前注意事項、ErP 量測與判定，以及四份確認清單。
+        報價試算請開 <a href="quote.html">安規報價試算器</a>。</p>
+    </div>
+  </div>
+</header>
+
+<!-- 只在列印／輸出 PDF 時出現：把左欄的申請組態摘要帶進文件 -->
+<div class="printonly" id="printhead"></div>
+
+<div class="readout">
+  <div class="wrap">
+    <div class="tile"><div class="k">ErP 送測前 SOP</div><div class="v" id="o-ck-erp">—</div><div class="n">已確認項數</div></div>
+    <div class="tile"><div class="k">Design Review</div><div class="v" id="o-ck-review">—</div><div class="n">已確認項數</div></div>
+    <div class="tile"><div class="k">C1D2 清單</div><div class="v" id="o-ck-c1d2">—</div><div class="n">已確認項數</div></div>
+    <div class="tile"><div class="k">ATEX 清單</div><div class="v" id="o-ck-atex">—</div><div class="n">已確認項數</div></div>
+    <div class="tile total"><div class="k">四份清單合計</div><div class="v" id="o-ck-all">—</div><div class="n" id="o-ck-all-n">&nbsp;</div></div>
+    <div class="tile"><div class="k">ErP Etec 判定</div><div class="v" id="o-erp">—</div><div class="n" id="o-erp-n">&nbsp;</div></div>
+    <div class="tile"><div class="k">送審文件備齊</div><div class="v" id="o-docs">—</div><div class="n" id="o-docs-n">&nbsp;</div></div>
+    <div class="tile risk"><div class="k">送測前注意事項</div><div class="v" id="o-prep">—</div><div class="n" id="o-prep-n">&nbsp;</div></div>
+  </div>
+</div>
+
+<div class="wrap"><div class="cols">
+
+  <!-- ══════ 左欄：申請組態 ══════ -->
+  <div class="rail">
+    <div class="panel noprint">
+      <header><h2>存檔</h2><span class="hint">預設存雲端，可隨時載入修改</span></header>
+      <div class="body">
+        <div class="field">
+          <label>存放位置</label>
+          <div class="seg" id="seg-store">
+            <button data-v="gdrive" aria-pressed="true">Google Drive</button>
+            <button data-v="cloud" aria-pressed="false">artifact 雲端</button>
+            <button data-v="local" aria-pressed="false">本機（備援）</button>
+          </div>
+          <div id="gd-tools" style="display:none;gap:6px;margin-top:6px;flex-wrap:wrap">
+            <button class="ghost" id="btn-gd-refresh">從 Google Drive 重新讀取</button>
+            <a class="ghost" id="lnk-gd-open" target="_blank" rel="noopener"
+              style="text-decoration:none;display:inline-block">開啟雲端資料夾</a>
+          </div>
+        </div>
+        <div class="field">
+          <label>存檔名稱</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="f-savename" placeholder="例：R12 全新申請 送測準備">
+            <button class="ghost" id="btn-save" style="white-space:nowrap">儲存</button>
+          </div>
+        </div>
+        <div id="p-saves"></div>
+        <div class="subhead">輸出檔案</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="ghost" id="btn-export">匯出 JSON 檔</button>
+          <button class="ghost" id="btn-import">匯入 JSON 檔</button>
+          <input type="file" id="f-import" accept=".json,application/json" style="display:none">
+        </div>
+        <p class="footnote" id="save-note"></p>
+        <p class="footnote">這一頁的存檔與「安規報價試算器」<b>各自獨立</b>
+          （Google Drive 上的檔名為 <span class="mono">cert-prep-saves.json</span>），
+          兩邊的組態不會互相覆蓋。要把報價頁的組態搬過來，用兩邊的「匯出／匯入 JSON 檔」。</p>
+        <p class="footnote">匯出的檔案（JSON／Word／PDF）由<b>瀏覽器的下載資料夾</b>決定存放位置，
+          頁面本身無法指定路徑。<b>指定的路徑是</b>
+          <span class="mono">C:\Users\joyce_fan\OneDrive</span> —— 到瀏覽器
+          「設定 → 下載 → 位置」改成這個路徑（Chrome 與 Edge 都在同一個地方），
+          並把「下載前詢問每個檔案的儲存位置」關掉。</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <header><h2>申請組態</h2><span class="exp noprint"><button class="ghost" data-expw="config" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="config" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+      <div class="body">
+        <div class="field">
+          <label>申請階段</label>
+          <div class="seg" id="seg-case">
+            <button data-v="new" aria-pressed="true">全新申請</button>
+            <button data-v="delta" aria-pressed="false">變更申請</button>
+          </div>
+        </div>
+        <div class="field"><label>機種</label>
+          <input type="text" id="f-model" list="model-list" placeholder="例：R12、R14"
+            autocomplete="off">
+          <datalist id="model-list"></datalist>
+          <span class="cap" id="model-note"
+            style="color:var(--ink-3);font-size:var(--fs-xs);line-height:1.6"></span>
+        </div>
+        <div class="field">
+          <label>產品類別（決定 ErP 規範）</label>
+          <div class="seg" id="seg-class">
+            <button data-v="tablet" aria-pressed="true">平板</button>
+            <button data-v="notebook" aria-pressed="false">筆電</button>
+            <button data-v="acc" aria-pressed="false">配件</button>
+          </div>
+          <span class="cap" id="class-note"
+            style="color:var(--ink-3);font-size:var(--fs-xs);line-height:1.6"></span>
+        </div>
+        <div class="subhead">產品配置說明</div>
+        <div id="p-cfg"></div>
+        <div class="subhead">主系統申請的安規認證項目</div>
+        <div id="p-scheme"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="pnl-scope" hidden>
+      <header><h2>已認證範圍</h2><span class="hint">變更申請：已涵蓋的不必再送</span>
+        <button class="ghost" id="btn-scope-auto">重新帶入機種台帳</button></header>
+      <div class="body" id="p-scope"></div>
+    </div>
+
+    <div class="panel">
+      <header><h2>防爆認證</h2><span class="hint">Hazardous Location</span></header>
+      <div class="body" id="p-ex"></div>
+    </div>
+
+    <div class="panel">
+      <header><h2>Adapter（認可品）</h2></header>
+      <div class="body" id="p-adapter"></div>
+    </div>
+
+    <div class="panel">
+      <header><h2>電池</h2><span class="hint">每顆 = 1 source</span></header>
+      <div class="body" id="p-batt"></div>
+    </div>
+
+    <div class="panel">
+      <header><h2>結構</h2><span class="hint">Fan · MXM</span></header>
+      <div class="body" id="p-struct"></div>
+    </div>
+
+    <div class="panel">
+      <header><h2>外接 PORT</h2><span class="hint">Testing by 5V, 0.5A</span></header>
+      <div class="body" id="p-ports"></div>
+    </div>
+
+    <div class="panel">
+      <header><h2>關鍵零件</h2><span class="hint">型號 · 認證法規</span></header>
+      <div class="body" id="p-comp"></div>
+    </div>
+
+  </div>
+  <!-- ══════ 右欄：文件準備／Design Review／送測前注意事項／ErP 測試 四個分頁 ══════
+       「結構 → MXM」，文件需求要讀認證項目勾選，切掉會變成來回跳分頁才能改一個欄位。 -->
+  <div class="stack">
+
+    <div class="tabs noprint" id="tabs">
+      <button data-tab="docs" aria-selected="true">文件準備</button>
+      <button data-tab="review" aria-selected="false">Design Review</button>
+      <button data-tab="prep" aria-selected="false">送測前注意事項</button>
+      <button data-tab="erp"  aria-selected="false">ErP 測試</button>
+    </div>
+    <!-- ══════ 分頁一：文件準備 ══════ -->
+    <div class="tabpane" id="tab-docs">
+
+    <!-- ① 文件需求 -->
+    <div class="panel lead">
+      <header><h2>文件需求</h2><span class="hint" id="docs-stat"></span><span class="exp noprint"><button class="ghost" data-expw="docs" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="docs" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+      <div class="body">
+        <div class="docs" id="docs"></div>
+        <div class="subhead">自訂文件項目</div>
+        <div id="doc-custom"></div>
+        <button class="ghost noprint" id="btn-doc-add">＋ 新增文件項目</button>
+        <p class="footnote">清單依 R10 實際的「Safety 認證準備文件」資料夾建立，由申請組態自動帶入。
+          <b>每一項都可以勾選，並各有「版本／日期」與「備註」兩欄</b>；每區下方另有整區的「補充說明」。
+          需要額外的送審文件（CDF、結構爆炸圖…）請用「自訂文件項目」新增。
+          勾選與填寫的內容都會一起存檔與輸出。</p>
+      </div>
+    </div>
+
+    <!-- ② 關鍵元件資訊（CB report 4.1.2） -->
+    <div class="panel">
+      <header><h2>關鍵元件資訊</h2>
+        <span class="hint">CB report 4.1.2 · CCL list 要交的內容</span><span class="exp noprint"><button class="ghost" data-expw="ccl" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="ccl" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+      <div class="body" id="p-ccl"></div>
+    </div>
+
+    <!-- ③ C1D2 確認清單 -->
+    <div class="panel">
+      <header><h2>C1D2 確認清單</h2>
+        <span class="hint">CAN/CSA C22.2 No.213-17</span><span class="exp noprint"><button class="ghost" data-expw="ck-c1d2" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="ck-c1d2" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+      <div class="body" id="p-ck-c1d2"></div>
+    </div>
+
+    <!-- ④ ATEX 確認清單 -->
+    <div class="panel">
+      <header><h2>ATEX 確認清單</h2>
+        <span class="hint">TÜV SÜD · w/o Fan only</span><span class="exp noprint"><button class="ghost" data-expw="ck-atex" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="ck-atex" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+      <div class="body" id="p-ck-atex"></div>
+    </div>
+
+    </div><!-- /tab-docs -->
+
+    <!-- ══════ 分頁二：Safety Design Review ══════ -->
+    <div class="tabpane" id="tab-review" hidden>
+      <div class="panel lead">
+        <header><h2>Safety Design Review 重點確認</h2>
+          <span class="hint">Feasibility stage · EE／ME／ESD</span><span class="exp noprint"><button class="ghost" data-expw="ck-review" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="ck-review" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+        <div class="body" id="p-ck-review"></div>
+      </div>
+    </div><!-- /tab-review -->
+
+    <!-- ══════ 分頁三：送測前注意事項 ══════ -->
+    <div class="tabpane" id="tab-prep" hidden>
+      <div class="panel lead">
+        <header><h2>送測前注意事項</h2><span class="hint">依選用項目自動出現</span><span class="exp noprint"><button class="ghost" data-expw="prep" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="prep" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+        <div class="body" id="p-prep"></div>
+      </div>
+    </div><!-- /tab-prep -->
+
+    <!-- ══════ 分頁四：ErP 測試 ══════ -->
+    <div class="tabpane" id="tab-erp" hidden>
+
+    <!-- ① ErP 送測前注意事項 -->
+    <div class="panel">
+      <header><h2>ErP 送測前注意事項</h2><span class="hint">測試環境設定</span></header>
+      <div class="body" id="p-prep-erp"></div>
+    </div>
+
+    <!-- ② ErP 送測前 SOP ＋ 量測與判定 -->
+    <div class="panel lead">
+      <header><h2>ErP 送測前 SOP</h2>
+        <span class="hint">Lot 3 · 四模式依序量測</span><span class="exp noprint"><button class="ghost" data-expw="ck-erp" title="輸出 Word 檔（.docx）">Word</button><button class="ghost" data-expp="ck-erp" title="輸出列印版 HTML，開檔後 Ctrl+P 另存為 PDF">PDF</button></span></header>
+      <div class="body">
+        <div id="p-ck-erp"></div>
+        <div class="subhead">量測與判定</div>
+        <div id="p-erp"></div>
+      </div>
+    </div>
+
+    </div><!-- /tab-erp -->
+
+</div></div></div>
+
+<script>
+"use strict";
+
+/* 姊妹頁連結：三支工具現在同在一個 PWA 資料夾底下，用相對檔名即可。
+   原本有一段把連結改寫成 claude.ai artifact 網址的程式碼，搬進 PWA 之後
+   那會把使用者丟回舊版，已經移除。 */
+const el = id => document.getElementById(id);
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+/* 這一頁不談金額，chip 只表示「已認證範圍」的涵蓋狀態 */
+const chip = s => ({ok:'<span class="chip ok">已簽回</span>',list:'<span class="chip list">報價中</span>',
+  derived:'<span class="chip derived">推導</span>',todo:'<span class="chip todo">未涵蓋</span>'})[s] || "";
+const SCOPE = {
+  R10:{ adapters:{"65":"signed"}, fan:{with:"signed",without:"signed"}, mxm:{}, battery:3,
+        schemes:{ulcb:"signed",erp:"signed",ccc:"signed",iec62471:"signed"} },
+  R12:{ adapters:{"65":"signed","90":"quoted"}, fan:{with:"signed",without:"quoted"},
+        mxm:{with:"quoted"}, battery:2,
+        schemes:{ulcb:"signed",ul4200a:"signed",erp:"signed",bcs:"signed",ccc:"signed",lvd:"quoted"} }
+};
+
+/* ══════ 認證項目 ══════
+   這一頁只用得到 id／名稱／適用規範。牌價與計價邏輯留在「安規報價試算器」，
+   兩邊不共用金額，避免同一組數字維護兩份。
+   auto 欄位保留：UL 4200A 由 RTC 觸發、CDRH report 由 Barcode scanner 觸發，
+   送審文件清單靠它自動出現。 */
+let ITEMS = [];
+const MAIN_ORDER = ["ulcb","erp","lvd","bcs","ccc","bsmi","iec62471","pse"];
+
+const APPROVALS = ["UL","EU","CB"];
+let EX_MARKS = { z2:"", z22:"", ts:"", atexCert:"" };
+let ORG_FOOTER = "系統技術處　Safety";   /* 報表頁尾，真名由資料檔帶入 */
+
+
+/* ══════ 文件署名（固定值，不再由使用者輸入） ══════ */
+const REPORTER = "Safety - Joyce";
+
+/* ══════ 產品類別 ══════
+   這一頁只用到「名稱」與「ErP 適用規範」，不帶任何牌價。 */
+const PCLASS = {
+  tablet:   {name:"平板", erp:"(EU) 2023/826"},
+  notebook: {name:"筆電", erp:"(EU) 617/2013 · Lot 3"},
+  acc:      {name:"配件", erp:"（配件不適用 ErP）"}
+};
+const pcls = () => PCLASS[state.pclass] || PCLASS.tablet;
+
+/* 認證項目要顯示的規範說明：由左欄實際填的內容組出來 */
+function stdOf(i){
+  if (!i) return "";          /* 基礎資料未匯入時 ITEMS.find() 會是 undefined */
+  const X = state.ex;
+  if (i.id === "ulcb") return state.ulcbVer;
+  if (i.id === "erp")  return pcls().erp + " · 依產品類別「" + pcls().name + "」帶入";
+  if (i.id === "bcs")  return "BCS scope · 單一規格單一配置";
+  if (i.id === "c1d2") return [X.c1d2.cls, X.c1d2.note].filter(Boolean).join(" · ");
+  if (i.id === "atex"){
+    const z = [];
+    if (X.atex.z2)  z.push("Zone 2：" + X.atex.m2);
+    if (X.atex.z22) z.push("Zone 22：" + X.atex.m22);
+    return [(z.join("　") || "未選使用區域"), "須 w/o Fan", X.atex.rev + " 版",
+            X.atex.certNo ? "證號 " + X.atex.certNo : "", X.atex.note].filter(Boolean).join(" · ");
+  }
+  if (i.id === "ts") return [X.ts.mark, X.ts.note].filter(Boolean).join(" · ");
+  return i.std || "";
+}
+/* ══════ 狀態 ══════ */
+const state = {
+  caseType:"new", model:"R12", pclass:"tablet",
+  /* 已認證範圍：變更申請時已經涵蓋的部分不必重複送審。auto:true 代表跟著機種帶入內建台帳 */
+  scope:{auto:true, adapters:{}, fan:{}, mxm:{}, battery:2, schemes:{}},
+  /* 產品配置說明 —— 對應報價單「申請組態 Based on」常見的描述項目，
+     只作文字說明用，不參與計價 */
+  cfgItems:[
+    {id:"mb",       label:"主板",              on:false, note:""},
+    {id:"housing",  label:"外觀",              on:false, note:""},
+    {id:"acrating", label:"AC Adapter rating", on:false, note:""},
+    {id:"rc",       label:"R/C component",     on:false, note:""}
+  ],
+  ulcbVer:"IEC 62368-1 Ed.3 + UL 62368-1 3rd",
+  adapters:[
+    {id:"65",  label:"65W",  on:false, appr:{UL:true,EU:true,CB:true}, unappr:false, pn:"", extra:""},
+    {id:"90",  label:"90W",  on:false,  appr:{UL:true,EU:true,CB:true}, unappr:false, pn:"", extra:""},
+    {id:"120", label:"120W", on:false, appr:{UL:false,EU:false,CB:false}, unappr:false, pn:"", extra:""},
+    {id:"240", label:"240W", on:false, appr:{UL:false,EU:false,CB:false}, unappr:false, pn:"", extra:""},
+    {id:"cust",label:"",     on:false, appr:{UL:false,EU:false,CB:false}, unappr:false, pn:"", extra:"", custom:true}
+  ],
+  batteries:[
+    {id:"high",  label:"with High cap.",     on:false, pn:""},
+    {id:"main",  label:"with Main cap.",     on:false,  pn:""},
+    {id:"bridge",label:"with Bridge battery",on:false, pn:""}
+  ],
+  ports:[
+    {id:"usba", label:"USB Gen 3.1 Type A", qty:0},
+    {id:"usbc", label:"USB Gen 3.2 Type C", qty:0},
+    {id:"tbt",  label:"Thunderbolt（視同 Type C）", qty:0}
+  ],
+  portNote:"",
+  ck:{},
+  /* ErP Lot 3 量測與判定（與 prep.erp 的送測前勾選分開存） */
+  erp:{wol:false, tuner:false, poff:"", pidle:"", psleep:"", plps:"", catOv:"",
+       ram:"", storage:"", dgfx:"", dgfxN:"", cores:"", bw:"", drate:"", dwidth:"",
+       brightness:"", note:""},
+  m44:{on:false, sources:1, note:""},
+  fan:{mode:"none", appr:{UL:false,EU:false,CB:false}, unappr:false, pn:""},
+  mxm:{mode:"none", appr:{UL:false,EU:false,CB:false}, unappr:false, pn:""},
+  comps:[
+    {id:"rtc",    label:"RTC（不可更換）", on:false, vendor:"", pn:"", std:"UL 4200A",
+     apprStd:"", apprOn:false, unappr:false, smp:""},
+    {id:"scanner",label:"Barcode scanner（Laser class 2）", on:false, vendor:"Honeywell", pn:"N6703",
+     std:"21 CFR 1040.10（CDRH）· laser class 2",
+     apprStd:"IEC 60825-1:2014 Ed.3（FDA - Laser Notice 56）", apprOn:false, unappr:false, smp:""},
+    {id:"ircam",  label:"Front Camera (IR LED module)", on:false, vendor:"LITE-ON",
+     pn:"LTE-R38381ASK, LTER38381AS-KXX (Both X can be A-Z, 0-9 or blank, means customer code)",
+     std:"IEC 62471 / EN 62471",
+     apprStd:"", apprOn:false, unappr:false, smp:"", needSmp:true},
+    {id:"led",    label:"Rear Camera (LED module)", on:false, vendor:"Everlight",
+     pn:"EHPA23/GT21HP01/5670/Y/K51/TR, EHPA24/GT21HP01/65K/K51/TR",
+     std:"IEC 62471 / EN 62471",
+     apprStd:"", apprOn:false, unappr:false, smp:"", needSmp:true}
+  ],
+  ex:{ c1d2:{cls:"Class I, Division 2", note:""},
+       atex:{z2:true, z22:true, m2:EX_MARKS.z2, m22:EX_MARKS.z22, rev:"2021", certNo:EX_MARKS.atexCert, note:""},
+       ts:{mark:EX_MARKS.ts, note:""} },
+  accs:[{on:false,name:"Keyboard Dock",pn:"",spec:"",std:"LVD · EN IEC 62368-1"}],
+  docNote:{}, docCustom:[],
+  /* 送審文件逐項的勾選與版本／備註，鍵值為 docSections() 的 item.id */
+  docItem:{},
+  /* 關鍵元件資訊（CB report 4.1.2）—— 六欄，列可自行增刪 */
+  ccl:[],
+  prep:{
+    ulcb:{smp:false, smpQty:"", bios:false,
+          batt:false, battQty:"2", packed:false, packedQty:"2",
+          unpacked:false, unpackedQty:"2",
+          male:false, maleQty:"", female:false, femaleQty:"", note:""},
+    c1d2:{batt:false, note:"", rows:[{pn:"",packed:false,pq:"",dummy:false,dq:""},{pn:"",packed:false,pq:"",dummy:false,dq:""}],
+          seal:false, ip54:false, warn:false},
+    atex:{batt:false, cell:false, oldSpec:false, oldQty:"1", newSpec:false, newQty:"20", note:"",
+          rows:[{pn:"",packed:false,pq:"",dummy:false,dq:""},{pn:"",packed:false,pq:"",dummy:false,dq:""}],
+          seal:false, coating:false, coatQty:"2", bag:false, bagQty:"4", warn:false},
+    erp:{arc:false, off:false, note:""},
+    bcs:{smp:false, smpQty:"", ckt:false, maxv:false, maxcap:false, note:""},
+    /* ErP／UL 4200A 的樣品需求，與 prep.erp 的量測條件分開存 */
+    erp4200:{smp:false, smpQty:"", ecbios:false, note:""},
+    cel:{tec:false, note:""}
+  },
+  on:{}
+};
+/* 新機種沒有已認證範圍是正常的（全新申請本來就沒有），回傳空台帳而不是 undefined */
+const EMPTY_SCOPE = {adapters:{}, fan:{}, mxm:{}, battery:2, schemes:{}};
+const knownModels = () => Object.keys(SCOPE);
+const isNewModel  = () => !SCOPE[state.model];
+/* 已認證範圍改為可編輯：auto = 跟著機種帶入內建台帳，
+   使用者一動就轉為手動，任何機種都能報變更案 */
+const sc = () => state.scope;
+function syncScope(){
+  if (!state.scope) state.scope = {auto:true};
+  if (!state.scope.auto) return;
+  const S = SCOPE[state.model] || EMPTY_SCOPE;
+  state.scope = JSON.parse(JSON.stringify({
+    auto:true, adapters:S.adapters||{}, fan:S.fan||{}, mxm:S.mxm||{},
+    battery:S.battery == null ? 2 : S.battery, schemes:S.schemes||{}
+  }));
+}
+function covStatus(kind, key){
+  const S = sc();
+  if (kind === "adapter") return S.adapters[key] || "none";
+  if (kind === "fan")     return S.fan[key] || "none";
+  if (kind === "mxm")     return S.mxm[key] || "none";
+  if (kind === "scheme")  return S.schemes[key] || "none";
+  return "none";
+}
+const chargeable = st => !(state.caseType === "delta" && st === "signed");
+function sync(){
+  const comp = id => state.comps.find(c => c.id === id);
+  const auto = { rtc:() => comp("rtc").on, scanner:() => comp("scanner").on };
+  ITEMS.forEach(i => { if (i.auto) state.on[i.id] = auto[i.auto](); });
+  /* ATEX 不再與 Fan 結構綁死，可自由勾選；w/o Fan 僅以備註提示 */
+  if ((comp("ircam").on && comp("ircam").unappr) || (comp("led").on && comp("led").unappr))
+    state.on.iec62471 = true;
+}
+/* ══════ 左欄 ══════ */
+function renderScheme(){
+  el("p-scheme").innerHTML = MAIN_ORDER.map(id => {
+    const i = ITEMS.find(x => x.id === id);
+    if (!i) return "";          /* 基礎資料尚未匯入時 ITEMS 是空的，跳過不要讓整頁壞掉 */
+    const st = covStatus("scheme", id);
+    const tag = state.caseType === "delta" && st === "signed" ? " " + chip("ok") : "";
+    return `<label class="chk"><input type="checkbox" data-on="${id}" ${state.on[id]?"checked":""}>
+      <span>${i.name}${tag}<span class="cap">${esc(stdOf(i))}</span></span></label>` +
+      (id === "ulcb" ? `<div style="margin:2px 0 10px 27px">
+        <input type="text" data-ulcbver value="${esc(state.ulcbVer)}" placeholder="填寫申請標準版本"></div>` : "");
+  }).join("") +
+  `<p class="footnote">UL 4200A（由 RTC 觸發）、CDRH report（由 Barcode scanner 觸發）不在此清單；
+   C1D2／ATEX／TS 請於「防爆認證」設定。</p>`;
+}
+
+function apprBox(path, o){
+  return `<div class="appr"><span class="ttl">認可品</span>` +
+    APPROVALS.map(k => `<label><input type="checkbox" data-appr="${path}:${k}" ${o.appr[k]?"checked":""}>${k}</label>`).join("") +
+    `<label class="${o.unappr?"unappr":""}"><input type="checkbox" data-unappr="${path}" ${o.unappr?"checked":""}>未認可品</label></div>`;
+}
+
+function renderAdapters(){
+  /* Adapter 由 FSP 負責，此處只標示該 rating 是否已在證書範圍內 */
+  const badge = a => {
+    if (a.custom) return chip("todo");
+    const st = covStatus("adapter", a.id);
+    return st === "signed" ? chip("ok") : st === "quoted" ? chip("list") : chip("todo");
+  };
+  const word = a => {
+    if (a.custom) return "未涵蓋";
+    const st = covStatus("adapter", a.id);
+    return st === "signed" ? "已認證" : st === "quoted" ? "報價中" : "未涵蓋";
+  };
+  el("p-adapter").innerHTML = state.adapters.map((a,i) => `
+    <div class="slot ${a.on?"on":""}">
+      <div class="top">
+        <input type="checkbox" data-ad="${i}" ${a.on?"checked":""}>
+        ${a.custom
+          ? `<input type="text" data-adlabel="${i}" value="${esc(a.label)}" placeholder="自行填寫規格，例：150W / 19V 7.9A">`
+          : `<span class="nm">${a.label}</span>`}
+        <span title="此 rating 於 ${state.model} 已認證範圍的狀態：${word(a)}">${badge(a)}</span>
+      </div>
+      <div class="detail">
+        <input type="text" data-adpn="${i}" value="${esc(a.pn)}" placeholder="Adapter 型號">
+        <input type="text" data-adextra="${i}" value="${esc(a.extra)}" placeholder="追加認證（例：PSE / KC / CCC，或其他需追加的認證內容）">
+        ${apprBox("ad:"+i, a)}
+      </div>
+    </div>`).join("") +
+    `<p class="footnote"><b>Adapter 由 FSP 廠商直接負責。</b>
+      此處填的規格與型號僅用於 UL+CB 的 based-on 條件與送審文件；右側標示為該 rating 在
+      ${state.model} 已認證範圍內的狀態。</p>`;
+}
+
+function renderBatteries(){
+  const M = state.m44;
+  el("p-batt").innerHTML = state.batteries.map((b,i) => `
+    <div class="slot ${b.on?"on":""}">
+      <div class="top"><input type="checkbox" data-bt="${i}" ${b.on?"checked":""}><span class="nm">${b.label}</span></div>
+      <div class="detail">
+        <input type="text" data-btpn="${i}" value="${esc(b.pn)}" placeholder="電池型號 / Battery P/N">
+      </div>
+    </div>`).join("") +
+    `<p class="footnote">已認證範圍涵蓋 ${sc().battery} 顆 source；「變更申請」只有超出的顆數需要送審。</p>
+
+    <div class="subhead">M.4.4 加測</div>
+    <div class="slot ${M.on?"on":""}">
+      <div class="top">
+        <input type="checkbox" data-m44on ${M.on?"checked":""}>
+        <span class="nm">需加測 M.4.4</span>
+        <span class="chip list">per source</span>
+      </div>
+      <div class="detail">
+        <div class="field" style="margin:0">
+          <label>Source 數</label>
+          <input type="number" data-m44src value="${M.sources}" min="1" max="9">
+        </div>
+        <input type="text" data-m44note value="${esc(M.note)}" placeholder="備註：適用哪些電池 source、系統重量、送測安排…">
+      </div>
+    </div>
+    <p class="footnote">尚未搭配整機做過 M.4.4 評估時才需加測，<b>依 source 數計</b>。<br>
+     <b>Remark：</b>電池認證時，最好送一台樣機給電池廠進行 M.4（by free charge）—— 見樣品群組 4。</p>`;
+}
+
+function renderStruct(){
+  const blk = (key, o, title, modes) => {
+    const seg = `<div class="field"><label>${title}</label>
+      <div class="seg" data-modeseg="${key}">
+        ${modes.map(m => `<button data-v="${m[0]}" aria-pressed="${o.mode===m[0]}">${m[1]}</button>`).join("")}
+      </div></div>`;
+    if (o.mode === "none") return seg;
+    return seg + `<div class="slot on" style="margin:-8px 0 18px">
+      <div class="detail">
+        <input type="text" data-stpn="${key}" value="${esc(o.pn)}" placeholder="${title} 型號">
+        ${apprBox("st:"+key, o)}
+      </div></div>`;
+  };
+  el("p-struct").innerHTML =
+    blk("fan", state.fan, "Fan 結構", [["none","w/o Fan"],["with","with Fan"],["both","兩者皆評估"]]) +
+    blk("mxm", state.mxm, "MXM 結構", [["none","w/o MXM"],["with","with MXM"],["both","兩者皆評估"]]);
+}
+
+/* 產品配置說明的純文字版，供各種輸出共用 */
+const cfgOn   = () => state.cfgItems.filter(c => c.on);
+const cfgList = () => cfgOn().map(c => c.label + "：" + (c.note || "（未填說明）"));
+
+/* 已認證範圍的純文字版，變更申請的送審文件要交代已涵蓋的基礎 */
+function scopeText(){
+  if (state.caseType !== "delta") return "";
+  const S = sc(), out = [];
+  const names = Object.keys(S.schemes || {}).filter(k => S.schemes[k] === "signed")
+    .map(k => (ITEMS.find(i => i.id === k) || {}).name || k);
+  out.push("已簽回認證項目：" + (names.length ? names.join("、") : "無"));
+  const st = [];
+  if (S.fan.with === "signed")    st.push("with Fan");
+  if (S.fan.without === "signed") st.push("w/o Fan");
+  if (S.mxm.with === "signed")    st.push("with MXM");
+  if (S.mxm.without === "signed") st.push("w/o MXM");
+  out.push("已認證結構：" + (st.length ? st.join("、") : "無"));
+  out.push("已認證電池 source：" + S.battery + " 顆");
+  out.push("來源：" + (S.auto ? (isNewModel() ? "空台帳（此機種無內建台帳）" : "機種「" + state.model + "」內建台帳") : "手動輸入"));
+  return out.join("\n");
+}
+const scopeLines = () => state.caseType === "delta" ? scopeText().split("\n") : [];
+const scopeLine  = () => scopeLines().join("　·　");
+
+/* ══════ 已認證範圍（可編輯台帳）══════
+   只在「變更申請」時出現，因為全新申請沒有已涵蓋的範圍。
+   預設跟著機種帶入內建台帳（R10／R12）；一旦手動勾選就轉為手動，
+   任何機種都能報變更案，不必等程式加台帳。 */
+function renderScope(){
+  const on = state.caseType === "delta";
+  el("pnl-scope").hidden = !on;
+  if (!on) return;
+  const S = sc();
+  const chk = (path, val, label, cap) =>
+    `<label class="chk"><input type="checkbox" data-scope="${path}" ${val==="signed"?"checked":""}>
+      <span>${esc(label)}${cap?`<span class="cap">${esc(cap)}</span>`:""}</span></label>`;
+
+  const schemes = MAIN_ORDER.concat(["ul4200a","cdrh","c1d2","atex","ts"])
+    .map(id => ITEMS.find(i => i.id === id)).filter(Boolean)
+    .map(i => chk("schemes." + i.id, S.schemes[i.id], i.name)).join("");
+
+  el("p-scope").innerHTML =
+    `<p class="footnote" style="margin:0 0 var(--sp-3)">
+       ${S.auto
+         ? (isNewModel()
+             ? `<b style="color:var(--hazard)">目前是空台帳</b> —— 機種「${esc(state.model||"（未填）")}」
+                沒有內建台帳。請在下面勾選<b>實際已經簽回</b>的項目，變更申請才會排除已涵蓋的部分。`
+             : `<b style="color:var(--accent)">自動帶入</b> —— 來自機種「${esc(state.model)}」的內建台帳
+                （由已簽回的報價單推導）。可以直接改，改了就轉為手動。`)
+         : `<b style="color:var(--hazard)">手動輸入</b> —— 不再跟著機種變動。
+            要回到內建台帳請按右上「重新帶入機種台帳」。`}
+     </p>`
+    + `<div class="subhead first">已簽回的認證項目</div>${schemes}`
+    + `<div class="subhead">已認證的結構</div>`
+    + chk("fan.with",    S.fan.with,    "with Fan 結構")
+    + chk("fan.without", S.fan.without, "w/o Fan 結構")
+    + chk("mxm.with",    S.mxm.with,    "with MXM 結構")
+    + chk("mxm.without", S.mxm.without, "w/o MXM 結構")
+    + `<div class="subhead">已認證的電池 source 數</div>
+       <div class="field" style="margin-bottom:0">
+         <input type="number" data-scopebatt value="${esc(S.battery)}" min="0" max="9">
+         <span class="cap" style="color:var(--ink-3);font-size:var(--fs-xs);line-height:1.6">
+           變更申請時，只有超出這個數量的電池 source 才需要送審。全新申請一律以 2 顆為基準。</span>
+       </div>`
+    + `<p class="footnote">這裡填的是<b>實驗室已經簽回、確定涵蓋</b>的範圍。
+       填錯會直接影響送審清單：多勾會漏送，漏勾會多送。不確定的項目寧可不勾（寧可多送不要漏送）。</p>`;
+}
+
+/* ══════ 機種提示 ══════
+   新機種沒有台帳，變更申請不會排除任何項目 —— 這件事一定要講清楚，
+   否則使用者選了「變更申請」卻算出全額，會以為程式壞了。 */
+function renderModelNote(){
+  const dl = el("model-list");
+  if (dl) dl.innerHTML = knownModels().map(m => `<option value="${esc(m)}">`).join("");
+  const n = el("model-note"); if (!n) return;
+  const S = sc();
+  n.innerHTML = !state.model
+    ? '<b style="color:var(--alert)">請輸入機種名稱。</b>'
+    : isNewModel()
+      ? '<b style="color:var(--hazard)">新機種</b>　尚無已認證範圍紀錄。'
+        + (state.caseType === "delta"
+            ? '<b style="color:var(--alert)">目前選「變更申請」，但沒有已簽回的項目，'
+              + '所有文件都會列成需要送審。要報變更案請改選已有簽回紀錄的機種。</b>'
+            : '全新申請本來就沒有台帳，所有項目都要送審。')
+      : '已知機種　已簽回涵蓋 '
+        + Object.keys(S.schemes || {}).filter(k => S.schemes[k] === "signed").length
+        + ' 個認證項目、' + S.battery + ' 顆電池 source';
+}
+
+/* ══════ 產品配置說明 ══════
+   對應報價單「申請組態 Based on」常見的描述項目（1 MB、1 種外觀、
+   Adapter 65W ×1、1 R/C component source…）。純文字說明，不參與計價。 */
+const CFG_PH = {
+  mb:       "例：1 MB（單一主板）",
+  housing:  "例：1 種外觀",
+  acrating: "例：19Vdc 4.74A 90W（FSP FSP090-ABBN3）",
+  rc:       "例：1 R/C component source（barcode scanner）"
+};
+function renderCfg(){
+  el("p-cfg").innerHTML = state.cfgItems.map((c,i) => `
+    <div class="slot ${c.on?"on":""}">
+      <div class="top">
+        <input type="checkbox" data-cfg="${i}" ${c.on?"checked":""}>
+        <span class="nm">${esc(c.label)}</span>
+      </div>
+      <div class="detail">
+        <input type="text" data-cfgnote="${i}" value="${esc(c.note)}"
+          placeholder="${esc(CFG_PH[c.id] || "說明")}">
+      </div>
+    </div>`).join("")
+    + `<p class="footnote">勾選後填寫說明，內容會帶進「申請組態 Based on」、列印抬頭與各項輸出。
+       這幾項只作說明用。</p>`;
+}
+
+/* ══════ 外接 PORT ══════
+   I/O port 的數量會影響 UL/CB 的 LPS 與短路測試點數，且要控管 Protect IC。
+   量測條件固定為 5V, 0.5A（每 port 2.5W）。 */
+function renderPorts(){
+  const rows = state.ports.map((p,ix) => `
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 96px auto;gap:10px;align-items:center;margin-bottom:8px">
+      <span style="font-size:var(--fs-sm)">${esc(p.label)}</span>
+      <input type="number" data-portq="${ix}" value="${esc(p.qty)}" min="0" max="99" placeholder="數量">
+      <span style="font-size:var(--fs-sm);color:var(--ink-3);white-space:nowrap">port</span>
+    </div>`).join("");
+  const tot = state.ports.reduce((s,p) => s + (parseInt(p.qty)||0), 0);
+  el("p-ports").innerHTML = rows
+    + `<input type="text" data-portnote value="${esc(state.portNote)}" placeholder="其他外接介面（VGA／HDMI／Display／RS-232／RJ-45／Card reader／Smart card…）">`
+    + `<p class="footnote" style="margin:10px 0 0">量測條件：<b>5V, 0.5A</b>（每 port 2.5W）。
+       目前合計 <b>${tot}</b> port，功耗上限約 <b>${(tot*2.5).toFixed(1)} W</b>。
+       Thunderbolt 視同 Type C。每個對外 port 都需有過電流保護 IC（IEC/EN 62368-1 · UL 2367）並控管在 CCL List，
+       送 LPS 測試時要逐一列出。</p>`;
+}
+
+function renderComps(){
+  /* 型號與認證法規常常很長，用可換行的 textarea 讓內容整段直接看得到 */
+  const grow = v => Math.max(1, Math.ceil((String(v||"").length + 6) / 38));
+  const ta = (key, i, val, ph) => `<textarea class="wrapf" data-${key}="${i}" rows="${grow(val)}"
+    placeholder="${ph}">${esc(val)}</textarea>`;
+  const lbl = t => `<label class="minilbl">${t}</label>`;
+
+  el("p-comp").innerHTML = state.comps.map((c,i) => `
+    <div class="slot ${c.on?"on":""}">
+      <div class="top"><input type="checkbox" data-cp="${i}" ${c.on?"checked":""}><span class="nm">${c.label}</span></div>
+      <div class="detail">
+        <div>${lbl("廠家")}<input type="text" data-cpvendor="${i}" value="${esc(c.vendor)}" placeholder="廠家"></div>
+        <div>${lbl("型號 / P/N")}${ta("cppn", i, c.pn, "型號 / P/N")}</div>
+        <div>${lbl("認證法規")}${ta("cpstd", i, c.std, "認證法規")}</div>
+        ${c.apprStd ? `<div class="appr"><label>
+            <input type="checkbox" data-cpappr="${i}" ${c.apprOn?"checked":""}>認可品：${esc(c.apprStd)}</label></div>` : ""}
+        <div class="appr"><label class="${c.unappr?"unappr":""}">
+          <input type="checkbox" data-cpun="${i}" ${c.unappr?"checked":""}>未認可品（需隨案評估）</label></div>
+        ${(c.unappr && c.needSmp) ? `<div>${lbl("送測樣品量（件）")}
+            <input type="number" data-cpsmp="${i}" value="${esc(c.smp)}" min="0" max="99" placeholder="件數"
+              style="max-width:140px"></div>` : ""}
+      </div>
+    </div>`).join("") +
+    `<p class="footnote">未認可的 Front Camera (IR LED module)／Rear Camera (LED module) 需另送零件樣品。</p>`;
+}
+
+function renderExproof(){
+  const X = state.ex, noFan = state.fan.mode === "both";
+  const box = (id, title, tag, inner) => `
+    <div class="slot ${state.on[id]?"on":""}">
+      <div class="top">
+        <input type="checkbox" data-on="${id}" ${state.on[id]?"checked":""}>
+        <span class="nm">${title}</span>${tag}
+      </div>
+      <div class="detail">${inner}</div>
+    </div>`;
+  el("p-ex").innerHTML =
+    box("c1d2","C1D2","",`
+      <input type="text" data-exf="c1d2.cls" value="${esc(X.c1d2.cls)}" placeholder="適用等級，例：Class I, Division 2">
+      <input type="text" data-exf="c1d2.note" value="${esc(X.c1d2.note)}" placeholder="補充資訊（Group／溫度等級／Test Mode…）">`) +
+    box("atex","ATEX","",`
+      <div class="appr"><span class="ttl">使用區域</span>
+        <label><input type="checkbox" data-exc="atex.z2" ${X.atex.z2?"checked":""}>Zone 2</label>
+        <label><input type="checkbox" data-exc="atex.z22" ${X.atex.z22?"checked":""}>Zone 22</label></div>
+      <div class="appr"><span class="ttl">申請版次</span>
+        <label><input type="radio" name="atexrev" data-exrev="2021" ${X.atex.rev==="2021"?"checked":""}>2021 版</label>
+        <label><input type="radio" name="atexrev" data-exrev="2023" ${X.atex.rev==="2023"?"checked":""}>2023 版</label></div>
+      <input type="text" data-exf="atex.certNo" value="${esc(X.atex.certNo)}" placeholder="ATEX 證號">
+      ${X.atex.z2  ? `<input type="text" data-exf="atex.m2"  value="${esc(X.atex.m2)}"  placeholder="Zone 2 防爆標示">` : ""}
+      ${X.atex.z22 ? `<input type="text" data-exf="atex.m22" value="${esc(X.atex.m22)}" placeholder="Zone 22 防爆標示">` : ""}
+      <input type="text" data-exf="atex.note" value="${esc(X.atex.note)}" placeholder="補充資訊">`) +
+    `<p class="footnote" style="margin:0 0 10px">備註：ATEX 須搭配 <b>w/o Fan 結構</b>${noFan?"（目前組態已含）":"（目前組態未含，請視實際申請內容確認）"}。
+      2023 版另需<b>防爆新配方電芯樣品 26 pcs／每個型號</b>（電芯廠家型號相同時只需一組）。</p>` +
+    box("ts","TS","",`
+      <input type="text" data-exf="ts.mark" value="${esc(X.ts.mark)}" placeholder="防爆標示">
+      <input type="text" data-exf="ts.note" value="${esc(X.ts.note)}" placeholder="補充資訊（認證機構／適用國家…）">`);
+}
+
+function renderAccs(){
+  if (!el("p-acc")) return;
+  el("p-acc").innerHTML = (state.accs.map((a,i) => `
+    <div class="acc">
+      <div class="top">
+        <input type="checkbox" data-ac="${i}" ${a.on?"checked":""}>
+        <span style="flex:1;font-size:var(--fs-micro);font-family:var(--f-display);letter-spacing:.12em;
+          text-transform:uppercase;color:var(--ink-3)">配件 ${i+1}</span>
+        <button class="x" data-acdel="${i}" title="刪除配件 ${i+1}">×</button>
+      </div>
+      <div class="g">
+        <input type="text" data-acname="${i}" value="${esc(a.name)}" placeholder="配件名稱">
+        <input type="text" data-acpn="${i}"   value="${esc(a.pn)}"   placeholder="型號">
+        <input type="text" data-acspec="${i}" value="${esc(a.spec)}" placeholder="規格">
+        <input type="text" data-acstd="${i}"  value="${esc(a.std)}"  placeholder="認證規格">
+      </div>
+    </div>`).join("") || `<p class="footnote" style="margin:0">尚無配件，按右上「＋ 新增配件」。</p>`) +
+    `<p class="footnote">配件需搭配 LVD 報告，請於「機種申請組態」勾選 LVD。</p>`;
+}
+/* ══════ 送審文件清單 ══════
+   依 R10 實際資料夾：
+   公司網路磁碟的專案資料夾 …\<機種>\3. EPR\Safety\（完整路徑不寫進原始碼，站台公開）
+   ★ 每一項都有穩定的 id —— 勾選與備註存在 state.docItem[id]，
+     不可以用「陣列索引」當鍵值：清單會隨左欄組態長短變化，
+     索引一位移，勾選就會跑到別的項目上去。
+   敘述文字依使用者 2026-09-04 在 Word 裡改過的版本更新。 */
+const DOC_COMMON = [
+  ["ccl",     "CCL list（關鍵零件清單）",
+   "對應 CB report 4.1.2 TABLE: Critical components information —— 見下方「關鍵元件資訊」面板"],
+  ["keypart", "Key part list", "與 CCL list 要對應"],
+  ["spec",    "Safety product SPEC",
+   "all output ports 都要定義為 5V, 0.5A；USB／Type C／Thunderbolt port 有變動時需改版"],
+  ["manual",  "Manual for Safety 申請用", "同上，port 有變動要一起改"],
+  ["label",   "Label", ""],
+  ["sch",     "線路圖", "至少要 RC 版"],
+  ["desig",   "位號圖", "至少要 RC 版"],
+  ["therm",   "散熱模組尺寸圖", ""],
+  ["outline", "產品外觀_開孔尺寸圖", ""],
+  ["barcode", "條碼製造年月說明", "參考先前的機種即可"]
+];
+const DOC_OTHERS = [
+  ["marking", "Label Manual - Marking checklist", ""],
+  ["irt",     "IRT Test Report", ""],
+  ["um",      "UM（使用手冊）", ""],
+  ["cklist",  "checklist", ""],
+  ["kbdock",  "系統 & KB DOCK 組裝說明", ""],
+  ["ogra",    "OG_RA", "Operating Guide / Risk Assessment"]
+];
+/* [id, 標題, 說明] → {id, l, h}，前綴避免不同區塊的 id 撞在一起 */
+const docRows = (pfx, arr) => arr.map(a => ({id:pfx + ":" + a[0], l:a[1], h:a[2] || ""}));
+
+function docSections(){
+  const D = [], has = id => state.on[id] && chargeable(covStatus("scheme", id));
+
+  if (has("ulcb")){
+    D.push({t:"共通送審文件", items:docRows("com", DOC_COMMON)});
+
+    /* 零件認證證書 —— 依左欄組態動態帶出。id 綁在來源物件上，不用索引 */
+    const items = [{id:"cert:std", l:"申請標準：" + state.ulcbVer, h:""}];
+    state.batteries.filter(b => b.on).forEach(b => items.push({id:"cert:batt:" + b.id,
+      l:`電池認證：${b.label}${b.pn?"（"+b.pn+"）":""}`,
+      h:"IEC/EN 62133-2 + UL 2054 + UL/IEC/EN 62368-1"
+        + (state.m44.on ? "" : "（已搭配整機做過 M.4.4）")}));
+    if (state.m44.on) items.push({id:"cert:m44",
+      l:`M.4.4 加測評估：${Math.max(1,state.m44.sources)} source`,
+      h:(state.m44.note ? state.m44.note + "　" : "") + "另送 1 台整機給電池廠"});
+    state.adapters.filter(a => a.on).forEach(a => items.push({id:"cert:ad:" + a.id,
+      l:`Adapter 認證：${a.custom?(a.label||"自訂規格"):a.label}${a.pn?"（"+a.pn+"）":""}`,
+      h:(a.unappr ? "未認可，需隨案評估　" : "") + (a.extra ? "追加認證：" + a.extra + "　" : "")
+        + "FSP 廠商提供"}));
+    if (state.fan.mode !== "none") items.push({id:"cert:fan",
+      l:`Fan 模組${state.fan.pn?"（"+state.fan.pn+"）":""}`,
+      h:state.fan.unappr ? "未認可，需隨案評估"
+        : "認可品證書：" + (APPROVALS.filter(k=>state.fan.appr[k]).join(" / ")||"未指定")});
+    if (state.mxm.mode !== "none") items.push({id:"cert:mxm",
+      l:`MXM 模組${state.mxm.pn?"（"+state.mxm.pn+"）":""}`,
+      h:state.mxm.unappr ? "未認可，需隨案評估"
+        : "認可品證書：" + (APPROVALS.filter(k=>state.mxm.appr[k]).join(" / ")||"未指定")});
+    state.comps.filter(c => c.on).forEach(c => items.push({id:"cert:comp:" + c.id,
+      l:`${c.label}${c.vendor?" "+c.vendor:""}${c.pn?"（"+c.pn+"）":""}`,
+      h:c.apprOn && c.apprStd ? "認可品證書：" + c.apprStd
+        : c.unappr ? "未認可，需隨案評估" : c.std}));
+    D.push({t:"零件認證證書", items});
+
+    D.push({t:"其他補充件", items:docRows("oth", DOC_OTHERS)});
+  }
+
+  if (has("iec62471")) D.push({t:"IEC 62471 test report", items:state.comps
+    .filter(c => (c.id==="led"||c.id==="ircam") && c.on)
+    .map(c => ({id:"471:" + c.id,
+      l:`${c.label}${c.vendor?" "+c.vendor:""}${c.pn?"（"+c.pn+"）":""} 光學規格書`,
+      h:c.std + (c.unappr && c.smp ? `　未認可，送測樣品 ${c.smp} 件` : "")}))
+    .concat([{id:"471:param", l:"未認可 source 之光學參數", h:""}])});
+
+  if (has("ul4200a")){ const rt = state.comps.find(c => c.id==="rtc");
+    D.push({t:"UL 4200A", items:[
+      {id:"4200:rtc", l:`RTC${rt.pn?"（"+rt.pn+"）":""} 不可更換之結構證明`, h:""},
+      {id:"4200:mode", l:"單一 Test Mode 說明", h:""}]}); }
+
+  if (has("bcs")) D.push({t:"NrCAN + CEC + DOE", items:[
+    {id:"bcs:cfg",   l:"單一規格、單一配置說明", h:""},
+    {id:"bcs:scope", l:"BCS scope 登錄資料", h:""}]});
+
+  if (has("ccc")) D.push({t:"CCC", items:[
+    {id:"ccc:rep", l:"CB report / license", h:"3 版 CB report ＋ CB 證書"},
+    {id:"ccc:cpu", l:"CPU source 與 product rating 說明", h:"各單一，for EMC"}]});
+
+  if (has("bsmi")) D.push({t:"BSMI", items:[
+    {id:"bsmi:cb", l:"CB report", h:"須先取得 CB"}]});
+
+  if (has("cdrh")){ const s2 = state.comps.find(c => c.id==="scanner");
+    D.push({t:"CDRH report", items:[
+      {id:"cdrh:spec",
+       l:("Barcode scanner " + (s2.vendor ? s2.vendor + " " : "") + (s2.pn || "") + " 規格書").replace(/\s+/g," "),
+       h:""},
+      {id:"cdrh:mark", l:"laser class 2 標示", h:s2.std},
+      s2.apprOn ? {id:"cdrh:appr", l:"認可品證書", h:s2.apprStd}
+        : (s2.unappr ? {id:"cdrh:un", l:"未認可，需隨案評估", h:""} : null)
+    ].filter(Boolean)}); }
+
+  if (has("c1d2")) D.push({t:"C1D2", items:[
+    {id:"c1d2:cls",  l:`適用等級：${state.ex.c1d2.cls}`, h:""},
+    {id:"c1d2:mode", l:"one Mode 說明", h:""},
+    state.ex.c1d2.note ? {id:"c1d2:note", l:state.ex.c1d2.note, h:""} : null,
+    {id:"c1d2:list", l:"送審文件與樣品逐項確認", h:"詳細 18 項在下方「C1D2 確認清單」面板"}
+  ].filter(Boolean)});
+
+  if (has("atex")) D.push({t:"ATEX", items:[
+    state.ex.atex.z2  ? {id:"atex:z2",  l:`Zone 2 防爆標示：${state.ex.atex.m2}`, h:""}   : null,
+    state.ex.atex.z22 ? {id:"atex:z22", l:`Zone 22 防爆標示：${state.ex.atex.m22}`, h:""} : null,
+    {id:"atex:area", l:"使用區域適用性說明", h:""},
+    {id:"atex:nofan", l:"w/o Fan 結構圖", h:""},
+    state.ex.atex.note ? {id:"atex:note", l:state.ex.atex.note, h:""} : null,
+    {id:"atex:list", l:"申請文件／ME／ID／EE／Coating／電池 逐項確認",
+     h:"詳細 49 項在下方「ATEX 確認清單」面板"}
+  ].filter(Boolean)});
+
+  if (has("ts")) D.push({t:"TS 防爆認證", items:[
+    {id:"ts:mark", l:`防爆標示：${state.ex.ts.mark}`, h:""},
+    state.ex.ts.note ? {id:"ts:note", l:state.ex.ts.note, h:""} : null].filter(Boolean)});
+
+  if (has("lvd")) D.push({t:"LVD（自製配件）", items:state.accs.filter(a => a.on)
+    .map((a,i) => ({id:"lvd:acc:" + i,
+      l:`${a.name||"配件"}${a.pn?"（"+a.pn+"）":""}${a.spec?" · "+a.spec:""}`,
+      h:a.std || "認證規格待填"}))
+    .concat([
+      {id:"lvd:dev", l:"U.S.A. / CANADA / JAPAN / AUSTRALIA / NEW ZEALAND national deviation", h:""},
+      {id:"lvd:single", l:"single approval key part source + single configure", h:""}])});
+
+  return D;
+}
+
+/* 逐項的勾選與填寫。存在 state.docItem，鍵值就是 item.id */
+const docIt = id => (state.docItem || {})[id] || {};
+const DOC_COLS = [{k:"ver", ph:"版本 / 日期"}, {k:"rm", ph:"備註"}];
+function docStat(){
+  let n = 0, tot = 0;
+  docSections().forEach(d => d.items.forEach(it => { tot++; if (docIt(it.id).on) n++; }));
+  return {n, tot};
+}
+
+function renderDocs(){
+  const D = docSections();
+  const st = docStat();
+  el("docs").innerHTML = D.length
+    ? D.map(d => {
+        const dn = d.items.filter(it => docIt(it.id).on).length;
+        return `<section><h3>${esc(d.t)}<span style="font-family:var(--f-mono);font-weight:400;
+            color:var(--ink-3);margin-left:8px">${dn} / ${d.items.length}</span></h3>
+          ${d.items.map(it => {
+            const s = docIt(it.id);
+            return `<div style="padding:5px 0;border-bottom:1px solid var(--rule-soft)">
+              <label class="chk" style="padding:0"><input type="checkbox"
+                data-docitem="${esc(it.id)}:on" ${s.on?"checked":""}>
+                <span>${esc(it.l)}</span></label>
+              ${it.h ? `<p class="footnote" style="margin:2px 0 0 27px">${esc(it.h)}</p>` : ""}
+              <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:5px 0 0 27px">
+                ${DOC_COLS.map(c => `<input type="text" data-docitem="${esc(it.id)}:${c.k}"
+                   value="${esc(s[c.k] || "")}" placeholder="${esc(c.ph)}"
+                   style="font-size:var(--fs-sm);padding:4px 8px">`).join("")}
+              </div></div>`;
+          }).join("")}
+          <input type="text" data-docnote="${esc(d.t)}" value="${esc(state.docNote[d.t] || "")}"
+            placeholder="補充說明（${esc(d.t)}）"
+            style="margin-top:8px;font-size:var(--fs-sm);padding:5px 8px"></section>`;
+      }).join("")
+    : `<p class="footnote" style="margin:0">未選用需送審的項目。</p>`;
+
+  const h = el("docs-stat");
+  if (h) h.textContent = st.tot ? "已備齊 " + st.n + " / " + st.tot + " 項" : "";
+
+  el("doc-custom").innerHTML = state.docCustom.length
+    ? state.docCustom.map((v,ix) => `<div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <input type="text" data-doccustom="${ix}" value="${esc(v)}"
+          placeholder="例：電路圖 / 結構爆炸圖 / 標籤 / 說明書 / BOM">
+        <button class="x noprint" data-docdel="${ix}" title="刪除這一項">×</button></div>`).join("")
+    : `<p class="footnote" style="margin:0 0 8px">尚無自訂項目。</p>`;
+}
+
+/* ══════ 關鍵元件資訊（CB report 4.1.2）══════
+   對應 CB report 的「TABLE: Critical components information」六欄。
+   列可自行增刪；只預先放常見的元件類別，**值一律留空**，
+   不要幫使用者填看起來合理的規格。 */
+const CCL_COLS = [
+  {k:"obj",  ph:"Object / part No.",       w:"minmax(120px,1.1fr)"},
+  {k:"mfr",  ph:"Manufacturer / trademark", w:"minmax(110px,1fr)"},
+  {k:"type", ph:"Type / model",             w:"minmax(110px,1fr)"},
+  {k:"tech", ph:"Technical data",           w:"minmax(140px,1.5fr)"},
+  {k:"std",  ph:"Standard",                 w:"minmax(100px,1fr)"},
+  {k:"mark", ph:"Mark(s) of conformity",    w:"minmax(110px,1fr)"}
+];
+/* 標準版帶入清單 —— R12 實際的 critical component 項目，來源：
+   公司網路磁碟的專案資料夾 …\R12系列\3. EPR\Safety\（完整路徑不寫進原始碼）
+   Safety 認證準備文件\CCL list\Critical component 證書及規格書\
+     Critical Component  規格書\   （17 項）
+     Critical Component 安規證書\   （10 項）
+   取兩者聯集，保留資料夾名稱上的註記（Optional／UL 會列上不需提供／型號）。
+   ★ 只帶「Object / part No.」這一欄，其餘五欄一律留空 ——
+     廠家、型號、技術數據、標準、認證標誌每個案子都不同，不可以預填。 */
+let CCL_SEED = [];
+const cclBlank = obj => ({obj:obj || "", mfr:"", type:"", tech:"", std:"", mark:""});
+
+function renderCcl(){
+  const box = el("p-ccl"); if (!box) return;
+  const R = state.ccl || [];
+  const grid = CCL_COLS.map(c => c.w).join(" ") + " auto";
+  box.innerHTML =
+    `<div class="tblwrap"><div style="min-width:900px">
+      <div style="display:grid;grid-template-columns:${grid};gap:6px;
+        font-family:var(--f-display);font-size:var(--fs-micro);font-weight:600;
+        letter-spacing:.1em;color:var(--ink-3);padding-bottom:6px;
+        border-bottom:1px solid var(--rule)">
+        ${CCL_COLS.map(c => `<div>${esc(c.ph)}</div>`).join("")}<div></div></div>
+      ${R.length ? R.map((r,ix) => `
+        <div style="display:grid;grid-template-columns:${grid};gap:6px;align-items:start;
+          padding:6px 0;border-bottom:1px solid var(--rule-soft)">
+          ${CCL_COLS.map(c => `<textarea class="wrapf" data-ccl="${ix}:${c.k}" rows="1"
+             placeholder="${esc(c.ph)}">${esc(r[c.k] || "")}</textarea>`).join("")}
+          <button class="x noprint" data-ccldel="${ix}" title="刪除第 ${ix+1} 列">×</button>
+        </div>`).join("")
+        : `<p class="footnote" style="margin:8px 0 0">尚無資料。按下方「＋ 新增一列」開始填，
+           或按「帶入標準版清單」把 R12 的 ${CCL_SEED.length} 個關鍵元件項目一次建好，再逐格填。</p>`}
+    </div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px" class="noprint">
+      <button class="ghost" id="btn-ccl-add">＋ 新增一列</button>
+      <button class="ghost" id="btn-ccl-seed">帶入標準版清單（R12 實績 ${CCL_SEED.length} 項）</button>
+      ${R.length ? `<button class="ghost" id="btn-ccl-clear">清空</button>` : ""}
+    </div>
+    <p class="footnote">六欄對應 CB report <b>4.1.2 TABLE: Critical components information</b>：
+      Object / part No.、Manufacturer / trademark、Type / model、Technical data、Standard、
+      Mark(s) of conformity。<b>可互換的零件在 Manufacturer／Type 填 Interchangeable</b>，
+      並另開一列 <span class="mono">(alt.)</span> 列出替代 source。
+      這張表就是「共通送審文件 → CCL list」要交的內容，會一併存檔與輸出。</p>`;
+}
+
+/* ══════ 送測前注意事項 ══════
+   依選用的認證項目動態出現；勾選與填寫內容一併存檔、列印與匯出 */
+const cbx = (path, on, label) =>
+  `<label class="chk"><input type="checkbox" data-prep="${path}" ${on?"checked":""}><span>${label}</span></label>`;
+const txt = (path, val, ph, w) =>
+  `<input type="text" data-prept="${path}" value="${esc(val)}" placeholder="${ph}"
+    style="${w?"width:"+w+";":""}font-size:var(--fs-sm);padding:5px 8px">`;
+
+/* 防爆認證電池組：型號 ＋ packed／Dummy 各自可填數量 */
+function battRows(key, rows){
+  return rows.map((r,ix) => `
+    <div style="display:grid;grid-template-columns:minmax(0,1.4fr) auto auto;gap:8px;align-items:center;
+      margin:0 0 8px 27px">
+      ${txt(key+"."+ix+".pn", r.pn, "電池組型號")}
+      <span style="display:flex;align-items:center;gap:6px;white-space:nowrap">
+        <label class="chk" style="padding:0"><input type="checkbox" data-prep="${key}.${ix}.packed" ${r.packed?"checked":""}><span>packed</span></label>
+        ${txt(key+"."+ix+".pq", r.pq, "數量", "72px")}
+      </span>
+      <span style="display:flex;align-items:center;gap:6px;white-space:nowrap">
+        <label class="chk" style="padding:0"><input type="checkbox" data-prep="${key}.${ix}.dummy" ${r.dummy?"checked":""}><span>Dummy</span></label>
+        ${txt(key+"."+ix+".dq", r.dq, "數量", "72px")}
+      </span>
+    </div>`).join("");
+}
+
+/* 勾選 ＋ 可手動填寫的數量（取代原本寫死的 × 2 等固定值） */
+const cbxQty = (path, on, label, qtyPath, qtyVal, unit) =>
+  `<span style="display:flex;align-items:center;gap:6px;white-space:nowrap">
+    <label class="chk" style="padding:0"><input type="checkbox" data-prep="${path}" ${on?"checked":""}><span>${label}</span></label>
+    <input type="number" data-prept="${qtyPath}" value="${esc(qtyVal)}" min="0" max="999" placeholder="數量"
+      style="width:78px;font-size:var(--fs-sm);padding:5px 8px">
+    <span style="font-size:var(--fs-sm);color:var(--ink-3)">${unit || ""}</span>
+  </span>`;
+
+function prepSections(){
+  const P = state.prep, S = [];
+  const on = id => state.on[id] && chargeable(covStatus("scheme", id));
+  if (on("ulcb")) S.push({k:"ulcb", t:"UL + CB", html:
+    `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        ${cbxQty("ulcb.smp", P.ulcb.smp, "Safety sample", "ulcb.smpQty", P.ulcb.smpQty, "台")}
+       </div>`
+    + cbx("ulcb.bios", P.ulcb.bios, "EC / BIOS update for safety skin Temp.")
+    + `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
+        ${cbxQty("ulcb.batt", P.ulcb.batt, "Battery pack sample", "ulcb.battQty", P.ulcb.battQty, "顆 / 每個型號")}
+       </div>`
+    + `<p class="footnote" style="margin:2px 0 4px 27px">
+        <b>請電池廠提供安規認證配方的樣品</b></p>`
+    + `<div style="display:flex;gap:18px;margin:0 0 8px 27px;flex-wrap:wrap">
+        ${cbxQty("ulcb.packed", P.ulcb.packed, "Packed", "ulcb.packedQty", P.ulcb.packedQty, "pcs / for each model")}
+        ${cbxQty("ulcb.unpacked", P.ulcb.unpacked, "Un-packed", "ulcb.unpackedQty", P.ulcb.unpackedQty, "pcs / for each model")}
+       </div>`
+    + `<div style="display:flex;gap:18px;margin:0 0 8px 0;flex-wrap:wrap">
+        ${cbxQty("ulcb.male", P.ulcb.male, "公頭", "ulcb.maleQty", P.ulcb.maleQty, "")}
+        ${cbxQty("ulcb.female", P.ulcb.female, "母頭", "ulcb.femaleQty", P.ulcb.femaleQty, "")}
+       </div>`
+    + txt("ulcb.note", P.ulcb.note, "其他注意事項")});
+
+  /* 歐洲能耗 ErP —— 只保留測試條件提示，不含報告產出。這一區顯示在「ErP 測試」分頁 */
+  if (on("erp")) S.push({k:"erp", t:"歐洲能耗 ErP", html:
+    `<p class="footnote" style="margin:0 0 8px">1. 產品測試前的準備</p>`
+    + cbx("erp.arc", P.erp.arc, "請 SW 檢查 Intel Graphic Driver「Arc」是否已關掉；若未關掉，需先手動關閉 Arc Driver 後再行測試")
+    + `<p class="footnote" style="margin:8px 0 8px">2. Off Mode 設定</p>`
+    + cbx("erp.off", P.erp.off, "按壓電源開關持續 5 秒將電腦關閉、停止一切硬體操作，並將 AC Adapter 重新插拔")
+    + txt("erp.note", P.erp.note, "其他注意事項")});
+
+  /* 北美能耗 BCS / DoE / NrCAN */
+  if (on("bcs")) S.push({k:"bcs", t:"北美能耗（BCS · DoE · NrCAN）", html:
+    `<p class="footnote" style="margin:0 0 8px"><b>確認充電線路有幾組，每組至少提供 2 台樣品。</b></p>`
+    + `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        ${cbxQty("bcs.smp", P.bcs.smp, "Sample", "bcs.smpQty", P.bcs.smpQty, "台")}
+       </div>`
+    + cbx("bcs.ckt",    P.bcs.ckt,    "確認電池充電電路有幾組？")
+    + cbx("bcs.maxv",   P.bcs.maxv,   "挑選最大充電電壓")
+    /* 「容量」不是「電容」—— BCS／DoE 的選樣依據是電池容量（Wh）。
+       使用者 2026-09-04 確認以「容量」為準，不要再改回電容。 */
+    + cbx("bcs.maxcap", P.bcs.maxcap, "最大電壓相同時，挑選最大容量者")
+    + txt("bcs.note", P.bcs.note, "充電電路組數／選定的電壓與容量")});
+
+  /* ErP / UL 4200A 的樣品需求 —— 與上面「歐洲能耗 ErP」的量測條件分開：
+     那一區是測試設定（在 ErP 測試分頁），這一區是樣品，屬於送測前注意事項。 */
+  if (on("erp") || on("ul4200a")) S.push({k:"erp4200", t:"ErP / UL 4200A", html:
+    `<p class="footnote" style="margin:0 0 8px"><b>新案件時，可直接使用 BCS 樣品測試。</b></p>`
+    + `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        ${cbxQty("erp4200.smp", P.erp4200.smp, "Sample", "erp4200.smpQty", P.erp4200.smpQty, "台")}
+       </div>`
+    + cbx("erp4200.ecbios", P.erp4200.ecbios, "Update to latest EC / BIOS revision.")
+    + txt("erp4200.note", P.erp4200.note, "其他注意事項")});
+
+  /* 中國能耗 CEL —— 與 CCC 安規分開開案，一併提示 */
+  if (on("ccc")) S.push({k:"cel", t:"中國能耗 CEL", html:
+    cbx("cel.tec", P.cel.tec, "GB 28380-2012《微型計算機能效限定值及能效等級》TEC 已確認")
+    + `<p class="footnote" style="margin:8px 0 0">TEC（Typical Energy Consumption，典型能源消耗）是評估微型計算機能效的關鍵指標，
+       反映一台計算機在典型使用情境下的一年耗電量（kWh／年）。
+       <b>CEL 為能效法規，與 CCC 安規分開開案</b>，費用未含在本報價中。</p>`
+    + txt("cel.note", P.cel.note, "TEC 實測值／能效等級")});
+
+  if (on("c1d2")) S.push({k:"c1d2", t:"C1D2", html:
+    cbx("c1d2.seal", P.c1d2.seal, "I/O port、battery latch、Pogo pin 全都要鐵件加螺絲封住")
+    + cbx("c1d2.ip54", P.c1d2.ip54, "高低溫後 drop test（六面／水泥地 1M）後，要符合 IP54（抽負壓）")
+    + cbx("c1d2.batt", P.c1d2.batt, "防爆電池／Dummy 電池（每個型號 min. 2 顆）")
+    + battRows("c1d2.rows", P.c1d2.rows)
+    + cbx("c1d2.warn", P.c1d2.warn, "C1D2 相關警語")
+    + txt("c1d2.note", P.c1d2.note, "其他注意事項")});
+
+  if (on("atex")) S.push({k:"atex", t:"ATEX（w/o Fan only）", html:
+    cbx("atex.seal", P.atex.seal, "I/O port、battery latch、Pogo pin 全都要鐵件加螺絲封住")
+    + `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        ${cbxQty("atex.coating", P.atex.coating, "PCBA with Coating", "atex.coatQty", P.atex.coatQty, "pcs")}
+       </div>`
+    + cbx("atex.batt", P.atex.batt, "防爆電池（每個型號 min. 1 顆）／Dummy 電池（每個型號 min. 2 顆）")
+    + battRows("atex.rows", P.atex.rows)
+    + `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        ${cbxQty("atex.bag", P.atex.bag, "靜電皮套", "atex.bagQty", P.atex.bagQty, "套（材質與先前認可品相同則 2 套）")}
+       </div>`
+    + cbx("atex.cell", P.atex.cell, "防爆認證電芯")
+    + `<div style="display:flex;gap:18px;margin:6px 0 8px 27px;flex-wrap:wrap">
+        ${cbxQty("atex.oldSpec", P.atex.oldSpec, "2021 版", "atex.oldQty", P.atex.oldQty, "顆 / 每個型號")}
+        ${cbxQty("atex.newSpec", P.atex.newSpec, "2023 版新配方", "atex.newQty", P.atex.newQty, "顆 / 每個型號")}
+       </div>`
+    + cbx("atex.warn", P.atex.warn, "ATEX 相關警語")
+    + txt("atex.note", P.atex.note, "其他注意事項")});
+
+  return S;
+}
+
+/* 送測前注意事項分兩個地方顯示：
+   ErP 那一段在「ErP 測試」分頁（跟 SOP 清單、量測判定放一起才是一份完整的測試指引），
+   其餘留在「送測前注意事項」分頁。
+   ★ 只是畫面位置不同，資料仍是同一份 state.prep，
+     Word／PDF 的「送測前注意事項」輸出（DOCS.prep）照舊含全部六區，文件內容不變。 */
+const prepBlock = s => `<section style="margin-bottom:18px">
+    <h3 style="font-family:var(--f-display);font-size:var(--fs-sm);font-weight:600;letter-spacing:.1em;
+      color:var(--accent);margin-bottom:6px">${esc(s.t)}</h3>${s.html}</section>`;
+
+function renderPrep(){
+  const all = prepSections();
+  const S = all.filter(s => s.k !== "erp");
+  const hasErp = all.some(s => s.k === "erp");
+  /* 三種狀況要說三種話。最容易誤導的是「只勾了 ErP」——
+     那時本頁確實沒東西，但不能說「沒有對應的送測前注意事項」，
+     使用者會以為原本的內容被弄不見了（實際發生過）。 */
+  const body = S.length
+    ? S.map(prepBlock).join("")
+      + (hasErp ? `<p class="footnote" style="margin:12px 0 0">
+          歐洲能耗 <b>ErP</b> 的送測前注意事項（Intel Arc Driver、Off Mode 設定）
+          在<b>「ErP 測試」分頁</b>，與 SOP 確認清單、量測與判定放在一起。
+          輸出 Word／PDF 的「送測前注意事項」仍含 ErP 段，文件內容不變。</p>` : "")
+    : hasErp
+      ? `<div class="proof" style="margin:0">
+          目前只勾了 <b>ErP</b>，而 ErP 的送測前注意事項（Intel Arc Driver、Off Mode 設定）
+          放在<b>「ErP 測試」分頁</b> —— <b>內容沒有不見，在那一頁</b>。
+          <p class="footnote" style="margin:6px 0 0">這一頁會列 UL + CB／北美能耗（BCS·DoE·NrCAN）／
+            中國能耗 CEL／C1D2／ATEX 的送測前注意事項，勾了對應的認證項目才會出現。
+            輸出 Word／PDF 的「送測前注意事項」六區都含，文件內容不變。</p></div>`
+      : `<p class="footnote" style="margin:0">還沒勾任何認證項目，所以沒有送測前注意事項。
+         請先在左欄「申請組態 → 主系統申請的安規認證項目」勾選。
+         UL + CB／歐洲能耗 ErP／北美能耗／中國能耗 CEL／C1D2／ATEX 各有專屬清單
+         （ErP 那一區在「ErP 測試」分頁）。</p>`;
+  el("p-prep").innerHTML = body;
+}
+
+/* ErP 分頁專用：只畫 ErP 那一區 */
+function renderPrepErp(){
+  const box = el("p-prep-erp"); if (!box) return;
+  const s = prepSections().find(x => x.k === "erp");
+  box.innerHTML = s
+    ? prepBlock(s)
+      + `<p class="footnote" style="margin:0">這一段原本在「送測前注意事項」，
+         2026-09-04 移到本分頁與 SOP 清單、量測判定放在一起。資料是同一份，
+         輸出 Word／PDF 的「送測前注意事項」文件仍會含這一段。</p>`
+    : `<p class="footnote" style="margin:0">尚未勾選 <b>ErP</b> 認證項目
+       （左欄「申請組態 → 主系統申請的安規認證項目」），所以沒有 ErP 的送測前注意事項。
+       下方的 SOP 確認清單與量測判定不受影響，隨時可以先填。</p>`;
+}
+
+/* 匯出用的純文字版：每區一組條列 */
+function prepText(){
+  const P = state.prep, out = [];
+  const q = (label, on, qty, unit) => on ? label + (qty ? " × " + qty + (unit||"") : "") : null;
+  prepSections().forEach(s => {
+    const ls = [];
+    if (s.k === "ulcb"){
+      if (P.ulcb.smp)  ls.push("Safety sample" + (P.ulcb.smpQty ? "：" + P.ulcb.smpQty + " 台" : ""));
+      if (P.ulcb.bios) ls.push("EC / BIOS update for safety skin Temp.");
+      if (P.ulcb.batt){
+        const bits = [q("Packed", P.ulcb.packed, P.ulcb.packedQty, " pcs / for each model"),
+                      q("Un-packed", P.ulcb.unpacked, P.ulcb.unpackedQty, " pcs / for each model")].filter(Boolean);
+        ls.push("Battery pack sample"
+          + (P.ulcb.battQty ? "（每個型號 " + P.ulcb.battQty + " 顆）" : "")
+          + "　※ 請電池廠提供安規認證配方的樣品"
+          + (bits.length ? "：" + bits.join("、") : ""));
+      }
+      const gd = [q("公頭", P.ulcb.male, P.ulcb.maleQty, ""),
+                  q("母頭", P.ulcb.female, P.ulcb.femaleQty, "")].filter(Boolean);
+      if (gd.length) ls.push(gd.join("、"));
+      if (P.ulcb.note) ls.push(P.ulcb.note);
+    }
+    if (s.k === "erp"){
+      if (P.erp.arc) ls.push("測試前確認 Intel Graphic Driver「Arc」已關閉");
+      if (P.erp.off) ls.push("Off Mode：長按電源鍵 5 秒關機、停止一切硬體操作，AC Adapter 重新插拔");
+      if (P.erp.note) ls.push(P.erp.note);
+    }
+    if (s.k === "erp4200"){
+      ls.push("新案件時，可直接使用 BCS 樣品測試");
+      if (P.erp4200.smp) ls.push("Sample" + (P.erp4200.smpQty ? "：" + P.erp4200.smpQty + " 台" : ""));
+      if (P.erp4200.ecbios) ls.push("Update to latest EC / BIOS revision.");
+      if (P.erp4200.note) ls.push(P.erp4200.note);
+    }
+    if (s.k === "bcs"){
+      ls.push("確認充電線路有幾組，每組至少提供 2 台樣品");
+      if (P.bcs.smp)    ls.push("Sample" + (P.bcs.smpQty ? "：" + P.bcs.smpQty + " 台" : ""));
+      if (P.bcs.ckt)    ls.push("確認電池充電電路組數");
+      if (P.bcs.maxv)   ls.push("挑選最大充電電壓");
+      if (P.bcs.maxcap) ls.push("最大電壓相同時挑選最大容量者");
+      if (P.bcs.note)   ls.push(P.bcs.note);
+    }
+    if (s.k === "cel"){
+      if (P.cel.tec)  ls.push("GB 28380-2012 TEC 已確認（能效法規，與 CCC 安規分開開案）");
+      if (P.cel.note) ls.push(P.cel.note);
+    }
+    if (s.k === "c1d2" || s.k === "atex"){
+      const X = P[s.k];
+      if (X.seal) ls.push("I/O port、battery latch、Pogo pin 全都要鐵件加螺絲封住");
+      if (s.k === "c1d2" && X.ip54) ls.push("高低溫後 drop test（六面／水泥地 1M）後須符合 IP54（抽負壓）");
+      if (s.k === "atex" && X.coating) ls.push("PCBA with Coating" + (X.coatQty ? " × " + X.coatQty + " pcs" : ""));
+      if (X.batt) ls.push(s.k === "c1d2"
+        ? "防爆電池／Dummy 電池（每個型號 min. 2 顆）"
+        : "防爆電池（每個型號 min. 1 顆）／Dummy 電池（每個型號 min. 2 顆）");
+      X.rows.forEach(r => {
+        const bits = [];
+        if (r.packed) bits.push("packed" + (r.pq ? " × " + r.pq : ""));
+        if (r.dummy)  bits.push("Dummy" + (r.dq ? " × " + r.dq : ""));
+        if (r.pn || bits.length) ls.push("　" + (r.pn || "（型號未填）") + (bits.length ? "：" + bits.join("、") : ""));
+      });
+      if (s.k === "atex" && X.bag)
+        ls.push("靜電皮套" + (X.bagQty ? " × " + X.bagQty + " 套" : "") + "（材質與先前認可品相同則 2 套）");
+      if (s.k === "atex" && X.cell){
+        const bits = [q("2021 版", X.oldSpec, X.oldQty, " 顆 / 每個型號"),
+                      q("2023 版新配方", X.newSpec, X.newQty, " 顆 / 每個型號")].filter(Boolean);
+        ls.push("防爆認證電芯" + (bits.length ? "：" + bits.join("、") : ""));
+      }
+      if (X.warn) ls.push((s.k === "c1d2" ? "C1D2" : "ATEX") + " 相關警語");
+      if (X.note) ls.push(X.note);
+    }
+    if (ls.length) out.push({t:s.t, ls});
+  });
+  return out;
+}
+/* ══════════════════════════════════════════════
+   認證作業確認清單
+   review —— Safety design review checklist_20251128（Feasibility stage）
+   c1d2   —— R10 C1D2 checklist（CAN/CSA C22.2 No.213-17）
+   atex   —— R10 ATEX document checklist（TÜV SÜD）
+   勾選與填寫內容存在 state.ck，鍵值為 "<清單>:<項目>"
+   ══════════════════════════════════════════════ */
+const CK = {
+erp:{
+  hint:"ErP Lot 3 送測前 SOP · 依 ErP送測前.pptx（2025-11-03）",
+  head:"四個模式的量測有嚴格順序：① Off → ② Long Idle → ③ Short Idle → ④ Sleep，"
+     + "每換一個模式都要重置電錶。順序錯了數據就不能用。",
+  cols:[{k:"memo", ph:"實際設定值 / 備註"}],
+  groups:[
+    {t:"一、產品測試前的準備", rows:[
+      {id:"p1", l:"待測機台重置為 Pure Image（當下最新版）",
+       h:"讓 Windows OS 回到最原始狀態，避免預載軟體影響功耗"},
+      {id:"p2", l:"BIOS ＆ EC 更新至最新版",
+       h:"更新後要確認最新版是否支援 ErP 四種測試模式：Off mode(S5)、Sleep mode(Modern Standby)、Long Idle(S0)、Short Idle"},
+      {id:"p3", l:"將電池（主電池組 及 Bridge Battery）先行移除",
+       h:"實驗室（Prodigy）2026-09 書面確認：電池一律移除，依據 EN 62623。"
+        +"電池裝著且未充飽時，充電電流會影響 Idle／Sleep 的量測值。"
+        +"另一份「ErP 申請及測試相關」概觀頁寫「電池充 100%」是錯的，不要照做"},
+      {id:"p4", l:"關閉 Intel Graphic Driver「Arc」",
+       h:"要在 Arc 關閉的情況下測試。若已安裝，桌面右下角會出現 icon，右鍵 close arc"}
+    ]},
+    {t:"① Off Mode（S5）　量測 5 分鐘 → Poff", rows:[
+      {id:"o1", l:"設定：按壓電源開關持續 5 秒關閉電腦，停止一切硬體操作"},
+      {id:"o2", l:"設定：AC Adapter 重新插拔"},
+      {id:"o3", l:"量測：EUT 置於關閉模式，電錶設為每秒多個讀數間隔累計真實功率",
+       h:"累積 5 分鐘的平均功率值，取該期間觀察到的算術平均值作為 Poff"},
+      {id:"o4", l:"判定：Poff ≦ 1W（出貨時 WOL 預設 Enable 才 +0.7W）"},
+      {id:"o5", l:"判定：Lowest power state ≦ 0.5W",
+       h:"這一項一定要判。Off mode 若已低於 0.5W，實驗室直接以 Off mode 判定為 "
+        +"lowest power state，兩項都算 Pass"}
+    ]},
+    {t:"② Long Idle Mode（S0）　量測 10 分鐘 → Pidle（★ ErP 的 Etec 用這個）", rows:[
+      {id:"l1", l:"設定：用電源開關開機進 Windows OS 畫面"},
+      {id:"l2", l:"設定：關閉所有打開的視窗，畫面只顯示標準操作桌面背景"},
+      {id:"l3", l:"設定：Backlight 設為 90 nits",
+       h:"各模式的 Backlight 都固定 90 nits。對應的 Windows 亮度百分比每個機種不同"
+        +"（R10 約 26%），請把本機種的實測百分比填在備註"},
+      {id:"l4", l:"量測：Off mode 測完後重置電錶，累積 10 分鐘平均值作為 Pidle",
+       h:"沒有 Limit 值，但會影響 Etec 的計算結果。實驗室 2026-09 確認："
+        +"報告上「Idle Mode Power Value (Pidle)」就是 Long Idle，而且 guidance 明確寫"
+        +"「display off 的 Long Idle」。★ 本步驟的設定寫 Backlight 90 nits（畫面亮著），"
+        +"與 display off 不符 —— 送測前請與實驗室確認本步驟該不該關閉顯示器"}
+    ]},
+    {t:"③ Short Idle Mode　量測 5 分鐘（Energy Star／EPEAT 用，不進 ErP 公式）", rows:[
+      {id:"s1", l:"設定：Long Idle 測完後，關閉所有打開的視窗，Backlight 維持 90 nits"},
+      {id:"s2", l:"設定：Control Panel → All Control Panel Items → Power Option → "
+                +"Change when the Computer sleeps → Edit Plan Settings → "
+                +"僅在 Plugged In 的 Turn off the display 選 5 minutes"},
+      {id:"s3", l:"量測：重置電錶，累積 5 分鐘平均值",
+       h:"這個值不進 ErP 的 Etec 公式 —— 實驗室 2026-09 書面確認「ErP 只需要量一個」。"
+        +"量兩個 idle 是 Energy Star／EPEAT 的要求"}
+    ]},
+    {t:"④ Sleep Mode（Modern Standby）　量測 5 分鐘 → Psleep", rows:[
+      {id:"z1", l:"設定：Short Idle 測完後，將電腦回復至正常 Windows 系統畫面"},
+      {id:"z2", l:"設定：關閉所有打開的視窗，點選電源圖示 → 選 Sleep 使電腦進入睡眠"},
+      {id:"z3", l:"量測：重置電錶，累積 5 分鐘平均值作為 Psleep"},
+      {id:"z4", l:"判定：Psleep < 3W（出貨時 WOL 預設 Enable 才 +0.7W）",
+       h:"ErP 依<出貨預設值>測試，不是看有沒有 WOL 功能。出貨 disable 就測 disable。"
+        +"Energy Star 才要求有 WOL 就必須 default enable"}
+    ]},
+    {t:"⑤ 結果計算與判定", rows:[
+      {id:"e1", l:"確認 Category（617/2013 Annex II）：A ＝ 不符合 B 或 C；"
+                +"B ＝ 至少一張 dGfx；C ＝ 核心 ≧ 2 且 記憶體 ≧ 2GB 且 "
+                +"dGfx 屬 G3(Data Width > 128-bit)／G4／G5／G6／G7",
+       h:"基準值：A = 27.00、B = 36.00、C = 60.50（kWh/year）。填好下方判定區的"
+        +"核心數／記憶體／dGfx 頻寬後會自動判定。註：Idle 低於 6W 者不算 notebook "
+        +"computer，不受本規範；平板與筆電同一套判定，但螢幕對角線需 ≧ 22.86 cm"},
+      {id:"e1a", l:"確認 dGfx 分級（617/2013 Article 2）",
+       h:"FB_BW =(Data Rate × Data Width) ÷ (8 × 1000)　GB/s。"
+        +"G1 ≦16／G2 ≦32／G3 ≦64／G4 ≦96／G5 ≦128／"
+        +"G6 >128 且 Data Width < 192-bit／G7 >128 且 Data Width ≧ 192-bit"},
+      {id:"e1b", l:"算出 ETEC_MAX＝基準 ＋ capability adjustments，不要直接用基準值",
+       h:"記憶體超過 4GB 的部分每 GB ＋0.4；額外內部儲存「beyond the first」——"
+        +"有第二顆就 ＋3 且只加一次，不逐顆累加（條文若要逐顆計會像 dGfx 那樣寫 each）；"
+        +"Discrete GPU 依分級加值。漏加會把實際 Pass 的機種誤判成 Fail"},
+      {id:"e2", l:"帶入公式：Etec =(8760/1000) × (0.6 Poff ＋ 0.10 Psleep ＋ 0.30 Pidle)"},
+      {id:"e3", l:"判定：實測 Etec ≦ ETEC_MAX",
+       h:"下方判定區會自動計算並判 Pass／Fail"},
+      {id:"e4", l:"若判為 Category C，確認是否符合豁免條件",
+       h:"CPU 物理核心 ≧ 4 且 dGfx 總頻寬 > 225 GB/s 且記憶體 ≧ 16GB，三者全部成立才豁免。"
+        +"豁免<只免 Etec> —— Sleep、Off mode、lowest power state 仍要量測與判定，"
+        +"實驗室會在報告上註記符合並判定 as exempt"}
+    ]},
+    {t:"⑥ 補充條件（來自「ErP 申請及測試相關」，本送測前 SOP 未涵蓋）", rows:[
+      {id:"x1", l:"Test Voltage 230V／50Hz",
+       h:"(EU) 617/2013 與 2023/826 都只要求這一組"},
+      {id:"x1b", l:"另要求 LAB 加測 110V／60Hz 的 Off mode 與 Lowest Power State",
+       h:"★ 這是 TH 自己追加的測項，<非法規要求>，但<不會另計費用>（2026-09 確認）。"
+        +"實驗室報告上會註明 customer-made instead of ERP directive requirement。"
+        +"開案時記得主動跟實驗室講"},
+      {id:"x2", l:"Windows updates 選取 5 週不更新",
+       h:"測試期間不可讓 Windows 自動更新造成功耗增加"},
+      {id:"x3", l:"Power mode 設為 Best Power Efficiency"},
+      {id:"x4", l:"Lid、Power ＆ Sleep button controls 全部改為 hibernate"},
+      {id:"x5", l:"送測機台選最高規：CPU i7、Memory 容量最大",
+       h:"參考 PA 的 Energy Star tested sample。若有 Discrete GPU（如 MXM Module），"
+        +"需與 Energy Star 同規格的 SKU 送測"}
+    ]}
+  ]
+},
+review:{
+  hint:"Feasibility stage 的 EE／ME／ESD 風險與可行性評估",
+  cols:[{k:"memo", ph:"實際值 / 料號 / 結論"}],
+  groups:[
+    {t:"EE design review — 保護元件", rows:[
+      {id:"fuse",  l:"DC IN Fuse：依 adapter 規格加安規係數選用 10A / 63V",
+       h:"AC Adapter 3.42～6.32A × 1.5 倍安全係數 ≈ 5.13～9.48A，再加誤差選用 10A。此保護元件不需控管在 CCL List，僅安規測試用"},
+      {id:"poly",  l:"Poly Switch 1A（過電流保護，IEC/EN 60730-1）"},
+      {id:"pic",   l:"Protect IC（過電流保護，IEC/EN 62368-1 · UL 2367）"},
+      {id:"rtcr",  l:"RTC Battery 限流電阻 1kΩ ＋ Diode（防止逆向充電）",
+       h:"Diode D11 防止 VRTC 對 RTC Battery 逆充；R728 1kΩ 使 3V/1kΩ = 3mA ≦ 5mA limit。IEC 62368 M.3 測試，且須控管保護元件"},
+      {id:"typec", l:"Type C port Protect IC — TPS65994（短路電流超過 3A 切斷）",
+       h:"需有安規認證（IEC/EN 62368-1 · UL 2367）。LPS 測試，且須控管保護元件"},
+      {id:"usbp",  l:"USB 2.0 / 3.0 Protect IC — RT9742EGJ5（超過 1.5A 切斷）",
+       h:"需有安規認證（IEC/EN 62368-1 · UL 2367）。LPS 測試，且須控管保護元件"},
+      {id:"ovp",   l:"Battery Pack OVP — Charger IC BQ24079 pin 2,3「VBAT」設定 4.25V 停充"},
+      {id:"ocp",   l:"Battery Pack OCP — Charger IC BQ24079 pin 16「ISET」設定 140.4mA"},
+      {id:"otp",   l:"Battery Pack OTP — Charger IC BQ24079 pin 1「BRD_TEMP」設定 45℃ 停充",
+       h:"Charger IC 不需控管在 CCL List，只 for 安規測試用"}
+    ]},
+    {t:"EE design review — 線路與接口", rows:[
+      {id:"blk",   l:"RD/EE 已提供線路圖 ＋ 方塊圖（含 power design layout）"},
+      {id:"iop",   l:"I/O ports 盤點：Thunderbolt / VGA / HDMI / Display / RS-232 / RJ-45"},
+      {id:"card",  l:"Card reader / Smart card"},
+      {id:"usbtv", l:"USB 2.0/3.0 線路：Protect IC ＋ TVS 元件 ＋ 靜電電容"},
+      {id:"ctv",   l:"Type C 線路：Protect IC（TPS25810RVCR）＋ TVS 元件（22P）"}
+    ]},
+    {t:"ME design review — 外部開孔", rows:[
+      {id:"otop",  l:"Top / Side openings：任一尺寸 < 5mm",
+       h:"例如方形孔對角線、圓形孔直徑。寬度 ≦ 1mm 的狹長型開孔長度不限"},
+      {id:"obot",  l:"Bottom openings：任一尺寸 < 3mm",
+       h:"寬度 ≦ 1mm 的狹長型開孔長度不限（如底部 SSD 開孔）"},
+      {id:"ofin",  l:"Heatsink 鰭片 pitch ≦ 1mm（用以擋住側邊出風口開孔）"},
+      {id:"omesh", l:"開孔未達要求處加 Mesh（DC Fan 出風口、CTO Door、SSD / DRAM 開孔）",
+       h:"編織網須有防火等級 UL 94 V-0 證明；金屬網不需防火等級證明"}
+    ]},
+    {t:"ME design review — 外部材質", rows:[
+      {id:"mmetal", l:"Metal enclosure AZ91D（鎂合金壓鑄）min. 1.0mm，提供成分表作認可品"},
+      {id:"mplas",  l:"Plastic enclosure UL CCN QMFZ2：E98529 Teijin MN-3600H#、V-0、min. 1.5mm"},
+      {id:"mthk",   l:"圖面須標示厚度 1.5mm",
+       h:"若實際外殼最小厚度無法達 1.5mm，須請機構 RD 在圖面標示最小厚度，並做一 Golden Sample 供廠檢"},
+      {id:"mcoat",  l:"Coating（濺鍍）UL CCN QMRX2：E173569 Paragon 柏騰 PT-1、0.45～2.0 mils"},
+      {id:"mcard",  l:"確認所使用濺鍍的塑膠料有列在 UL card 上（MN-3600H# ＋ PT-1）",
+       h:"Teijin UL file E98529、柏騰（蘇州廠）UL file E173569；Coating 需符合 QMRX2 或 QMSS2"}
+    ]},
+    {t:"ME design review — 內部材質", rows:[
+      {id:"ipcb",  l:"PCB Board 防火等級 94 V-0（UL 黃卡）"},
+      {id:"imark", l:"PCB 廠商遵照「印製 UL/cUL Mark 規則」"},
+      {id:"imyl",  l:"Mylar 防火等級 94 V-2"},
+      {id:"icon",  l:"Connectors 防火等級 94 V-2"},
+      {id:"iwire", l:"線材 防火等級 94 V-1 或 VW-1 或 FT-1",
+       h:"防火等級由高到低：V-0 > V-1 > V-2"}
+    ]},
+    {t:"C1D2 design review", rows:[
+      {id:"cio",  l:"I/O port 全都要鐵件加螺絲封住"},
+      {id:"cdok", l:"Docking 要鎖住（refer to R8）"}
+    ]},
+    {t:"ESD design review — Grounding", rows:[
+      {id:"eio",  l:"I/O port 的外部鐵件要跟系統接地，含 Poly switch 與 TVS 元件"},
+      {id:"ekb",  l:"確認 Keyboard 下系統接地點"},
+      {id:"epn",  l:"確認 Panel 下系統接地點"},
+      {id:"essd", l:"確認 SSD 下系統接地點"},
+      {id:"edc",  l:"DC in check：Fuse 10A ＋ TVS 元件（1500P）"},
+      {id:"ebat", l:"Battery charger 線路 check：Protect IC ＋ 靜電電容（1000P）"}
+    ]},
+    {t:"Safety Feasibility Report 產出", rows:[
+      {id:"fko",  l:"PM/PP team Kick off 中完成可行性評估"},
+      {id:"fwho", l:"案件由評估者填上"},
+      {id:"fme",  l:"ME 討論結果與建議",
+       h:"例：喇叭開孔超出 1mm 產生 fail，須符合小於 1mm 的限制值"},
+      {id:"fee",  l:"EE 討論結果與建議",
+       h:"例：USB 2.0 線路增加靜電電容或 TVS 保護 — TVS 0402TVS_060（22P / 5V）、靜電電容 0402C_055（10P / 50V / NPO）"}
+    ]}
+  ]
+},
+c1d2:{
+  hint:"CAN/CSA C22.2 No.213-17（revised Apr. 2021）· Class I, Division 2, Groups A B C D, T5",
+  head:"L/T 22 weeks · 開工條件：sample 與安規樣品條件一致",
+  cols:[{k:"st", ph:"Status"},{k:"to", ph:"To Lab（日期）"},{k:"rm", ph:"Remark"}],
+  groups:[
+    {t:"送審文件與樣品（18 項）", rows:[
+      {id:"d1",  l:"1. Outline photo（六面）＋ main board（正反面 ＋ each connector port）"},
+      {id:"d2",  l:"2. Main Board Circuit（Revision R0 at least）",
+       h:"including Block diagram（with power design layout）"},
+      {id:"d3",  l:"3. C1D2 BOM list of Main PCBA"},
+      {id:"d4",  l:"4. 能量計算表 by 實驗室"},
+      {id:"d5",  l:"5. PPR Sample × 3（with barcode scanner），更換 R0 主板"},
+      {id:"d6",  l:"6. ME 外觀鐵件瑣附"},
+      {id:"d7",  l:"7. High cap. — Dummy battery × 1 for drop test"},
+      {id:"d8",  l:"8. Main cap. — Dummy battery × 1 for drop test"},
+      {id:"d9",  l:"9. High cap. — Battery pack × 1"},
+      {id:"d10", l:"10. Product label"},
+      {id:"d11", l:"11. C1D2 label"},
+      {id:"d12", l:"12. Main cap. — IEC 62133 license and report"},
+      {id:"d13", l:"13. Main cap. — IEC 62368 license and report"},
+      {id:"d14", l:"14. High cap. — IEC 62133 license and report"},
+      {id:"d15", l:"15. High cap. — IEC 62368 license and report"},
+      {id:"d16", l:"16. 系統 IEC 62368 license and report（含 High cap. / Main cap.）"},
+      {id:"d17", l:"17. IP54 Solutions"},
+      {id:"d18", l:"18. 型號命名規則（Naming rule）"}
+    ]},
+    {t:"樣品配置與承擔測試", rows:[
+      {id:"s1", l:"Set 1：High cap.（全功能／最高功耗）with barcode scanner → 溫昇測試（Temp. Rise）",
+       h:"專攻電氣與發熱。測完後 Gasket 會變形、外殼會被挖洞，此樣品應視為報廢"},
+      {id:"s2", l:"Set 2：High cap.（最重 SKU / Dummy）with barcode scanner → 熱老化 → 低溫放置 → 落摔 → IPX4 → IP5X（要挖孔）",
+       h:"測試最重負載下的結構抗衝擊能力與液體防護能力"},
+      {id:"s3", l:"Set 3：Main cap.（次重 SKU / Dummy）→ 熱老化 → 低溫放置 → 落摔 → IPX4 → IP5X（挖孔）",
+       h:"專攻防塵測試。IP5X 需抽負壓鑽孔，必須獨立一台樣品"},
+      {id:"s4", l:"Set 4（retest IP5X）：High cap.（全功能）with barcode scanner → 熱老化 → 低溫放置 → 落摔 → IP5X（挖孔）"}
+    ]},
+    {t:"機構重工", rows:[
+      {id:"r1", l:"更換 R0 主板"},
+      {id:"r2", l:"移除 Bridge battery"},
+      {id:"r3", l:"I/O PORT／電池鐵件瑣附"},
+      {id:"r4", l:"搭配認證電池組／Dummy（依 set 別）"}
+    ]}
+  ]
+},
+atex:{
+  hint:"TÜV SÜD · 須 w/o Fan 結構 · L/T 24 weeks",
+  head:"Marking：II 3G Ex ic IIC T4 Gc ／ II 3D Ex ic IIIB T135°C Dc · 2021 版與 2023 版價格不同",
+  cols:[{k:"st", ph:"Status"},{k:"to", ph:"To Lab（日期）"},{k:"rm", ph:"Remark"}],
+  groups:[
+    {t:"申請文件", rows:[
+      {id:"a1", l:"User Guide / User Manual",
+       h:"(1) 皮套使用敘述 (2) warning message 敘述 (3) Special Conditions for Safe Use 敘述 (4) ATEX marking 及 Certificate No.（證號由實驗室提供）(5) 文件編號、日期、Version"},
+      {id:"a2", l:"ATEX Rating Label",
+       h:"(1) II 3G Ex ic IIC T4 Gc、II 3D Ex ic IIIB T135°C Dc (2) Certificate No. (3) Warning (4) Ambient (5) Manufacturer name & address (6) Model name (7) Rating（VDC and A）"},
+      {id:"a3", l:"SN Label with date code ＋ 條碼空白標籤",
+       h:"提供機台本體的 Serial No. Label 與 Date Code 說明；空白標籤供轉印機台 Serial Number"},
+      {id:"a4", l:"CE Declaration of Conformity（draft version）",
+       h:"CE DoC × 1、ATEX DoC × 2、UKCA DoC × 1；Gas ＋ Dust DoC"},
+      {id:"a5", l:"CB 證書及報告（EMC / Safety）＋ 供電 Adapter CB 證書及報告"},
+      {id:"a6", l:"ATEX application Form ＋ 型號命名規則"}
+    ]},
+    {t:"技術文件 — ME 類", rows:[
+      {id:"m1", l:"Outline Drawing（產品外部尺寸圖 ＋ 爆炸圖）"},
+      {id:"m2", l:"Upper cover drawing ＋ 塑料外殼材質規格書 ＋ 安規證書"},
+      {id:"m3", l:"Lower cover drawing"},
+      {id:"m4", l:"機台組裝 SOP ／ ME 外觀結構圖"},
+      {id:"m5", l:"ME 外觀鐵件瑣附（drawing ＋ samples）"},
+      {id:"m6", l:"IP54 Solutions（same as C1D2）"}
+    ]},
+    {t:"技術文件 — ID 類", rows:[
+      {id:"i1", l:"抗靜電皮套 Drawing（含規格、尺寸、材質、表面阻抗規格）"},
+      {id:"i2", l:"皮套規格書 ＋ 拆裝說明"}
+    ]},
+    {t:"技術文件 — EE 類", rows:[
+      {id:"e1", l:"Power Block Diagram（每個電壓區塊標示 電壓／電流／電容值／電感值）",
+       h:"兩條件成立時可簡化：(1) 產品用在 Zone 2 且所有對外接口都不允許使用於防爆環境；(2) 所有 components 都在 rating × 2/3 以下運作"},
+      {id:"e2", l:"線路圖（含 ATEX Power Block Diagram，battery mode only）"},
+      {id:"e3", l:"零件位置圖（TOP & Bottom，含圖號）"},
+      {id:"e4", l:"整機 BOM List ／ PCBA BOM ／ 整機含皮套、MB、Coating PCBA BOM（含位置圖）"},
+      {id:"e5", l:"Layout（含圖號、疊構圖、每層 gerber、厚度值）"},
+      {id:"e6", l:"Minimum Power Trace current 列表"},
+      {id:"e7", l:"所有線材 Power Pins、線徑、電流列表"},
+      {id:"e8", l:"List of 2/3 rating of components 表"},
+      {id:"e9", l:"All IC List for 溫度 requirement 表"},
+      {id:"e10", l:"所有對外接口 SPEC、圖面、Pin 間距"},
+      {id:"e11", l:"Wi-Fi + BT Module 規格書、WWAN 規格書",
+       h:"若 Wi-Fi 規格書無功率（dBm）資訊，可直接提供 SAR report"},
+      {id:"e12", l:"Barcode Module 證書、Datasheet（IEC 60825，發散光源）"},
+      {id:"e13", l:"Speaker 規格書、LED panel 規格書、IC 規格書或其他元件規格書"}
+    ]},
+    {t:"PCB Coating（線距要求）", rows:[
+      {id:"c1", l:"PCBA with Coating（樣品 2 pcs）"},
+      {id:"c2", l:"Coating 材料規格書"},
+      {id:"c3", l:"Coating UL 證書（符合 IEC 60664-3）"},
+      {id:"c4", l:"Coating SOP"},
+      {id:"c5", l:"三防膠塗膠 UL license",
+       h:"例：Dow Silicones Corp. 1-2577"},
+      {id:"c6", l:"三防膠遮噴區域圖（機構提供）",
+       h:"取證後請機構提供遮噴 SOP 給工廠"}
+    ]},
+    {t:"電池", rows:[
+      {id:"b1", l:"Battery pack and cell 規格書（含 Cell 正負極材質描述、Cell 構造剖面圖）"},
+      {id:"b2", l:"Battery pack IEC 62133-2:2017 證書（每個型號）"},
+      {id:"b3", l:"Battery pack IEC 62368 license and report（每個型號）"},
+      {id:"b4", l:"電池測試樣品 10 pcs"},
+      {id:"b5", l:"ATEX 電池資訊"},
+      {id:"b6", l:"防爆電池組（每個型號 min. 1 顆）／Battery unpack"},
+      {id:"b7", l:"Dummy battery for drop test（每個型號 min. 2 顆）"},
+      {id:"b8", l:"2023 版：防爆新配方 CELL sample 26 pcs / 每個型號",
+       h:"電芯廠家型號相同時只需提供一組。僅 2023 版適用"}
+    ]},
+    {t:"測試樣品與機構重工", rows:[
+      {id:"t1", l:"PPR Sample × 3（w/o fan，機構改裝）",
+       h:"低溫測試 ＋ Drop ＋ IP20/IP30 Test：1 台 standard cap BP、2 台 high cap BP。T code（Temperature Code）測試"},
+      {id:"t2", l:"I/O PORT／電池鐵件瑣附、battery latch、Pogo pin 全都要鐵件加螺絲封住"},
+      {id:"t3", l:"w/o fan（＋ mylar）"},
+      {id:"t4", l:"移除 Bridge battery"},
+      {id:"t5", l:"更換 R0 主板"},
+      {id:"t6", l:"移除 smart card"},
+      {id:"t7", l:"靜電皮套 4 套（材質與先前認可品相同則 2 套）"},
+      {id:"t8", l:"CPU PL1 limit 確認（例：limit to 8W）"}
+    ]}
+  ]
+}
+};
+
+function ckStat(key){
+  const L = CK[key]; let n = 0, tot = 0;
+  L.groups.forEach(g => g.rows.forEach(r => { tot++; if ((state.ck[key+":"+r.id]||{}).on) n++; }));
+  return {n, tot};
+}
+
+function renderCk(key){
+  const L = CK[key];
+  const html = L.groups.map(g => `
+    <section style="margin-bottom:18px">
+      <h3 style="font-family:var(--f-display);font-size:var(--fs-sm);font-weight:600;letter-spacing:.1em;
+        color:var(--accent);margin-bottom:8px">${esc(g.t)}</h3>
+      ${g.rows.map(r => {
+        const s = state.ck[key+":"+r.id] || {};
+        return `<div style="padding:6px 0;border-bottom:1px solid var(--rule)">
+          <label class="chk" style="padding:0"><input type="checkbox" data-ck="${key}:${r.id}:on" ${s.on?"checked":""}>
+            <span>${esc(r.l)}</span></label>
+          ${r.h ? `<p class="footnote" style="margin:2px 0 0 27px">${esc(r.h)}</p>` : ""}
+          <div style="display:grid;grid-template-columns:repeat(${L.cols.length},minmax(0,1fr));gap:8px;margin:6px 0 0 27px">
+            ${L.cols.map(c => `<input type="text" data-ck="${key}:${r.id}:${c.k}" value="${esc(s[c.k]||"")}"
+               placeholder="${esc(c.ph)}" style="font-size:var(--fs-sm);padding:5px 8px">`).join("")}
+          </div>
+        </div>`;
+      }).join("")}
+    </section>`).join("");
+  const st = ckStat(key);
+  el("p-ck-"+key).innerHTML =
+    (L.head ? `<p class="footnote" style="margin:0 0 12px"><b>${esc(L.head)}</b></p>` : "")
+    + `<p class="footnote" style="margin:0 0 12px">已確認 <b>${st.n} / ${st.tot}</b> 項</p>`
+    + html;
+}
+const renderChecklists = () => Object.keys(CK).forEach(renderCk);
+/* ══════ ErP Lot 3 量測與判定 ══════
+   規則來源：(EU) 617/2013 Article 2 ＋ Annex II 條文，
+   以及 Prodigy 實驗室 2026-09 對 A 段 24 題的書面回覆。
+   校準報告：S15 案 T230728-03-35-A0 · R10 案 T2722508103A。
+
+   —— 條文照抄，不要憑印象改 ——
+
+   dGfx 分級（Article 2）　FB_BW = (Data Rate × Data Width) / (8 × 1000)　GB/s
+     G1  FB_BW ≦ 16            G5  96 < FB_BW ≦ 128
+     G2  16 < FB_BW ≦ 32       G6  FB_BW > 128（FB Data Width < 192-bit）
+     G3  32 < FB_BW ≦ 64       G7  FB_BW > 128（FB Data Width ≧ 192-bit）
+     G4  64 < FB_BW ≦ 96
+
+   Category（Annex II）
+     A  不符合 B 或 C 者
+     B  至少有一張 dGfx
+     C  同時滿足：實體核心 ≧ 2、記憶體 ≧ 2GB、
+        且 dGfx 屬 G3(FB Data Width > 128-bit)／G4／G5／G6／G7
+     ※ idle < 6W 者不算 notebook computer，不受本規範
+     ※ notebook 定義含螢幕對角線 ≧ 22.86 cm（9 吋），平板同一套判定
+
+   capability adjustments
+     記憶體　　　　超過 4GB 的部分每 GB ＋0.4
+     額外內部儲存　"beyond the first" —— 有第二顆就 ＋3，且 **只加一次**。
+                   條文若要逐顆計會像 dGfx 那樣寫 "each"（實驗室原話）。
+     Discrete GPU　依分級查 Annex II 1.4.2 的 first／additional 對照表（見 ERP_DGFX_TEC）
+     電視調諧器　　獨立電視調諧器 ＋2.1（1.3.2(c)）；依 1.3.3，只有測試時啟用的才計入
+
+   Off／Sleep limit　WOL **依出貨預設值**，不是「有沒有這個功能」。
+                     出貨 disable 就測 disable（limit 1.0／3.0）。
+                     Energy Star 才要求有 WOL 就必須 default enable。
+   Lowest power state ≦ 0.5 W　一定要判；Off mode 若已低於 0.5，
+                     直接以 Off mode 判定為 lowest power state。
+   Category C 豁免　只免 Etec，Sleep／Off／lowest power state 仍要測與判。 */
+
+const ERP_BASE = { A:27.00, B:36.00, C:60.50 };
+const ERP_LPS_MAX = 0.5;
+
+/* ══════ Annex II 1.4.2（2016-01-01 起適用）dGfx TEC allowance ══════
+   直接照抄 (EU) 617/2013 consolidated 02013R0617-20200301 的 notebook 表。
+   注意這是 1.4.2 的**修訂版**數值，不是 1.3.2(d) 的 2014 版
+   （2014 版 first 為 12／20／26／37／49／61／113，已被 1.4.2 取代）。
+   S15 案報告記的 first dGfx = 61 → 對應 G7。 */
+const ERP_DGFX_TEC = {
+  first: { G1:7, G2:11, G3:13, G4:20, G5:27, G6:33, G7:61 },
+  more:  { G1:4, G2:6,  G3:8,  G4:12, G5:16, G6:20, G7:36 }
+};
+/* Annex II 1.3.2(c)：獨立電視調諧器。只有「測試時啟用」的才算（1.3.3） */
+const ERP_TUNER_TEC = 2.1;
+
+const erpNum = k => { const v = parseFloat((state.erp || {})[k]); return isFinite(v) ? v : null; };
+const erpInt = k => { const v = parseInt((state.erp || {})[k], 10); return isFinite(v) ? v : null; };
+
+/* 出貨時 WOL 預設為 Enable → limit 各 +0.7W。欄位語意是「出貨預設值」。 */
+const erpWol = () => !!(state.erp && state.erp.wol);
+const erpLim = () => ({ off:1 + (erpWol() ? 0.7 : 0), sleep:3 + (erpWol() ? 0.7 : 0) });
+
+/* FB_BW 可由 Data Rate 與 Data Width 反算，省得人工換算 */
+function erpFbBw(){
+  const bw = erpNum("bw");
+  if (bw !== null) return bw;
+  const rate = erpNum("drate"), width = erpNum("dwidth");
+  if (rate === null || width === null) return null;
+  return +((rate * width) / 8000).toFixed(3);
+}
+
+/* dGfx 分級。>128 GB/s 時要有 Data Width 才分得出 G6／G7 —— 缺就回 null，不猜。 */
+function erpDgfx(){
+  const bw = erpFbBw();
+  if (bw === null) return null;
+  if (bw <= 16)  return "G1";
+  if (bw <= 32)  return "G2";
+  if (bw <= 64)  return "G3";
+  if (bw <= 96)  return "G4";
+  if (bw <= 128) return "G5";
+  const w = erpNum("dwidth");
+  if (w === null) return null;
+  return w >= 192 ? "G7" : "G6";
+}
+
+/* Category C 要求的 dGfx 等級。G3 另有 Data Width > 128-bit 的但書。 */
+function erpDgfxMeetsC(){
+  const g = erpDgfx();
+  if (!g) return null;
+  if (g === "G4" || g === "G5" || g === "G6" || g === "G7") return true;
+  if (g === "G3"){ const w = erpNum("dwidth"); return w === null ? null : w > 128; }
+  return false;
+}
+
+const erpCatOv = () => { const v = (state.erp || {}).catOv;
+  return (v === "A" || v === "B" || v === "C") ? v : null; };
+
+/* 自動判定。條件不足以判 C 時退回 B（有 dGfx）或 A，並在畫面上說明理由。 */
+function erpCatAuto(){
+  const hasDgfx = state.mxm.mode === "with" || state.mxm.mode === "both" || erpFbBw() !== null;
+  if (!hasDgfx) return {cat:"A", why:"沒有 dGfx"};
+  const cores = erpInt("cores"), ram = erpNum("ram"), okG = erpDgfxMeetsC();
+  if (cores !== null && ram !== null && okG === true && cores >= 2 && ram >= 2)
+    return {cat:"C", why:"核心 " + cores + " ≧ 2、記憶體 " + ram + "GB ≧ 2、dGfx " + erpDgfx() + " 符合 C 級距"};
+  if (okG === null || cores === null || ram === null)
+    return {cat:"B", why:"有 dGfx。核心數／記憶體／dGfx 分級尚未填齊，無法判斷是否達 Category C"};
+  return {cat:"B", why:"有 dGfx，但未同時滿足 Category C 的三個條件"};
+}
+const erpCat = () => erpCatOv() || erpCatAuto().cat;
+
+/* ETEC_MAX ＝ 基準 ＋ capability adjustments */
+function erpMax(){
+  const cat = erpCat(), parts = [{l:"Category " + cat + " 基準", v:ERP_BASE[cat]}];
+  const ram = erpNum("ram");
+  if (ram !== null && ram > 4)
+    parts.push({l:"記憶體 (" + ram + "−4) GB × 0.4", v:+((ram - 4) * 0.4).toFixed(3)});
+  /* "beyond the first" —— 有第二顆就加，加一次。不是每顆都加。 */
+  const sto = erpInt("storage");
+  if (sto !== null && sto > 1)
+    parts.push({l:"額外內部儲存（第 2 顆起，固定加一次）", v:3});
+  /* dGfx 加值 —— Annex II 1.4.2 的 first／additional 對照表自動帶入。
+     手動欄位（dgfx）有填時以手動值為準，方便實驗室給不同數字時直接覆寫。 */
+  const g = erpDgfx(), man = erpNum("dgfx");
+  if (man !== null && man > 0){
+    parts.push({l:"Discrete GPU（手動覆寫" + (g ? "，本機 " + g : "") + "）", v:man});
+  } else if (g){
+    const n = Math.max(1, erpInt("dgfxN") === null ? 1 : erpInt("dgfxN"));
+    parts.push({
+      l:"Discrete GPU " + g + "（first " + ERP_DGFX_TEC.first[g]
+        + (n > 1 ? " ＋ additional " + ERP_DGFX_TEC.more[g] + " × " + (n - 1) : "") + "）",
+      v:+(ERP_DGFX_TEC.first[g] + (n - 1) * ERP_DGFX_TEC.more[g]).toFixed(3)});
+  }
+  /* 獨立電視調諧器（1.3.2(c)）—— 只有測試時啟用的才算（1.3.3） */
+  if (state.erp && state.erp.tuner)
+    parts.push({l:"獨立電視調諧器 discrete television tuner", v:ERP_TUNER_TEC});
+  return {cat:cat, total:+parts.reduce((s, p) => s + p.v, 0).toFixed(3), parts:parts};
+}
+
+/* Category C 豁免：≧4 核 且 總頻寬 > 225 GB/s 且 記憶體 ≧ 16GB。
+   豁免只免 Etec，其餘量測照做（實驗室原話）。 */
+function erpExempt(){
+  if (erpCat() !== "C") return null;
+  const cores = erpInt("cores"), bw = erpFbBw(), ram = erpNum("ram");
+  if (cores === null || bw === null || ram === null) return {ok:null};
+  return {ok:(cores >= 4 && bw > 225 && ram >= 16), cores:cores, bw:bw, ram:ram};
+}
+
+function erpEtec(){
+  const off = erpNum("poff"), slp = erpNum("psleep"), idle = erpNum("pidle");
+  if (off === null || slp === null || idle === null) return null;
+  return (8760 / 1000) * (0.6 * off + 0.10 * slp + 0.30 * idle);
+}
+
+/* Lowest power state：沒單獨填就用 Off mode 的值
+   （Off mode 低於 0.5 時實驗室直接以它判定）。 */
+function erpLps(){
+  const v = erpNum("plps");
+  return v !== null ? {v:v, from:"單獨量測"} :
+         (erpNum("poff") !== null ? {v:erpNum("poff"), from:"沿用 Off mode 實測值"} : null);
+}
+
+/* 舊存檔遷移：單一 Pidle 之前是 Long／Short 二選一 */
+function erpMigrate(){
+  const E = state.erp;
+  if (!E || E.pidle !== undefined) return;
+  const short = E.pidleUse === "short";
+  E.pidle = E[short ? "pidleShort" : "pidleLong"] || "";
+  if (E.pidleLong || E.pidleShort) E.migFrom = short ? "Short Idle" : "Long Idle";
+}
+
+function renderErp(){
+  const box = el("p-erp"); if (!box) return;
+  erpMigrate();
+  const E = state.erp || {}, L = erpLim(), M = erpMax(), cat = M.cat;
+  const auto = erpCatAuto(), etec = erpEtec(), ex = erpExempt();
+  const lps = erpLps(), g = erpDgfx(), fbw = erpFbBw();
+  const num = (k, ph, st) => `<input type="number" data-erp="${k}" value="${esc(E[k] || "")}"
+    step="${st || "0.001"}" min="0" placeholder="${ph}" style="text-align:right">`;
+  const verdict = (v, lim) => v === null
+    ? '<span style="color:var(--ink-3)">未填</span>'
+    : v <= lim ? '<span style="color:var(--accent);font-weight:600">Pass</span>'
+               : '<span style="color:var(--alert);font-weight:600">Fail</span>';
+  const row = (label, k, lim, note) => `
+    <tr><td class="itm">${label}${note ? `<span class="std">${esc(note)}</span>` : ""}</td>
+      <td class="num">${num(k, "0.000")}</td>
+      <td class="num">${lim === null ? '<span style="color:var(--ink-3)">無 Limit</span>' : lim + " W"}</td>
+      <td class="num">${lim === null ? '<span style="color:var(--ink-3)">—</span>' : verdict(erpNum(k), lim)}</td></tr>`;
+  const fld = (label, k, ph, cap, st) => `
+    <div class="field"><label>${label}</label>${num(k, ph, st)}
+      ${cap ? `<span class="cap" style="color:var(--ink-3);font-size:var(--fs-xs);line-height:1.6">${cap}</span>` : ""}</div>`;
+  const H = [];
+
+  /* ── 機器規格：Category 與 dGfx 分級都靠這幾格 ── */
+  H.push(`<div class="subhead">機器規格　Category 與 dGfx 分級的判定依據</div>`
+    + `<div class="groups">
+        ${fld("CPU 物理核心數", "cores", "例：10", "Category C 需 ≧ 2；豁免需 ≧ 4", "1")}
+        ${fld("系統記憶體（GB）", "ram", "例：64", "Category C 需 ≧ 2；豁免需 ≧ 16；超過 4GB 每 GB ＋0.4", "1")}
+        ${fld("內部儲存顆數", "storage", "例：2", "第 2 顆起固定 ＋3（不逐顆累加）", "1")}
+      </div>`
+    + `<div class="groups">
+        ${fld("dGfx frame buffer 頻寬（GB/s）", "bw", "例：192",
+              "留白則用下面兩欄反算：(Data Rate × Data Width) ÷ 8000", "0.1")}
+        ${fld("　└ Data Rate（MHz）", "drate", "例：12000", "記憶體有效資料頻率", "1")}
+        ${fld("　└ FB Data Width（bit）", "dwidth", "例：128",
+              "分 G6／G7 與 G3 但書都要用它", "1")}
+      </div>`);
+
+  H.push(`<div class="proof" style="margin-top:var(--sp-3)">
+      <b>dGfx 分級：${g ? g : '<span style="color:var(--ink-3)">未判定</span>'}</b>${
+        fbw !== null ? "　FB_BW ＝ " + fbw + " GB/s" : ""}${
+        (erpNum("bw") === null && fbw !== null) ? "（由 Data Rate × Data Width 反算）" : ""}
+      <p class="footnote" style="margin:6px 0 0">
+        G1 ≦16　·　G2 ≦32　·　G3 ≦64　·　G4 ≦96　·　G5 ≦128　·
+        G6 &gt;128（Data Width &lt; 192-bit）　·　G7 &gt;128（Data Width ≧ 192-bit）
+        ${fbw !== null && fbw > 128 && erpNum("dwidth") === null
+          ? '<br><b style="color:var(--hazard)">頻寬超過 128，要填 FB Data Width 才分得出 G6 或 G7。</b>' : ""}</p>
+    </div>`);
+
+  /* ── Category ── */
+  const catBtn = (v, t) => `<button data-v="${v}" aria-pressed="${
+    (v === "auto") ? (erpCatOv() === null) : (erpCatOv() === v)}">${t}</button>`;
+  H.push(`<div class="proof" style="margin-top:var(--sp-3)">
+      <b>Category ${cat}</b>　基準 ${ERP_BASE[cat].toFixed(2)} kWh/year
+      <div class="seg" id="seg-erp-cat" style="margin-top:8px">
+        ${catBtn("auto", "自動")}${catBtn("A", "A")}${catBtn("B", "B")}${catBtn("C", "C")}</div>
+      <p class="footnote" style="margin:6px 0 0">${
+        erpCatOv() ? "目前為<b>手動指定</b>。自動判定的結果是 <b>Category " + auto.cat + "</b>：" + esc(auto.why)
+                   : "自動判定：" + esc(auto.why)}
+        <br>A ＝ 不符合 B 或 C；B ＝ 至少一張 dGfx；
+        C ＝ 核心 ≧ 2 且 記憶體 ≧ 2GB 且 dGfx 屬 G3(Data Width &gt; 128-bit)／G4／G5／G6／G7。</p>
+      <p class="footnote" style="margin:6px 0 0;color:var(--ink-3)">
+        Idle 低於 6W 的產品不算 notebook computer，不受本規範。
+        平板與筆電用同一套判定，但螢幕對角線需 ≧ 22.86 cm（9 吋）。</p>
+    </div>`);
+
+  if (E.migFrom)
+    H.push(`<div class="proof" style="border-left-color:var(--hazard);margin-top:var(--sp-3)">
+      這份存檔是舊版建立的，原本的「${esc(E.migFrom)}」數值已搬到單一 Pidle 欄位。</div>`);
+
+  /* ── 量測 ── */
+  H.push(`<div class="subhead" style="margin-top:var(--sp-4)">量測值與判定</div>`
+    + `<label class="chk"><input type="checkbox" data-erp="wol" ${E.wol ? "checked" : ""}>
+        <span>出貨時 Wake on LAN 預設為 Enable
+        <span class="cap">ErP 依<b>出貨預設值</b>測試，不是看有沒有這個功能 ——
+          出貨 disable 就測 disable。勾選後 Off 與 Sleep 的 limit 各 ＋0.7W。
+          （Energy Star 才要求有 WOL 就必須 default enable）</span></span></label>`);
+
+  H.push(`<div class="tblwrap" style="margin-top:var(--sp-3)"><table>
+      <thead><tr><th>量測項目</th><th class="num">實測值（W）</th>
+        <th class="num">Limit</th><th class="num">判定</th></tr></thead><tbody>
+      ${row("Poff（Off mode S5）", "poff", L.off,
+            "Annex II 4.1：≦ 1.00 W" + (erpWol() ? "，WOL 加值後 1.70 W（4.3(a)）" : "")
+            + "　·　累積 5 分鐘平均")}
+      ${row("Pidle（Long Idle，display off）", "pidle", null,
+            "617/2013 只需要一個 idle，用 display off 的 Long Idle")}
+      ${row("Psleep（Sleep／Modern Standby）", "psleep", L.sleep,
+            "Annex II 2.2：≦ 3.00 W" + (erpWol() ? "，WOL 加值後 3.70 W（2.4(a)）" : "")
+            + "　·　累積 5 分鐘平均")}
+      <tr><td class="itm">Lowest power state<span class="std">Annex II 3.1：≦ ${ERP_LPS_MAX} W
+          <b>固定值，WOL 不放寬</b>（第 3 節沒有 WOL 條款）　·　${
+          lps && lps.from === "沿用 Off mode 實測值"
+            ? "未單獨填時沿用 Off mode 的值" : "單獨量測值，留白則沿用 Off mode"}</span></td>
+        <td class="num">${num("plps", erpNum("poff") !== null ? String(erpNum("poff")) : "0.000")}</td>
+        <td class="num">${ERP_LPS_MAX} W</td>
+        <td class="num">${lps === null
+          ? '<span style="color:var(--ink-3)">未填</span>' : verdict(lps.v, ERP_LPS_MAX)}</td></tr>
+    </tbody></table>
+    <p class="footnote" style="margin:8px 0 0">
+      <b>Off mode 與 lowest power state 是兩條不同的條文、限制值不同，兩條都要判。</b>
+      Off mode（S5）是 Annex II 4.1 的 1.00 W（WOL 出貨啟用時 1.70 W）；
+      lowest power state 是 Annex II 3.1 的 ${ERP_LPS_MAX} W，<b>不受 WOL 加值</b>。
+      實務上常是同一次量測 —— Off mode 若已低於 ${ERP_LPS_MAX} W，
+      實驗室直接以 Off mode 判定為 lowest power state，兩項都算 Pass。
+      若 Off mode 落在 ${ERP_LPS_MAX}～${L.off} W 之間，Off mode 會 Pass 但 lowest power state 會 Fail，
+      這時必須另外找更低的狀態單獨量測並填在左欄。${
+      lps && lps.from === "沿用 Off mode 實測值"
+        ? '<br>目前<b>沿用 Off mode 的 ' + lps.v + ' W</b>。若實驗室另有單獨量測值，填在左欄。' : ""}</p></div>`);
+
+  /* ── ETEC_MAX ── */
+  H.push(`<div class="proof" style="margin-top:var(--sp-3)">
+      <b>ETEC_MAX ＝ ${M.parts.map(p => p.v).join(" ＋ ")} ＝ ${M.total.toFixed(2)} kWh/year</b>
+      <p class="footnote" style="margin:6px 0 0">${
+        M.parts.map(p => esc(p.l) + " ＝ " + p.v).join("　·　")}</p>
+      ${!g ? `<p class="footnote" style="margin:6px 0 0;color:var(--hazard)">
+        dGfx 分級還沒判出來（frame buffer 頻寬或 FB Data Width 未填），
+        <b>ETEC_MAX 沒有算進 dGfx 加值</b>。沒有 dGfx 的機種請忽略這一句。</p>` : ""}
+    </div>`
+    + `<div class="groups" style="margin-top:var(--sp-3)">
+        ${fld("dGfx 張數", "dgfxN", "例：1",
+              "第一張用 first 欄、第二張起用 additional 欄。留白視為 1 張", "1")}
+        <div class="field"><label>Discrete GPU 加值　手動覆寫（kWh/year）</label>
+          ${num("dgfx", g ? "留白＝自動帶 " + ERP_DGFX_TEC.first[g] : "留白＝依分級自動帶入", "0.1")}
+          <span class="cap" style="color:var(--ink-3);font-size:var(--fs-xs);line-height:1.6">
+            只有實驗室給的數字與條文不同時才填。留白就用下面 Annex II 1.4.2 的對照表自動帶入。</span></div>
+      </div>`
+    + `<label class="chk"><input type="checkbox" data-erp="tuner" ${E.tuner ? "checked" : ""}>
+        <span>有獨立電視調諧器（discrete television tuner）
+        <span class="cap">Annex II 1.3.2(c)：＋${ERP_TUNER_TEC} kWh/year。
+          依 1.3.3，只有<b>測試時啟用</b>的調諧器與 dGfx 才計入加值。</span></span></label>`
+    + `<div class="proof" style="margin-top:var(--sp-3)">
+        <b>dGfx TEC allowance　(EU) 617/2013 Annex II 1.4.2（2016-01-01 起）</b>
+        <div class="tblwrap" style="margin-top:8px"><table>
+          <thead><tr><th>dGfx category</th>${["G1","G2","G3","G4","G5","G6","G7"]
+            .map(k => `<th class="num">${k}</th>`).join("")}</tr></thead>
+          <tbody>
+            <tr><td class="itm">First dGfx</td>${["G1","G2","G3","G4","G5","G6","G7"]
+              .map(k => `<td class="num"${k === g ? ' style="font-weight:600;color:var(--accent)"' : ""}>${
+                ERP_DGFX_TEC.first[k]}</td>`).join("")}</tr>
+            <tr><td class="itm">Each additional dGfx</td>${["G1","G2","G3","G4","G5","G6","G7"]
+              .map(k => `<td class="num"${k === g ? ' style="font-weight:600;color:var(--accent)"' : ""}>${
+                ERP_DGFX_TEC.more[k]}</td>`).join("")}</tr>
+          </tbody></table></div>
+        <p class="footnote" style="margin:8px 0 0">單位 kWh/year。這是 1.4.2 的<b>修訂版</b>數值；
+          條文另有一組 1.3.2(d) 的 2014 版（first 12／20／26／37／49／61／113），已被 1.4.2 取代，不要拿錯。
+          其餘 capability adjustments：記憶體超過 4GB 每 GB ＋0.4（1.3.2(a)）、
+          額外內部儲存 ＋3（1.3.2(b)，固定一次不逐顆累加）。</p></div>`);
+
+  /* ── 豁免 ── */
+  if (ex){
+    H.push(`<div class="proof" style="margin-top:var(--sp-3);border-left-color:${
+          ex.ok === true ? "var(--accent)" : "var(--rule)"}">
+        <b>Category C 豁免判定</b>　需同時：核心 ≧ 4、FB_BW &gt; 225 GB/s、記憶體 ≧ 16GB
+        <p style="margin:6px 0 0">${
+          ex.ok === null
+            ? '<span style="color:var(--ink-3)">核心數／頻寬／記憶體填齊才判定。</span>'
+            : ex.ok
+              ? '<b style="color:var(--accent)">符合豁免</b>　'
+                + ex.cores + " 核 ≧ 4　·　" + ex.bw + " GB/s > 225　·　" + ex.ram + "GB ≧ 16"
+              : "<b>不符合豁免</b>　"
+                + ex.cores + " 核" + (ex.cores >= 4 ? " ✓" : " ✗") + "　·　"
+                + ex.bw + " GB/s" + (ex.bw > 225 ? " ✓" : " ✗（需 > 225）") + "　·　"
+                + ex.ram + "GB" + (ex.ram >= 16 ? " ✓" : " ✗")}</p>
+        <p class="footnote" style="margin:6px 0 0">
+          豁免<b>只免 Etec</b> —— Sleep、Off mode、lowest power state 仍要量測與判定。
+          實驗室會在報告上註記符合並判定 as exempt。</p></div>`);
+  }
+
+  /* ── Etec ── */
+  const exempt = ex && ex.ok === true;
+  H.push(`<div class="proof" style="margin-top:var(--sp-3);border-left-color:${
+        exempt ? "var(--accent)" : etec === null ? "var(--rule)"
+          : etec <= M.total ? "var(--accent)" : "var(--alert)"}">
+      <b>Etec ＝ (8760/1000) × (0.6 Poff ＋ 0.10 Psleep ＋ 0.30 Pidle)</b>
+      <p style="margin:6px 0 0;font-family:var(--f-mono)">
+        ${etec === null
+          ? '<span style="color:var(--ink-3)">Poff／Pidle／Psleep 都填齊才會計算。</span>'
+          : "8.76 × (0.6×" + erpNum("poff") + " ＋ 0.10×" + erpNum("psleep")
+            + " ＋ 0.30×" + erpNum("pidle") + ") ＝ <b>" + etec.toFixed(6) + "</b> kWh/year"
+            + "<br>vs　ETEC_MAX " + M.total.toFixed(2) + "　→　"
+            + (etec <= M.total ? '<b style="color:var(--accent)">Pass</b>'
+                               : '<b style="color:var(--alert)">Fail</b>')}
+      </p>${exempt ? `<p class="footnote" style="margin:6px 0 0;color:var(--accent)">
+        本機符合 Category C 豁免，<b>Etec 不列入判定</b>；上面的計算僅供參考。</p>` : ""}</div>`);
+
+  H.push(`<div class="field" style="margin-top:var(--sp-3)">
+      <label>Backlight 90 nits 對應的 Windows 亮度百分比</label>
+      <input type="text" data-erp="brightness" value="${esc(E.brightness || "")}"
+        placeholder="例：R10 約 26%">
+      <span class="cap" style="color:var(--ink-3);font-size:var(--fs-xs);line-height:1.6">
+        每個機種不同，量到之後記在這裡，下次同機種送測直接用。</span></div>`);
+  H.push(`<div class="field"><label>其他備註</label>
+      <input type="text" data-erp="note" value="${esc(E.note || "")}"
+        placeholder="例：TH 追加的 110V 實測結果、BIOS/EC 版本"></div>`);
+
+  box.innerHTML = H.join("");
+}
+
+/* ErP 量測資料有沒有填過 —— 沒填就不必出現在匯出裡 */
+const erpHasData = () => ["poff","pidle","psleep","plps","ram","storage","dgfx","dgfxN",
+  "cores","bw","drate","dwidth","brightness","note"]
+  .some(k => String((state.erp || {})[k] || "").trim() !== "")
+  || !!(state.erp && (state.erp.wol || state.erp.tuner));
+
+/* 匯出用的純文字版 */
+function erpText(){
+  const E = state.erp || {}, L = erpLim(), M = erpMax(), auto = erpCatAuto();
+  const etec = erpEtec(), ex = erpExempt(), lps = erpLps(), g = erpDgfx(), fbw = erpFbBw();
+  const v = k => { const n = erpNum(k); return n === null ? "未填" : n + " W"; };
+  const out = [
+    ["Category", M.cat + (erpCatOv() ? "（手動指定；自動判定為 " + auto.cat + "）"
+                                     : "（自動：" + auto.why + "）")],
+    ["dGfx 分級", g ? g + (fbw !== null ? "　FB_BW " + fbw + " GB/s" : "") : "未判定"],
+    ["dGfx 張數", (erpInt("dgfxN") === null ? "未填（視為 1 張）" : erpInt("dgfxN") + " 張")
+      + (g ? "　allowance first " + ERP_DGFX_TEC.first[g] + "／additional " + ERP_DGFX_TEC.more[g] : "")],
+    ["獨立電視調諧器", (state.erp && state.erp.tuner) ? "有，＋" + ERP_TUNER_TEC + " kWh/year" : "無"],
+    ["ETEC_MAX", M.parts.map(p => p.v).join(" ＋ ") + " ＝ " + M.total.toFixed(2) + " kWh/year"],
+    ["　明細", M.parts.map(p => p.l + " ＝ " + p.v).join("；")],
+    ["Wake on LAN", erpWol() ? "出貨預設 Enable（Off／Sleep limit 各 +0.7W）"
+                             : "出貨預設 Disable"],
+    ["Poff（Off mode S5）", v("poff") + "　limit ≦ " + L.off + " W（Annex II 4.1"
+      + (erpWol() ? " ＋ 4.3(a) WOL 加值 0.7W" : "") + "）"],
+    ["Pidle（Long Idle, display off）", v("pidle") + "　無 limit"],
+    ["Psleep（Sleep）", v("psleep") + "　limit ≦ " + L.sleep + " W（Annex II 2.2"
+      + (erpWol() ? " ＋ 2.4(a) WOL 加值 0.7W" : "") + "）"],
+    ["Lowest power state", lps === null ? "未填"
+      : lps.v + " W（" + lps.from + "）　limit ≦ " + ERP_LPS_MAX + " W（Annex II 3.1，WOL 不放寬）　→　"
+        + (lps.v <= ERP_LPS_MAX ? "Pass" : "Fail")],
+    ["Etec 實測", etec === null ? "資料未填齊，未計算"
+      : etec.toFixed(6) + " kWh/year　→　" + (etec <= M.total ? "Pass" : "Fail")]
+  ];
+  if (ex) out.push(["Category C 豁免", ex.ok === null ? "核心數／頻寬／記憶體未填齊，未判定"
+    : ex.ok ? "符合（" + ex.cores + " 核 ≧ 4；" + ex.bw + " GB/s > 225；" + ex.ram + "GB ≧ 16）"
+              + "。只免 Etec，Sleep／Off／lowest power state 仍需判定"
+            : "不符合（" + ex.cores + " 核／" + ex.bw + " GB/s／" + ex.ram + "GB）"]);
+  if (E.brightness) out.push(["Backlight 90 nits 對應亮度", E.brightness]);
+  if (E.note) out.push(["備註", E.note]);
+  return out;
+}
+
+/* 匯出用的純文字版 */
+const CK_TITLE = {erp:"ErP 送測前 SOP 確認清單", review:"Safety Design Review 重點確認",
+                  c1d2:"C1D2 確認清單", atex:"ATEX 確認清單"};
+function ckText(){
+  return Object.keys(CK).map(key => {
+    const L = CK[key], gs = [];
+    L.groups.forEach(g => {
+      const ls = [];
+      g.rows.forEach(r => {
+        const s = state.ck[key+":"+r.id] || {};
+        const extra = L.cols.map(c => s[c.k]).filter(Boolean).join(" · ");
+        if (s.on || extra) ls.push((s.on ? "[V] " : "[ ] ") + r.l + (extra ? "　→ " + extra : ""));
+      });
+      if (ls.length) gs.push({t:g.t, ls});
+    });
+    return {key, t:CK_TITLE[key], gs};
+  }).filter(x => x.gs.length);
+}
+
+/* ══════ 各大項欄位的輸出內容 ══════
+   build() 回傳區塊陣列，Word 與 PDF 共用同一份內容 */
+const DOCS = {
+
+config:{ title:"申請組態 Based on", build(){
+  const kv = [];
+  kv.push(["機種", state.model]);
+  kv.push(["申請階段", state.caseType === "delta" ? "變更申請" : "全新申請"]);
+  kv.push(["產品類別", pcls().name + "　·　ErP 適用 " + pcls().erp]);
+  kv.push(["申請標準", state.ulcbVer]);
+  const SCH = MAIN_ORDER.concat(["ul4200a","cdrh","c1d2","atex","ts"])
+    .filter(id => state.on[id])
+    .map(id => (ITEMS.find(i => i.id === id) || {}).name || id);
+  kv.push(["申請的認證項目", SCH.join("、") || "—"]);
+  const A = state.adapters.filter(a => a.on).map(a =>
+    (a.custom ? (a.label || "自訂規格") : a.label) + (a.pn ? "（" + a.pn + "）" : "")
+    + (a.unappr ? " 未認可" : "") + (a.extra ? " ／追加認證：" + a.extra : ""));
+  kv.push(["Adapter（認可品）", A.join("；") || "—"]);
+  kv.push(["電池", state.batteries.filter(b => b.on)
+    .map(b => b.label + (b.pn ? "（" + b.pn + "）" : "")).join("\n") || "—"]);
+  kv.push(["M.4.4 加測", state.m44.on
+    ? Math.max(1, state.m44.sources) + " source" + (state.m44.note ? "（" + state.m44.note + "）" : "") : "不需"]);
+  kv.push(["Fan 結構", {none:"w/o Fan", with:"with Fan", both:"with Fan ＋ w/o Fan（兩者皆評估）"}[state.fan.mode]
+    + (state.fan.pn ? "（" + state.fan.pn + "）" : "") + (state.fan.unappr ? " 未認可" : "")]);
+  kv.push(["MXM 結構", {none:"w/o MXM", with:"with MXM", both:"with MXM ＋ w/o MXM（兩者皆評估）"}[state.mxm.mode]
+    + (state.mxm.pn ? "（" + state.mxm.pn + "）" : "") + (state.mxm.unappr ? " 未認可" : "")]);
+  const P = state.ports.filter(p => (parseInt(p.qty)||0) > 0).map(p => p.label + " × " + p.qty);
+  kv.push(["外接 PORT（5V, 0.5A）", [P.join("；"), state.portNote].filter(Boolean).join("　／　") || "—"]);
+  if (state.caseType === "delta") kv.push(["已認證範圍（已涵蓋、不必重送）", scopeText()]);
+  if (cfgOn().length) kv.push(["產品配置說明", cfgList().join("\n")]);
+  const C = state.comps.filter(c => c.on).map(c =>
+    c.label + (c.vendor ? " " + c.vendor : "") + (c.pn ? "（" + c.pn + "）" : "")
+    + (c.std ? " — " + c.std : "") + (c.apprOn ? "（認可品）" : "") + (c.unappr ? " 未認可" : "")
+    + (c.unappr && c.smp ? "，樣品 " + c.smp + " 件" : ""));
+  if (C.length) kv.push(["關鍵零件", C.join("\n")]);
+  const EX = [];
+  if (state.on.c1d2) EX.push("C1D2：" + stdOf(ITEMS.find(i => i.id === "c1d2")));
+  if (state.on.atex) EX.push("ATEX：" + stdOf(ITEMS.find(i => i.id === "atex")));
+  if (state.on.ts)   EX.push("TS："   + stdOf(ITEMS.find(i => i.id === "ts")));
+  if (EX.length) kv.push(["防爆認證", EX.join("\n")]);
+  const AC = state.accs.filter(a => a.on).map(a =>
+    (a.name || "配件") + (a.pn ? "（" + a.pn + "）" : "") + (a.spec ? " · " + a.spec : "")
+    + (a.std ? " — " + a.std : ""));
+  if (AC.length) kv.push(["自製配件", AC.join("\n")]);
+  return [{kv}];
+}},
+
+docs:{ title:"送審文件需求", build(){
+  const D = docSections();
+  if (!D.length) return [];
+  const st = docStat();
+  const B = [{p:"已備齊 " + st.n + " / " + st.tot + " 項"}];
+  D.forEach(d => {
+    const rows = d.items.map(it => {
+      const s = docIt(it.id);
+      return [s.on ? "V" : "□", it.l + (it.h ? "\n" + it.h : ""), s.ver || "", s.rm || ""];
+    });
+    B.push({h:d.t + "（" + d.items.filter(it => docIt(it.id).on).length + " / " + d.items.length + "）",
+      table:{head:["備齊", "文件項目", "版本 / 日期", "備註"], rows}});
+    if (state.docNote[d.t]) B.push({p:"補充說明：" + state.docNote[d.t]});
+  });
+  const cus = (state.docCustom || []).filter(Boolean);
+  if (cus.length) B.push({h:"自訂文件項目", list:cus});
+  return B;
+}},
+
+/* 關鍵元件資訊（CB report 4.1.2）—— 空表就不輸出，不要交一張空白表出去 */
+ccl:{ title:"關鍵元件資訊（CB report 4.1.2）", build(){
+  const R = (state.ccl || []).filter(r => CCL_COLS.some(c => String(r[c.k] || "").trim()));
+  if (!R.length) return [];
+  return [
+    {p:"對應 CB report 4.1.2 TABLE: Critical components information。"
+      + "可互換的零件在 Manufacturer／Type 填 Interchangeable，並另開一列 (alt.) 列出替代 source。"},
+    {table:{head:CCL_COLS.map(c => c.ph), rows:R.map(r => CCL_COLS.map(c => r[c.k] || ""))}}
+  ];
+}},
+
+prep:{ title:"送測前注意事項", build(){
+  return prepText().map(p => ({h:p.t, list:p.ls}));
+}}
+
+};
+
+/* 四份確認清單共用同一個產生器 */
+Object.keys(CK).forEach(key => {
+  DOCS["ck-" + key] = { title:CK_TITLE[key], build(){
+    const L = CK[key], B = [];
+    if (L.head) B.push({p:L.head});
+    const st = ckStat(key);
+    B.push({p:"已確認 " + st.n + " / " + st.tot + " 項"});
+    L.groups.forEach(g => {
+      const rows = g.rows.map(r => {
+        const s = state.ck[key + ":" + r.id] || {};
+        return [s.on ? "V" : "□", r.l + (r.h ? "\n" + r.h : "")]
+          .concat(L.cols.map(c => s[c.k] || ""));
+      });
+      B.push({h:g.t, table:{head:["確認", "項目"].concat(L.cols.map(c => c.ph)), rows}});
+    });
+    /* ErP 的量測與判定不在 CK 結構裡，輸出時要一併帶上，否則報告少一半 */
+    if (key === "erp") B.push({h:"量測與判定", kv:erpText()});
+    return B;
+  }};
+});
+/* ══════ 標準模板：Arial 12 ══════
+   docx 的字級單位是「半點」，所以 12pt = 24。
+   Arial 沒有中日韓字符，eastAsia 另指微軟正黑體，中文才不會變成方框。 */
+const DOC_FONT = { latin:"Arial", cjk:"Microsoft JhengHei" };
+const DOC_FS = { body:24, table:24, h:28, title:40, meta:18 };   /* 12 / 12 / 14 / 20 / 9 pt */
+
+const CRC_T = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++){
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(u8){
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < u8.length; i++) c = CRC_T[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+/* 不壓縮的 ZIP。Office 檔就是 ZIP，STORE 一樣讀得開，省掉非同步壓縮 */
+function zipStore(files){
+  const enc = new TextEncoder(), local = [], central = [];
+  let off = 0;
+  files.forEach(f => {
+    const nm = enc.encode(f.name);
+    const data = typeof f.data === "string" ? enc.encode(f.data) : f.data;
+    const crc = crc32(data), sz = data.length;
+    const lh = new Uint8Array(30 + nm.length), lv = new DataView(lh.buffer);
+    lv.setUint32(0, 0x04034b50, true); lv.setUint16(4, 20, true); lv.setUint16(6, 0x0800, true);
+    lv.setUint16(8, 0, true); lv.setUint16(10, 0, true); lv.setUint16(12, 0x21, true);
+    lv.setUint32(14, crc, true); lv.setUint32(18, sz, true); lv.setUint32(22, sz, true);
+    lv.setUint16(26, nm.length, true); lv.setUint16(28, 0, true);
+    lh.set(nm, 30);
+    const ch = new Uint8Array(46 + nm.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true); cv.setUint16(4, 20, true); cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0x0800, true); cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true); cv.setUint16(14, 0x21, true);
+    cv.setUint32(16, crc, true); cv.setUint32(20, sz, true); cv.setUint32(24, sz, true);
+    cv.setUint16(28, nm.length, true); cv.setUint32(42, off, true);
+    ch.set(nm, 46);
+    local.push(lh, data); central.push(ch);
+    off += lh.length + sz;
+  });
+  const cdSz = central.reduce((s, c) => s + c.length, 0);
+  const eo = new Uint8Array(22), ev = new DataView(eo.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(8, files.length, true); ev.setUint16(10, files.length, true);
+  ev.setUint32(12, cdSz, true); ev.setUint32(16, off, true);
+  const out = new Uint8Array(off + cdSz + 22);
+  let p = 0;
+  local.concat(central, [eo]).forEach(c => { out.set(c, p); p += c.length; });
+  return out;
+}
+
+const xe = s => String(s == null ? "" : s)
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const W_NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+
+/* 一段文字。opts: b 粗體、sz 半點字級、color、fill 底色、before/after 段距 */
+function wP(text, o){
+  o = o || {};
+  /* OOXML 的 rPr／pPr 子元素順序是 schema 規定的，順序錯了 Word 會說檔案毀損。
+     rPr：b → color → sz → szCs　　pPr：shd → spacing → ind */
+  const rPr = "<w:rPr>" + (o.b ? "<w:b/>" : "")
+    + (o.color ? `<w:color w:val="${o.color}"/>` : "")
+    + (o.sz ? `<w:sz w:val="${o.sz}"/><w:szCs w:val="${o.sz}"/>` : "") + "</w:rPr>";
+  const pPr = "<w:pPr>"
+    + (o.fill ? `<w:shd w:val="clear" w:fill="${o.fill}"/>` : "")
+    + `<w:spacing w:before="${o.before || 0}" w:after="${o.after == null ? 80 : o.after}"/>`
+    + (o.bullet ? '<w:ind w:left="360" w:hanging="180"/>' : "") + "</w:pPr>";
+  const body = String(text == null ? "" : text).split("\n").map((ln, i) =>
+    (i ? "<w:br/>" : "") + `<w:t xml:space="preserve">${xe(ln)}</w:t>`).join("");
+  return `<w:p>${pPr}<w:r>${rPr}${body}</w:r></w:p>`;
+}
+function wTable(head, rows){
+  const bd = ["top","left","bottom","right","insideH","insideV"]
+    .map(s => `<w:${s} w:val="single" w:sz="4" w:space="0" w:color="C9D1CD"/>`).join("");
+  const cols = Math.max(head ? head.length : 0, ...rows.map(r => r.length)) || 1;
+  const grid = Array.from({length: cols}, () => `<w:gridCol w:w="${Math.floor(9200/cols)}"/>`).join("");
+  const cell = (v, hd) =>
+    `<w:tc><w:tcPr><w:tcW w:w="${Math.floor(9200/cols)}" w:type="dxa"/>`
+    + (hd ? '<w:shd w:val="clear" w:fill="EFF3F1"/>' : "") + "</w:tcPr>"
+    + wP(v, {b: !!hd, after: 0, sz: DOC_FS.table}) + "</w:tc>";
+  const tr = (cs, hd) => "<w:tr>"
+    + Array.from({length: cols}, (_, i) => cell(cs[i] == null ? "" : cs[i], hd)).join("") + "</w:tr>";
+  return "<w:tbl><w:tblPr><w:tblW w:w=\"5000\" w:type=\"pct\"/><w:tblBorders>" + bd
+    + "</w:tblBorders></w:tblPr><w:tblGrid>" + grid + "</w:tblGrid>"
+    + (head && head.length ? tr(head, true) : "")
+    + rows.map(r => tr(r, false)).join("") + "</w:tbl>" + wP("", {after: 0, sz: 8});
+}
+
+function blocksToDocx(title, blocks){
+  const body = [];
+  body.push(wP(ORG_FOOTER, {sz: DOC_FS.meta, color: "737E79", after: 20}));
+  body.push(wP(title, {b: true, sz: DOC_FS.title, color: "B3241A", after: 60}));
+  body.push(wP(state.model + "　"
+    + (state.caseType === "delta" ? "變更申請" : "全新申請")
+    + "　Tester：" + REPORTER
+    + "　產生時間 " + nowStamp(), {sz: DOC_FS.meta, color: "737E79", after: 200}));
+  blocks.forEach(b => {
+    if (b.h)     body.push(wP(b.h, {b: true, sz: DOC_FS.h, color: "0E5A52", before: 220, after: 90}));
+    if (b.p)     body.push(wP(b.p, {sz: DOC_FS.body}));
+    if (b.list)  b.list.forEach(x => body.push(wP("・" + x, {sz: DOC_FS.body, bullet: true, after: 40})));
+    if (b.kv)    body.push(wTable(null, b.kv));
+    if (b.table) body.push(wTable(b.table.head, b.table.rows));
+  });
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document ${W_NS}><w:body>${body.join("")}
+<w:sectPr><w:pgSz w:w="11906" w:h="16838"/>
+<w:pgMar w:top="1134" w:right="1021" w:bottom="1134" w:left="1021" w:header="709" w:footer="709"/>
+</w:sectPr></w:body></w:document>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles ${W_NS}><w:docDefaults><w:rPrDefault><w:rPr>
+<w:rFonts w:ascii="${DOC_FONT.latin}" w:hAnsi="${DOC_FONT.latin}" w:eastAsia="${DOC_FONT.cjk}" w:cs="${DOC_FONT.latin}"/>
+<w:sz w:val="${DOC_FS.body}"/><w:szCs w:val="${DOC_FS.body}"/></w:rPr></w:rPrDefault>
+<w:pPrDefault><w:pPr><w:spacing w:after="80" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault>
+</w:docDefaults></w:styles>`;
+  const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+</Types>`;
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+  const drels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+  return zipStore([
+    {name:"[Content_Types].xml",        data:ct},
+    {name:"_rels/.rels",                data:rels},
+    {name:"word/document.xml",          data:doc},
+    {name:"word/styles.xml",            data:styles},
+    {name:"word/_rels/document.xml.rels", data:drels}
+  ]);
+}
+
+/* PDF 路線：頁面本身無法直接產生 PDF，改為輸出排好版的 HTML，
+   使用者開檔後 Ctrl+P → 另存為 PDF */
+function blocksToHTML(title, blocks){
+  const H = [];
+  blocks.forEach(b => {
+    if (b.h)    H.push(`<h2>${esc(b.h)}</h2>`);
+    if (b.p)    H.push(`<p>${esc(b.p)}</p>`);
+    if (b.list) H.push(`<ul>${b.list.map(x => `<li>${esc(x)}</li>`).join("")}</ul>`);
+    if (b.kv)   H.push(`<table>${b.kv.map(r =>
+                  `<tr><td class="k">${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</table>`);
+    if (b.table) H.push(`<table>`
+                  + (b.table.head ? `<tr>${b.table.head.map(x => `<th>${esc(x)}</th>`).join("")}</tr>` : "")
+                  + b.table.rows.map(r => `<tr>${r.map(x => `<td>${esc(x)}</td>`).join("")}</tr>`).join("")
+                  + `</table>`);
+  });
+  return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>${esc(title)}</title>
+<style>
+  @page{size:A4 portrait;margin:14mm}
+  /* 標準模板：Arial 12。Arial 無中日韓字符，中文交給微軟正黑體接手 */
+  body{font-family:Arial,"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:12pt;
+       color:#151b1c;line-height:1.55;margin:0;padding:14mm}
+  .banner{background:#d3e4df;border:1px solid #0e5a52;border-radius:6px;padding:10px 14px;
+          margin:0 0 16pt;font-size:10pt;color:#0e5a52}
+  .eyebrow{font-size:9pt;letter-spacing:.14em;color:#737e79;text-transform:uppercase}
+  h1{font-size:20pt;margin:2pt 0 4pt;color:#b3241a}
+  .meta{font-size:9pt;color:#737e79;margin:0 0 14pt}
+  h2{font-size:14pt;margin:15pt 0 5pt;padding:3pt 7pt;background:#d3e4df;color:#0e5a52;
+     border-left:3pt solid #0e5a52;break-after:avoid}
+  p{margin:0 0 6pt}
+  ul{margin:0 0 8pt;padding-left:18pt} li{margin-bottom:3pt}
+  table{border-collapse:collapse;width:100%;margin:0 0 10pt;break-inside:auto}
+  th,td{border:.5pt solid #c9d1cd;padding:4pt 7pt;vertical-align:top;font-size:12pt;text-align:left}
+  th{background:#eff3f1;color:#46524f;font-weight:600}
+  td.k{background:#f5f8f6;font-weight:600;white-space:nowrap;width:1%}
+  tr{break-inside:avoid}
+  @media print{ .banner{display:none} body{padding:0} }
+</style></head><body>
+<div class="banner"><b>要存成 PDF：</b>按 Ctrl+P（Mac 為 ⌘+P）→ 印表機選「另存為 PDF」→ 儲存。這段提示不會被印出來。</div>
+<div class="eyebrow">${esc(ORG_FOOTER)}</div>
+<h1>${esc(title)}</h1>
+<p class="meta">${esc(state.model)}　${state.caseType === "delta" ? "變更申請" : "全新申請"}　Tester：${esc(REPORTER)}　產生時間 ${esc(nowStamp())}</p>
+${H.join("\n")}
+</body></html>`;
+}
+
+const nowStamp = () => { const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-"
+       + String(d.getDate()).padStart(2,"0") + " " + String(d.getHours()).padStart(2,"0")
+       + ":" + String(d.getMinutes()).padStart(2,"0"); };
+
+/* 每個大項欄位的輸出按鈕 */
+
+async function doExportSection(key, kind){
+  const S = DOCS[key];
+  if (!S){ note("找不到這個區塊。"); return; }
+  let blocks;
+  try { blocks = S.build(); }
+  catch(e){ note("產生內容失敗：" + e.message); return; }
+  if (!blocks || !blocks.length){ note("「" + S.title + "」目前沒有內容可輸出。"); return; }
+  const base = state.model + "_" + S.title.replace(/[\\/:*?"<>|]/g, "") + "_" + nowStamp().slice(0,10);
+  if (kind === "w"){
+    const r = await dlSave(base + ".docx", blocksToDocx(S.title, blocks), "已輸出 " + base + ".docx。");
+    if (r && r !== "saved") note(r === "declined" ? "已取消輸出。"
+      : r === "extension_not_enabled" ? "這個環境不允許輸出 .docx，請改用 PDF。"
+      : r === "rate_limited" ? "剛剛已有存檔提示，請稍候再試。" : "輸出失敗（" + r + "）。");
+  } else {
+    const r = await dlSave(base + ".html", blocksToHTML(S.title, blocks),
+      "已輸出 " + base + ".html —— 開檔後 Ctrl+P → 另存為 PDF。");
+    if (r && r !== "saved") note(r === "declined" ? "已取消輸出。" : "輸出失敗（" + r + "）。");
+  }
+}
+
+/* ══════ 列印抬頭：把左欄的申請組態摘要帶進 PDF ══════ */
+function renderPrintHead(){
+  const A = state.adapters.filter(a => a.on).map(a =>
+    (a.custom ? (a.label || "自訂規格") : a.label)
+    + (a.pn ? "（" + a.pn + "）" : "")
+    + (a.unappr ? " 未認可" : "")
+    + (a.extra ? " ／追加認證：" + a.extra : ""));
+  const B = state.batteries.filter(b => b.on).map(b => b.label + (b.pn ? "（" + b.pn + "）" : ""));
+  const C = state.comps.filter(c => c.on).map(c =>
+    c.label + (c.vendor ? " " + c.vendor : "") + (c.pn ? "（" + c.pn + "）" : "")
+    + (c.std ? " — " + c.std : "") + (c.apprOn ? "（認可品）" : "") + (c.unappr ? " 未認可" : "")
+    + (c.unappr && c.smp ? "，樣品 " + c.smp + " 件" : ""));
+  const AC = state.accs.filter(a => a.on).map(a =>
+    (a.name || "配件") + (a.pn ? "（" + a.pn + "）" : "") + (a.spec ? " · " + a.spec : "") + (a.std ? " — " + a.std : ""));
+  const fanTxt = {none:"w/o Fan", with:"with Fan", both:"with Fan ＋ w/o Fan（兩者皆評估）"}[state.fan.mode];
+  const mxmTxt = {none:"w/o MXM", with:"with MXM", both:"with MXM ＋ w/o MXM（兩者皆評估）"}[state.mxm.mode];
+  const EX = [];
+  if (state.on.c1d2) EX.push("C1D2：" + stdOf(ITEMS.find(i=>i.id==="c1d2")));
+  if (state.on.atex) EX.push("ATEX：" + stdOf(ITEMS.find(i=>i.id==="atex")));
+  if (state.on.ts)   EX.push("TS："   + stdOf(ITEMS.find(i=>i.id==="ts")));
+  const SCH = MAIN_ORDER.concat(["ul4200a","cdrh","c1d2","atex","ts"])
+    .filter(id => state.on[id]).map(id => (ITEMS.find(i => i.id === id) || {}).name || id);
+
+  const PORT = [state.ports.filter(p => (parseInt(p.qty)||0) > 0)
+                  .map(p => p.label + " × " + p.qty).join("；"), state.portNote]
+                .filter(Boolean).join("　／　");
+
+  el("printhead").innerHTML = `<div class="wrap">
+    <div class="ph">
+      <div><b>機種</b>　${esc(state.model)}</div>
+      <div><b>申請階段</b>　${state.caseType === "delta" ? "變更申請" : "全新申請"}</div>
+      <div><b>產品類別</b>　${esc(pcls().name)}　ErP 適用 ${esc(pcls().erp)}</div>
+      <div><b>申請標準</b>　${esc(state.ulcbVer)}</div>
+      <div><b>Tester</b>　${esc(REPORTER)}</div>
+      <div><b>產生時間</b>　${esc(nowStamp())}</div>
+    </div>
+    <h3>申請組態 Based on</h3>
+    <ul>
+      <li>認證項目：${SCH.length ? esc(SCH.join("、")) : "—"}</li>
+      <li>Adapter（認可品）：${A.length ? esc(A.join("；")) : "—"}</li>
+      <li>電池：${B.length ? esc(B.join("；")) : "—"}${state.m44.on
+          ? "　／ M.4.4 加測 " + Math.max(1,state.m44.sources) + " source"
+            + (state.m44.note ? "（" + esc(state.m44.note) + "）" : "") : ""}</li>
+      <li>Fan 結構：${fanTxt}${state.fan.pn ? "（" + esc(state.fan.pn) + "）" : ""}${state.fan.unappr ? " 未認可" : ""}</li>
+      <li>MXM 結構：${mxmTxt}${state.mxm.pn ? "（" + esc(state.mxm.pn) + "）" : ""}${state.mxm.unappr ? " 未認可" : ""}</li>
+      ${PORT ? `<li>外接 PORT（Testing by 5V, 0.5A）：${esc(PORT)}</li>` : ""}
+      ${cfgOn().length ? `<li>產品配置說明：${esc(cfgList().join("；"))}</li>` : ""}
+      ${state.caseType === "delta" ? `<li>已認證範圍（已涵蓋、不必重送）：${esc(scopeLine())}</li>` : ""}
+      ${C.length ? `<li>關鍵零件：${esc(C.join("；"))}</li>` : ""}
+      ${EX.length ? `<li>防爆認證：${esc(EX.join("；"))}</li>` : ""}
+      ${AC.length ? `<li>自製配件：${esc(AC.join("；"))}</li>` : ""}
+    </ul>
+  </div>`;
+}
+
+/* 摘要列用的短標籤。★ 新增 prepSections 區段時要一起加，否則摘要列會露出原始鍵值
+   （erp4200 就漏過一次，畫面上直接顯示「erp4200」）。也不要用 toUpperCase()。 */
+const PREP_SHORT = {ulcb:"UL+CB", erp:"ErP", bcs:"北美能耗", erp4200:"ErP/UL4200A",
+                    cel:"CEL", c1d2:"C1D2", atex:"ATEX"};
+/* ══════ 摘要列 ══════
+   四份清單的進度、ErP 判定結果、文件與注意事項的區塊數 */
+function renderSummary(){
+  let n = 0, tot = 0;
+  Object.keys(CK).forEach(k => {
+    const st = ckStat(k);
+    n += st.n; tot += st.tot;
+    const box = el("o-ck-" + k);
+    if (box) box.textContent = st.n + " / " + st.tot;
+  });
+  el("o-ck-all").textContent = n + " / " + tot;
+  el("o-ck-all-n").textContent = tot ? Math.round(n / tot * 100) + "% 已確認" : "—";
+
+  /* ErP：只有勾了 ErP 才判定；資料未填齊就說未填，不用 0 假裝通過 */
+  const M = erpMax(), etec = erpEtec(), ex = erpExempt();
+  const v = el("o-erp"), vn = el("o-erp-n");
+  if (!state.on.erp){ v.textContent = "未申請"; vn.textContent = "未勾選 ErP"; }
+  else if (ex && ex.ok === true){
+    v.textContent = "豁免";
+    vn.textContent = "Category C 豁免 · 只免 Etec";
+  } else if (etec === null){
+    v.textContent = "未填";
+    vn.textContent = "Poff／Pidle／Psleep 未填齊";
+  } else {
+    v.textContent = etec <= M.total ? "Pass" : "Fail";
+    vn.textContent = etec.toFixed(3) + " / " + M.total.toFixed(2) + " kWh/年";
+  }
+
+  const D = docSections();
+  const ds = docStat();
+  el("o-docs").textContent = ds.tot ? ds.n + " / " + ds.tot : "—";
+  el("o-docs-n").textContent = "共 " + D.length + " 區"
+    + ((state.docCustom || []).filter(Boolean).length
+        ? "　＋自訂 " + state.docCustom.filter(Boolean).length : "");
+  const P = prepSections();
+  el("o-prep").textContent = P.length + " 區";
+  /* 不用 toUpperCase()：ErP 會變成 ERP、DoE 會變成 DOE */
+  el("o-prep-n").textContent = P.length ? P.map(x => PREP_SHORT[x.k] || x.k).join(" · ") : "無對應項目";
+}
+
+function render(){
+  sync();
+  renderScheme(); renderCfg(); renderAdapters(); renderBatteries(); renderStruct();
+  renderPorts(); renderComps(); renderExproof(); renderAccs();
+  renderModelNote(); renderScope();
+  renderDocs(); renderCcl(); renderPrep(); renderPrepErp(); renderChecklists(); renderErp();
+  renderSummary(); renderPrintHead();
+  autoGrow();
+}
+
+/* 依實際內容把可換行欄位撐到剛好，長型號不會被裁切 */
+function autoGrow(scope){
+  (scope || document).querySelectorAll("textarea.wrapf").forEach(t => {
+    t.style.height = "auto";
+    t.style.height = (t.scrollHeight + 2) + "px";
+  });
+}
+document.addEventListener("input", e => {
+  if (e.target.classList && e.target.classList.contains("wrapf")) {
+    e.target.style.height = "auto";
+    e.target.style.height = (e.target.scrollHeight + 2) + "px";
+  }
+});
+
+/* ══════ 事件 ══════ */
+el("seg-case").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.caseType = b.dataset.v;
+  [...e.currentTarget.children].forEach(x => x.setAttribute("aria-pressed", x === b));
+  render();
+});
+el("f-model").addEventListener("input", e => {
+  state.model = e.target.value.trim().toUpperCase();
+  syncScope();          /* auto 模式下換機種要重新帶入台帳 */
+  render();
+});
+el("btn-scope-auto").addEventListener("click", () => {
+  state.scope.auto = true; syncScope(); render();
+  note(isNewModel()
+    ? "機種「" + state.model + "」沒有內建台帳，已清成空台帳。"
+    : "已重新帶入機種「" + state.model + "」的內建台帳。");
+});
+el("seg-class").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const was = state.pclass;
+  state.pclass = b.dataset.v;
+  /* 配件通常只申請 LVD report，其餘不帶入 */
+  if (state.pclass === "acc" && was !== "acc"){
+    ITEMS.forEach(i => state.on[i.id] = false);
+    state.on.lvd = true;
+    note("配件只帶入 LVD report。其他項目（BSMI 等）如有需求請自行勾選。");
+  }
+  syncStatic(); render();
+});
+document.addEventListener("click", e => {
+  const s = e.target.closest("#seg-erp-cat button"); if (!s) return;
+  if (!state.erp) state.erp = {};
+  state.erp.catOv = (s.dataset.v === "auto") ? "" : s.dataset.v; render();
+});
+el("btn-doc-add").addEventListener("click", () => { state.docCustom.push(""); render(); });
+
+document.addEventListener("click", e => {
+  const seg = e.target.closest("[data-modeseg]");
+  if (seg){ const b = e.target.closest("button"); if (b){ state[seg.dataset.modeseg].mode = b.dataset.v; return render(); } }
+  const d = e.target.closest("[data-acdel]");
+  if (d){ state.accs.splice(+d.dataset.acdel, 1); return render(); }
+  const dd = e.target.closest("[data-docdel]");
+  if (dd){ state.docCustom.splice(+dd.dataset.docdel, 1); return render(); }
+  const sa = e.target.closest("#btn-saves-all");
+  if (sa){ savesAll = !savesAll; return renderSaves(); }
+  /* 關鍵元件資訊的列增刪 */
+  const cd = e.target.closest("[data-ccldel]");
+  if (cd){ state.ccl.splice(+cd.dataset.ccldel, 1); return render(); }
+  if (e.target.closest("#btn-ccl-add")){
+    (state.ccl = state.ccl || []).push(cclBlank("")); return render(); }
+  if (e.target.closest("#btn-ccl-seed")){
+    state.ccl = (state.ccl || []).concat(CCL_SEED.map(cclBlank)); return render(); }
+  if (e.target.closest("#btn-ccl-clear")){ state.ccl = []; return render(); }
+});
+
+/* 文字與數字欄位一律綁 change（離開欄位才重繪），避免每敲一字就重建 DOM、吃掉輸入焦點 */
+document.addEventListener("change", e => {
+  const t = e.target, d = t.dataset; if (!d) return;
+  if (d.on      !== undefined){ state.on[d.on] = t.checked; return render(); }
+  if (d.docnote !== undefined){ state.docNote[d.docnote] = t.value; return render(); }
+  /* 送審文件逐項：鍵值為 "<item.id>:<欄位>"，item.id 本身含冒號，所以從最後一個冒號切 */
+  if (d.docitem !== undefined){
+    const p = d.docitem.lastIndexOf(":");
+    const key = d.docitem.slice(0, p), f = d.docitem.slice(p + 1);
+    if (!state.docItem) state.docItem = {};
+    if (!state.docItem[key]) state.docItem[key] = {};
+    state.docItem[key][f] = (t.type === "checkbox") ? t.checked : t.value;
+    return render();
+  }
+  /* 關鍵元件資訊：鍵值為 "<列索引>:<欄位>" */
+  if (d.ccl !== undefined){
+    const p = d.ccl.split(":");
+    if (!state.ccl) state.ccl = [];
+    if (state.ccl[+p[0]]) state.ccl[+p[0]][p[1]] = t.value;
+    return render();
+  }
+  /* 已認證範圍：勾選任一項就轉為手動，不再跟著機種帶入 */
+  if (d.scope     !== undefined){
+    const p = d.scope.split(".");
+    state.scope.auto = false;
+    state.scope[p[0]][p[1]] = t.checked ? "signed" : "";
+    return render();
+  }
+  if (d.scopebatt !== undefined){
+    state.scope.auto = false;
+    state.scope.battery = Math.max(0, parseInt(t.value) || 0);
+    return render();
+  }
+  /* ErP 量測與判定欄位 */
+  if (d.erp !== undefined){
+    if (!state.erp) state.erp = {};
+    state.erp[d.erp] = (t.type === "checkbox") ? t.checked : t.value;
+    return render();
+  }
+  if (d.cfg      !== undefined){ state.cfgItems[+d.cfg].on = t.checked; return render(); }
+  if (d.cfgnote  !== undefined){ state.cfgItems[+d.cfgnote].note = t.value; return render(); }
+  if (d.portq   !== undefined){ state.ports[+d.portq].qty = Math.max(0, parseInt(t.value)||0); return render(); }
+  if (d.portnote!== undefined){ state.portNote = t.value; return render(); }
+  if (d.exrev   !== undefined){ if (t.checked) state.ex.atex.rev = d.exrev; return render(); }
+  /* 認證作業確認清單：鍵值為 "<清單>:<項目>:<欄位>" */
+  if (d.ck      !== undefined){
+    const p = d.ck.split(":"), k = p[0] + ":" + p[1];
+    if (!state.ck[k]) state.ck[k] = {};
+    state.ck[k][p[2]] = (t.type === "checkbox") ? t.checked : t.value;
+    return render();
+  }
+  /* 送測前注意事項：路徑如 ulcb.bios 或 atex.rows.0.packed */
+  if (d.prep  !== undefined || d.prept !== undefined){
+    const path = (d.prep !== undefined ? d.prep : d.prept).split(".");
+    const val  = d.prep !== undefined ? t.checked : t.value;
+    let o = state.prep;
+    for (let n = 0; n < path.length - 1; n++) o = o[path[n]];
+    o[path[path.length-1]] = val;
+    return render();
+  }
+  if (d.doccustom !== undefined){ state.docCustom[+d.doccustom] = t.value; return render(); }
+  if (d.ulcbver !== undefined){ state.ulcbVer = t.value; return render(); }
+  if (d.ad      !== undefined){ state.adapters[+d.ad].on = t.checked; return render(); }
+  if (d.adpn    !== undefined){ state.adapters[+d.adpn].pn = t.value; return render(); }
+  if (d.adextra !== undefined){ state.adapters[+d.adextra].extra = t.value; return render(); }
+  if (d.adlabel !== undefined){ state.adapters[+d.adlabel].label = t.value; return render(); }
+  if (d.bt      !== undefined){ state.batteries[+d.bt].on = t.checked; return render(); }
+  if (d.btpn    !== undefined){ state.batteries[+d.btpn].pn = t.value; return render(); }
+  if (d.m44on   !== undefined){ state.m44.on = t.checked; return render(); }
+  if (d.m44src  !== undefined){ state.m44.sources = Math.max(1, parseInt(t.value)||1); return render(); }
+  if (d.m44note !== undefined){ state.m44.note = t.value; return render(); }
+  if (d.stpn    !== undefined){ state[d.stpn].pn = t.value; return render(); }
+  if (d.cp      !== undefined){ state.comps[+d.cp].on = t.checked; return render(); }
+  if (d.cppn    !== undefined){ state.comps[+d.cppn].pn = t.value; return render(); }
+  if (d.cpstd   !== undefined){ state.comps[+d.cpstd].std = t.value; return render(); }
+  if (d.cpvendor!== undefined){ state.comps[+d.cpvendor].vendor = t.value; return render(); }
+  if (d.cpsmp   !== undefined){ state.comps[+d.cpsmp].smp = t.value; return render(); }
+  if (d.cpappr  !== undefined){ const c = state.comps[+d.cpappr];
+    c.apprOn = t.checked; if (t.checked) c.unappr = false; return render(); }
+  if (d.cpun    !== undefined){ const c = state.comps[+d.cpun];
+    c.unappr = t.checked; if (t.checked) c.apprOn = false; return render(); }
+  if (d.exf     !== undefined){ const p = d.exf.split("."); state.ex[p[0]][p[1]] = t.value;   return render(); }
+  if (d.exc     !== undefined){ const p = d.exc.split("."); state.ex[p[0]][p[1]] = t.checked; return render(); }
+  if (d.ac      !== undefined){ state.accs[+d.ac].on = t.checked; return render(); }
+  if (d.acname  !== undefined){ state.accs[+d.acname].name = t.value; return render(); }
+  if (d.acpn    !== undefined){ state.accs[+d.acpn].pn = t.value; return render(); }
+  if (d.acspec  !== undefined){ state.accs[+d.acspec].spec = t.value; return render(); }
+  if (d.acstd   !== undefined){ state.accs[+d.acstd].std = t.value; return render(); }
+  if (d.appr    !== undefined){
+    const p = d.appr.split(":");
+    const tgt = p[0] === "ad" ? state.adapters[+p[1]] : state[p[1]];
+    tgt.appr[p[2]] = t.checked;
+    if (t.checked) tgt.unappr = false;
+    return render();
+  }
+  if (d.unappr  !== undefined){
+    const p = d.unappr.split(":");
+    const tgt = p[0] === "ad" ? state.adapters[+p[1]] : state[p[1]];
+    tgt.unappr = t.checked;
+    if (t.checked) APPROVALS.forEach(k => tgt.appr[k] = false);
+    return render();
+  }
+});
+
+/* ── 分頁切換：只切右欄，左欄組態層所有分頁共用 ──────────
+   通用寫法：掃過所有 .tabpane，id 為 "tab-<data-tab>" 者留下，其餘 hidden。
+   以後加分頁只要加一個 button ＋ 一個 .tabpane，這段不用動。 */
+el("tabs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const t = b.dataset.tab;
+  [...e.currentTarget.children].forEach(x => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll(".tabpane").forEach(p => { p.hidden = (p.id !== "tab-" + t); });
+});
+
+/* 各大項欄位的 Word／PDF 輸出 */
+document.addEventListener("click", e => {
+  const w = e.target.closest("[data-expw]");
+  if (w) return doExportSection(w.dataset.expw, "w");
+  const p = e.target.closest("[data-expp]");
+  if (p) return doExportSection(p.dataset.expp, "p");
+});
+
+coInit();          /* 基礎資料要在第一次繪製之前就位 */
+syncStatic(); render();
+
+/* ══════════════════════════════════════════════
+   存檔：Google Drive（MCP connector）／artifact 雲端／本機 localStorage
+   ＋ JSON 檔匯出匯入
+   ★ 存放的檔名與 localStorage 鍵值都與「安規報價試算器」分開，
+     兩支工具各自獨立，不會互相覆蓋。
+   ══════════════════════════════════════════════ */
+const LS_KEY = "twinhead-cert-prep-v1";
+const CLOUD_PATH = "data/saves.json";
+const SCHEMA = 1;
+
+const note = t => { const n = el("save-note"); if (n) n.textContent = t; };
+
+/* 逐鍵合併，讓舊版存檔在新增欄位後仍可載入；
+   也讓「報價試算器」匯出的 JSON 可以直接匯入 —— 多出來的計價欄位會被一併帶進來但用不到 */
+function merge(target, src){
+  if (!src || typeof src !== "object") return;
+  Object.keys(src).forEach(k => {
+    const s = src[k], t = target[k];
+    if (Array.isArray(s) && Array.isArray(t)){
+      s.forEach((item, i) => {
+        if (t[i] && typeof t[i] === "object" && item && typeof item === "object") merge(t[i], item);
+        else t[i] = item;
+      });
+      t.length = s.length;
+    } else if (s && typeof s === "object" && !Array.isArray(s) && t && typeof t === "object" && !Array.isArray(t)){
+      merge(t, s);
+    } else {
+      target[k] = s;
+    }
+  });
+}
+
+const snapshot = () => ({ schema:SCHEMA, savedAt:new Date().toISOString(),
+                          state:JSON.parse(JSON.stringify(state)) });
+const entry = () => { const s = snapshot();
+  let n = 0, tot = 0;
+  Object.keys(CK).forEach(k => { const st = ckStat(k); n += st.n; tot += st.tot; });
+  return { savedAt:s.savedAt, schema:SCHEMA, model:state.model, caseType:state.caseType,
+           total:"清單 " + n + "/" + tot, state:s.state }; };
+
+/* 還原後把不經 render() 重繪的原生控件同步回畫面 */
+function syncStatic(){
+  syncScope();
+  if (document.activeElement !== el("f-model")) el("f-model").value = state.model;
+  renderModelNote();
+  [...el("seg-case").children].forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.v === state.caseType));
+  [...el("seg-class").children].forEach(b =>
+    b.setAttribute("aria-pressed", b.dataset.v === state.pclass));
+  el("class-note").textContent = "ErP 適用 " + pcls().erp;
+}
+
+function restore(obj, label){
+  const s = obj && obj.state ? obj.state : obj;
+  if (!s || typeof s !== "object"){ note("檔案格式不符，無法載入。"); return false; }
+  merge(state, s);
+  syncStatic(); render();
+  note("已載入" + (label ? "「" + label + "」" : "")
+    + (obj.savedAt ? "（存檔於 " + obj.savedAt.slice(0,16).replace("T"," ") + "）" : "") + "。");
+  return true;
+}
+
+/* ── 本機（localStorage）─────────────────────── */
+const LS_OK = (function(){ try { localStorage.setItem("__probe","1");
+  localStorage.removeItem("__probe"); return true; } catch(e){ return false; } })();
+const lsRead  = () => { if (!LS_OK) return {};
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e){ return {}; } };
+const lsWrite = o => { if (!LS_OK){ note("此環境不允許瀏覽器內存檔。"); return false; }
+  try { localStorage.setItem(LS_KEY, JSON.stringify(o)); return true; }
+  catch(e){ note("瀏覽器儲存空間已滿。請改用「匯出 JSON 檔」。"); return false; } };
+
+/* ── 雲端（artifact files publish）───────────── */
+let AF = null;            /* artifact 能力命名空間 */
+let cloudOK = false;      /* 這個 view 能否寫入雲端 */
+let cloud = {};           /* 雲端存檔（記憶體中的權威副本） */
+let store = "gdrive";     /* 預設存 Google Drive；artifact 雲端與本機瀏覽器為備援 */
+let cloudTried = false;   /* cloudInit 是否已跑完 */
+
+async function cloudInit(){
+  try {
+    AF = (typeof claude !== "undefined" && claude && claude.use) ? await claude.use("artifact") : null;
+  } catch(e){ AF = null; }
+  if (!AF){
+    cloudTried = true; store = "local"; renderStoreSeg(); renderSaves();
+    note("這個檢視取不到雲端存檔能力，已退回本機瀏覽器存檔。若要跨電腦，請用「匯出 JSON 檔」。");
+    return;
+  }
+  /* 讀取本 view 載入的那一版資料檔；第一次使用時檔案不存在是正常的 */
+  try {
+    const res = await fetch(CLOUD_PATH, {cache:"no-store"});
+    if (res.ok) cloud = await res.json();
+  } catch(e){ /* 檔案不存在或無法解析，視為空 */ }
+  cloudOK = true; cloudTried = true; store = "cloud";
+  renderStoreSeg(); renderSaves();
+  note("雲端存檔已就緒 —— 存在這個 artifact 裡，換電腦也讀得到。");
+}
+
+async function cloudWrite(){
+  if (!AF){ note("此環境無法使用雲端存檔。"); return false; }
+  try {
+    await AF.publish({ [CLOUD_PATH]: JSON.stringify(cloud, null, 2) });
+    return true;
+  } catch(err){
+    const c = err && err.code;
+    if (c === "conflict"){ note("有另一個版本先發布了，畫面即將重新載入，請重試一次。"); return false; }
+    if (c === "not_writer" || c === "not_granted" || c === "not_declared" || c === "consent_required"){
+      cloudOK = false; store = "local"; renderStoreSeg(); renderSaves();
+      note("這個檢視沒有寫入權限，已切換為本機存檔。"); return false;
+    }
+    if (c === "capability_disabled" || c === "capability_removed"){
+      cloudOK = false; store = "local"; renderStoreSeg(); renderSaves();
+      note("此檢視不支援雲端存檔，已切換為本機存檔。"); return false;
+    }
+    if (c === "rate_limited"){ note("存檔太頻繁，請稍候幾秒再試。"); return false; }
+    if (c === "too_large"){ note("存檔內容過大，無法寫入雲端。"); return false; }
+    note("雲端存檔失敗（" + (c || "unknown") + "）。可改用本機存檔或匯出 JSON 檔。");
+    return false;
+  }
+}
+
+/* ══════════════════════════════════════════════
+   Google Drive 存檔（透過 claude.ai 的 MCP connector）
+   ----------------------------------------------
+   實測過的工具格式（2026-08-27）：
+     search_files          → {} 或 {files:[{id,title,modifiedTime,contentSnippet,…}]}
+     create_file           → {id,title,mimeType,fileSize,viewUrl,…}
+     download_file_content → {content:<base64>,id,mimeType,title}
+     trash_file            → 空回應
+
+   ★ 這個 connector 沒有「更新檔案內容」的工具 —— update_file 只能改標題與資料夾。
+     所以覆寫存檔的做法是「新建一份 → 把舊的丟垃圾桶」。
+     萬一 trash 失敗，載入時會取 modifiedTime 最新的那份並順手清掉多餘的，會自我修復。
+
+   ★ server 一律用「顯示名稱」，不是 UUID。名稱由 listTools() 在執行時查出來，
+     不寫死，避免不同帳號的顯示名稱不同。
+   ══════════════════════════════════════════════ */
+const GD_FILE   = "cert-prep-saves.json";
+const GD_SERVER = "Google Drive";        /* manifest 宣告用；實際名稱由 listTools() 解析 */
+/* 存檔資料夾：我的雲端硬碟／Claude。寫入放這裡，
+   但讀取仍以檔名全碟搜尋 —— 早期存在根目錄的檔案才不會讀不到 */
+const GD_FOLDER = "14h1fJqCxOeybeqfbNEG8vU1Q_FbGlbJS";
+const GD_URL    = "https://drive.google.com/drive/folders/" + GD_FOLDER;
+let GDN = null;        /* mcp 能力命名空間 */
+let gdName = null;     /* 解析出的 connector 顯示名稱 */
+let gd = {};           /* 存檔內容（記憶體中的權威副本） */
+let gdIds = [];        /* Drive 上同名檔案的 id，寫入後用來清舊檔 */
+let gdOK = false, gdTried = false, gdErr = "", gdSeen = "";
+
+/* 每個錯誤碼都有各自該做的事，不可以全部併成一句「發生錯誤」 */
+const GD_MSG = {
+  not_granted:          "這個檢視沒有連接器權限，無法使用 Google Drive 存檔。請改用其他存放位置。",
+  capability_disabled:  "這個檢視不支援連接器，無法使用 Google Drive 存檔。請改用其他存放位置。",
+  capability_removed:   "這個檢視不支援連接器，無法使用 Google Drive 存檔。請改用其他存放位置。",
+  server_not_connected: "找不到可用的 Google Drive 連接器。若你<b>已經</b>在 claude.ai → 設定 → Connectors "
+                      + "新增過，那可能是本工具宣告的連接器名稱與你帳號上顯示的名稱不同 —— "
+                      + "請把該頁顯示的<b>確切名稱</b>告訴 Claude 修改。",
+  needs_reauth:         "Google Drive 授權已過期。請到 claude.ai → 設定 → Connectors 重新連接。",
+  selection_required:   "你有多個同名的 Google Drive 連接器，請先在 claude.ai 的提示中選一個。",
+  server_not_found:     "這個 Google Drive 連接器已不存在，請重新新增。",
+  not_in_manifest:      "工具宣告的連接器名稱與你帳號上的不符。請把 claude.ai → 設定 → Connectors "
+                      + "顯示的<b>確切名稱</b>告訴 Claude 修改。",
+  blocked_by_policy:    "組織政策封鎖了這個 Google Drive 工具。",
+  approval_required:    "這個工具需要逐次核准，artifact 目前不支援。請改用其他存放位置。",
+  server_unavailable:   "Google Drive 暫時無法連線，稍後再試一次。",
+  rate_limited:         "呼叫太頻繁，請稍候幾秒再試。",
+  bad_request:          "呼叫參數有誤（程式問題），請回報。",
+  cancelled:            "呼叫已取消，Drive 上的結果未知，請重新載入確認。",
+  tool_error:           "Google Drive 回報錯誤",
+  upstream_error:       "Google Drive 連線發生未知錯誤。"
+};
+const gdMsg = (code, extra) =>
+  (code === "server_not_connected" && gdSeen
+    ? "（這個檢視目前看得到的連接器：" + gdSeen + "）" : "") +
+  (GD_MSG[code] || GD_MSG.upstream_error) + (extra ? "（" + extra + "）" : "");
+
+async function gdInit(){
+  try { GDN = (typeof claude !== "undefined" && claude && claude.use) ? await claude.use("mcp") : null; }
+  catch(e){ GDN = null; }
+  if (!GDN){ gdErr = "not_granted"; gdTried = true; return false; }
+  try {
+    const r = await GDN.listTools();
+    /* 用工具名稱認人，不靠顯示名稱字面比對 */
+    const s = (r.servers || []).find(x =>
+      (x.tools || []).some(t => t.name === "create_file") &&
+      (x.tools || []).some(t => t.name === "search_files"));
+    if (!s){
+      /* 連接器名稱對不上時，把 listTools 實際看到的名稱記下來，方便對照 */
+      gdSeen = (r.servers || []).map(x => x.server).join("、");
+      gdErr = "server_not_connected"; gdTried = true; return false;
+    }
+    gdName = s.server;
+    if (s.authStatus === "needs_reauth"){ gdErr = "needs_reauth"; gdTried = true; return false; }
+    const got = await gdRead();
+    gd = got.saves; gdIds = got.ids;
+    gdOK = true; gdErr = ""; gdTried = true;
+    return true;
+  } catch(e){
+    gdErr = (e && e.code) || "upstream_error";
+    if (gdErr === "tool_error" && e && e.message) gdErr = "tool_error|" + e.message;
+    gdTried = true; return false;
+  }
+}
+
+const gdCall = (tool, input) => GDN.callTool(gdName, tool, input, {cache:false});
+
+/* base64 → UTF-8 文字（存檔含中文，不能用 atob 直接當字串） */
+function b64utf8(b64){
+  const s = atob(b64 || "");
+  const u8 = new Uint8Array(s.length);
+  for (let i = 0; i < s.length; i++) u8[i] = s.charCodeAt(i);
+  return new TextDecoder().decode(u8);
+}
+
+async function gdRead(){
+  const r = await gdCall("search_files",
+    {query:"title = '" + GD_FILE + "' and owner = 'me'", pageSize:20, excludeContentSnippets:true});
+  const files = ((r.payload || {}).files) || [];
+  if (!files.length) return {saves:{}, ids:[]};
+  /* 取 modifiedTime 最新的一份；其餘是先前 trash 失敗留下的，載入後順手清掉 */
+  files.sort((a,b) => String(b.modifiedTime||"").localeCompare(String(a.modifiedTime||"")));
+  const d = await gdCall("download_file_content", {fileId:files[0].id});
+  let obj = {};
+  try { obj = JSON.parse(b64utf8((d.payload || {}).content)) || {}; } catch(e){ obj = {}; }
+  const ids = files.map(f => f.id);
+  if (ids.length > 1) gdTrash(ids.slice(1));      /* 不等它完成，失敗也無妨 */
+  return {saves: obj.saves || {}, ids:[files[0].id]};
+}
+
+async function gdTrash(ids){
+  for (const id of ids || []){
+    try { await gdCall("trash_file", {fileId:id}); } catch(e){ /* 清不掉就留著，下次再清 */ }
+  }
+}
+
+async function gdWrite(saves){
+  if (!gdOK){ note(gdMsg(gdErr || "not_granted")); return false; }
+  const body = JSON.stringify(
+    {schema:SCHEMA, updatedAt:new Date().toISOString(), saves}, null, 2);
+  let newId = null;
+  try {
+    const c = await gdCall("create_file", {
+      title: GD_FILE, textContent: body, contentMimeType:"application/json",
+      disableConversionToGoogleType: true, parentId: GD_FOLDER
+    });
+    newId = (c.payload || {}).id || null;
+  } catch(e){
+    const code = (e && e.code) || "upstream_error";
+    /* 寫入失敗有兩種：確定沒寫進去，或結果不明（可能已經寫了）。後者不可自動重試 */
+    if (code === "server_unavailable" || code === "upstream_error" || code === "cancelled"){
+      note(gdMsg(code) + " 這次寫入的結果不明，請按「從 Google Drive 重新讀取」確認 Drive 上的內容後再存一次。");
+    } else if (code === "needs_reauth" || code === "server_not_connected"
+            || code === "not_in_manifest" || code === "blocked_by_policy"
+            || code === "approval_required" || code === "selection_required"){
+      gdOK = false; gdErr = code; renderStoreSeg(); renderSaves();
+      note(gdMsg(code));
+    } else {
+      note(gdMsg(code, e && e.message));
+    }
+    return false;
+  }
+  const old = gdIds.filter(id => id && id !== newId);
+  gdIds = newId ? [newId] : gdIds;
+  gd = saves;
+  if (old.length) gdTrash(old);
+  return true;
+}
+
+/* 手動重新整理：從 Drive 重讀一次（例如在另一台裝置存過檔） */
+async function gdRefresh(){
+  if (!GDN){ note(gdMsg(gdErr || "not_granted")); return; }
+  note("正在從 Google Drive 重讀…");
+  try {
+    if (!gdName){ if (!(await gdInit())){ note(gdMsg(gdErr)); return; } }
+    else { const got = await gdRead(); gd = got.saves; gdIds = got.ids; gdOK = true; gdErr = ""; }
+    renderStoreSeg(); renderSaves();
+    note("已從 Google Drive 重讀，共 " + Object.keys(gd).length + " 筆存檔。");
+  } catch(e){
+    const code = (e && e.code) || "upstream_error";
+    note(gdMsg(code, e && e.message));
+  }
+}
+
+const readStore  = () => store === "gdrive" ? gd : store === "cloud" ? cloud : lsRead();
+const writeStore = async o => {
+  if (store === "gdrive") return await gdWrite(o);
+  if (store === "cloud"){ cloud = o; return await cloudWrite(); }
+  return lsWrite(o);
+};
+const STORE_NAME = {gdrive:"Google Drive", cloud:"artifact 雲端", local:"本機瀏覽器"};
+const storeOK = v => v === "gdrive" ? gdOK : v === "cloud" ? cloudOK : LS_OK;
+const storeTried = v => v === "gdrive" ? gdTried : v === "cloud" ? cloudTried : true;
+
+/* ── UI ─────────────────────────────────────── */
+function renderStoreSeg(){
+  const seg = el("seg-store"); if (!seg) return;
+  [...seg.children].forEach(b => {
+    const v = b.dataset.v, off = !storeOK(v) && storeTried(v);
+    b.setAttribute("aria-pressed", v === store);
+    b.disabled = off;
+    b.style.opacity = off ? ".45" : "";
+    b.title = off ? (v === "gdrive" ? "Google Drive 目前不可用" :
+                     v === "cloud"  ? "此檢視無法寫入 artifact 雲端" :
+                                      "此環境停用了瀏覽器存檔") : "";
+  });
+  const t = el("gd-tools");
+  if (t) t.style.display = (store === "gdrive" && gdOK) ? "flex" : "none";
+  const a = el("lnk-gd-open");
+  if (a) a.href = GD_URL;
+}
+
+function renderSaves(){
+  if (!storeTried(store)){
+    el("f-savename").disabled = true; el("btn-save").disabled = true;
+    el("btn-save").style.opacity = ".45";
+    el("p-saves").innerHTML = `<p class="footnote" style="margin:0">`
+      + esc(STORE_NAME[store]) + ` 連線中…</p>`;
+    return;
+  }
+  const usable = storeOK(store);
+  el("f-savename").disabled = !usable;
+  el("btn-save").disabled = !usable;
+  el("btn-save").style.opacity = usable ? "" : ".45";
+  if (!usable){
+    el("p-saves").innerHTML = '<p class="footnote" style="margin:0">'
+      + (store === "gdrive" ? gdMsg(gdErr || "not_granted")
+        : store === "cloud" ? "此檢視無法寫入 artifact 雲端存檔。"
+                            : "此環境停用了瀏覽器內存檔。")
+      + " 請改用另一個存放位置，或用下方「匯出 JSON 檔」把組態存成檔案。</p>";
+    return;
+  }
+  const all = readStore();
+  const keys = Object.keys(all).sort((a,b) => (all[b].savedAt||"").localeCompare(all[a].savedAt||""));
+  const row = k => {
+    const s = all[k];
+    return `<div class="sv">
+      <span class="svn">${esc(k)}<span class="svm">${esc(s.model||"")} · ${s.caseType==="delta"?"變更":"全新"} · ${esc(s.total||"")} · ${esc((s.savedAt||"").slice(0,16).replace("T"," "))}</span></span>
+      <button class="ghost" data-load="${esc(k)}">載入</button>
+      <button class="x" data-del="${esc(k)}" title="刪除存檔">×</button>
+    </div>`;
+  };
+  /* 只列最近兩筆，其餘收在「顯示全部」後面 —— 存檔一多這裡會很長 */
+  const recent = keys.slice(0, 2), rest = keys.slice(2);
+  el("p-saves").innerHTML = keys.length
+    ? recent.map(row).join("")
+      + (rest.length
+          ? `<button class="ghost" id="btn-saves-all" style="margin:4px 0 6px">
+               ${savesAll ? "只顯示最近兩筆" : "顯示全部（另有 " + rest.length + " 筆）"}</button>`
+            + (savesAll ? rest.map(row).join("") : "")
+          : "")
+      + driveLink()
+    : `<p class="footnote" style="margin:0 0 4px">${esc(STORE_NAME[store])}尚無存檔。填好組態後在上方命名並按「儲存」。</p>`
+      + driveLink();
+}
+let savesAll = false;
+
+/* 直接開雲端存放位置，方便自己挑檔案 */
+function driveLink(){
+  if (store !== "gdrive") return "";
+  const f = gdIds && gdIds[0]
+    ? `<a href="https://drive.google.com/file/d/${esc(gdIds[0])}/view" target="_blank">開啟存檔檔案</a>　·　`
+    : "";
+  return `<p class="footnote" style="margin:6px 0 0">${f}`
+    + `<a href="https://drive.google.com/drive/my-drive" target="_blank">開啟我的雲端硬碟</a>`
+    + `　—— 存檔位於 <span class="mono">${esc(GD_FILE)}</span></p>`;
+}
+
+async function doSave(){
+  const name = (el("f-savename").value || "").trim();
+  if (!name){ note("請先輸入存檔名稱。"); el("f-savename").focus(); return; }
+  const all = readStore();
+  const existed = !!all[name];
+  all[name] = entry();
+  note("儲存中…");
+  if (await writeStore(all)){
+    renderSaves();
+    note((existed ? "已覆寫" : "已儲存") + "「" + name + "」到" + STORE_NAME[store]
+      + (store === "gdrive" ? "（我的雲端硬碟／Claude／" + GD_FILE + "，換裝置登入同一個 Google 帳號就讀得到）。"
+       : store === "cloud"  ? "（換電腦開同一個連結就讀得到）。"
+                            : "。要跨裝置請改存 Google Drive 或匯出 JSON 檔。"));
+  }
+}
+
+async function doDelete(k){
+  const all = readStore();
+  delete all[k];
+  if (await writeStore(all)){ renderSaves(); note("已刪除「" + k + "」。"); }
+}
+
+/* ── 檔案匯出／匯入 ─────────────────────────── */
+async function dlSave(filename, data, okMsg){
+  const dl = (typeof claude !== "undefined" && claude && claude.use) ? await claude.use("downloads") : null;
+  if (dl){
+    try { await dl.save({filename, data}); note(okMsg); return "saved"; }
+    catch(err){ return (err && err.code) || "unknown"; }
+  }
+  /* 直接用瀏覽器開這個 HTML 檔時（本機雙擊）沒有 downloads 能力，改用一般下載連結 */
+  try {
+    const blob = data instanceof Blob ? data : new Blob([data]);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    note(okMsg); return "saved";
+  } catch(err){ note("此環境無法輸出檔案。請改用上方的「儲存」功能。"); return null; }
+}
+
+async function doExport(){
+  const snap = snapshot();
+  const fname = "認證作業注意事項_" + state.model + "_" + (state.caseType==="delta"?"變更":"全新")
+              + "_" + snap.savedAt.slice(0,10) + ".json";
+  const r = await dlSave(fname, JSON.stringify(snap, null, 2), "已匯出 " + fname + "。");
+  if (r && r !== "saved") note(
+    r === "declined" ? "已取消匯出。" :
+    r === "rate_limited" ? "剛剛已有存檔提示，請稍候再試。" :
+    "匯出失敗（" + r + "）。");
+}
+
+function doImport(file){
+  const fr = new FileReader();
+  fr.onload = () => {
+    let obj;
+    try { obj = JSON.parse(fr.result); } catch(e){ note("檔案不是有效的 JSON。"); return; }
+    if (restore(obj, file.name) && !el("f-savename").value)
+      el("f-savename").value = file.name.replace(/\.json$/i, "");
+  };
+  fr.onerror = () => note("檔案讀取失敗。");
+  fr.readAsText(file);
+}
+
+el("seg-store").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b || b.disabled) return;
+  store = b.dataset.v;
+  renderStoreSeg(); renderSaves(); note("");
+});
+el("btn-save").addEventListener("click", doSave);
+el("btn-export").addEventListener("click", doExport);
+el("btn-import").addEventListener("click", () => el("f-import").click());
+el("f-import").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0];
+  if (f) doImport(f);
+  e.target.value = "";
+});
+el("p-saves").addEventListener("click", e => {
+  const L = e.target.closest("[data-load]");
+  if (L){ const all = readStore(), k = L.dataset.load;
+    if (all[k]){ restore(all[k], k); el("f-savename").value = k; } return; }
+  const D = e.target.closest("[data-del]");
+  if (D) doDelete(D.dataset.del);
+});
+el("btn-gd-refresh").addEventListener("click", gdRefresh);
+
+/* ══════ 公司資料載入 ══════
+   認證項目、ATEX 證號、關鍵元件清單都不寫在原始碼裡 —— 站台公開，JS 原始碼
+   也會被送到瀏覽器。資料改放本機存放區，使用者自行匯入一次。
+   原始檔：_private\安規準備頁資料.json（被 .gitignore 的 _* 規則擋住） */
+/* 鍵名寫在函式裡，不用外層 const —— coInit() 會在這個區塊之前被呼叫 */
+function applyCo(d){
+  if (!d || typeof d !== "object") return false;
+  let n = 0;
+  if (d.ITEMS)    { ITEMS    = d.ITEMS;    n++; }
+  if (d.EX_MARKS) { EX_MARKS = d.EX_MARKS; n++; }
+  if (d.ORG_FOOTER) { ORG_FOOTER = d.ORG_FOOTER;    }
+  if (d.CCL_SEED) { CCL_SEED = d.CCL_SEED; n++; }
+  return n > 0;
+}
+
+function coBanner(show){
+  let b = el("co-banner");
+  if (!show){ if (b) b.remove(); return; }
+  if (b) return;
+  b = document.createElement("div");
+  b.id = "co-banner";
+  b.style.cssText = "margin:0 0 14px;padding:12px 15px;border-radius:8px;font-size:13px;line-height:1.7;"
+    + "background:#fdf0d2;color:#7a5500;border-left:3px solid #c08a2e";
+  b.innerHTML = '<b>尚未匯入基礎資料</b>　認證項目與關鍵元件清單目前是空的。'
+    + '請匯入 <code>_private\\安規準備頁資料.json</code>。'
+    + '<button id="co-pick" style="margin-left:10px;font:inherit;font-weight:700;padding:5px 12px;'
+    + 'border-radius:7px;border:1px solid #c08a2e;background:#fff;color:#7a5500;cursor:pointer">選擇檔案</button>'
+    + '<input id="co-file" type="file" accept="application/json,.json" hidden>';
+  document.body.insertBefore(b, document.body.firstChild);
+  el("co-pick").addEventListener("click", () => el("co-file").click());
+  el("co-file").addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = "";
+    if (!f) return;
+    const fr = new FileReader();
+    fr.onload = () => {
+      let d; try { d = JSON.parse(fr.result); }
+      catch(err){ note("這個檔案不是有效的 JSON。"); return; }
+      if (!applyCo(d)){ note("檔案裡找不到 ITEMS／CCL_SEED 等欄位，確認是不是基礎資料檔。"); return; }
+      try { localStorage.setItem("sq.prepdata.v1", JSON.stringify(d)); } catch(err){}
+      coBanner(false);
+      if (typeof render === "function") render();
+      note("基礎資料已匯入並記住，下次打開不用再匯一次。");
+    };
+    fr.onerror = () => note("檔案讀取失敗。");
+    fr.readAsText(f);
+  });
+}
+
+function coInit(){
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem("sq.prepdata.v1") || "null"); } catch(e){}
+  const ok = applyCo(d);
+  coBanner(!ok);
+  return ok;
+}
+
+store = "gdrive";
+renderStoreSeg(); renderSaves();
+/* 三個存放位置各自獨立初始化，任何一個失敗都不影響其他兩個 */
+cloudInit();
+gdInit().then(ok => {
+  renderStoreSeg(); renderSaves();
+  if (ok) note("Google Drive 存檔已就緒（Claude 資料夾／" + GD_FILE
+             + "），共 " + Object.keys(gd).length + " 筆。");
+  else {
+    /* Drive 不可用就自動退到還能用的位置，並說明原因與該怎麼修 */
+    store = cloudOK ? "cloud" : "local";
+    renderStoreSeg(); renderSaves();
+    note(gdMsg(gdErr) + " 已暫時改用" + STORE_NAME[store] + "。");
+  }
+});
+</script>

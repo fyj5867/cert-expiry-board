@@ -386,7 +386,19 @@
     font:inherit; font-size:12.5px; font-weight:600; cursor:pointer;
     padding:7px 14px; border-radius:8px; border:1px solid var(--border);
     background:var(--surface); color:var(--ink);
+    display:inline-block; line-height:1.25; -webkit-appearance:none; appearance:none;
   }
+  /* iOS Safari 不會對 display:none 的 file input 開啟選檔視窗，所以用「看不見但仍在版面上」
+     的做法，並且讓 <label for> 直接觸發原生選檔，不靠 JS 的 .click() */
+  .vh{ position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+       border:0; clip:rect(0 0 0 0); overflow:hidden; white-space:nowrap; }
+  .paste-box{ margin:10px 0 0; }
+  .paste-box textarea{
+    width:100%; min-height:140px; font:inherit; font-size:12.5px; line-height:1.5;
+    padding:10px; border-radius:8px; border:1px solid var(--border);
+    background:var(--surface); color:var(--ink); box-sizing:border-box;
+  }
+  .paste-box .row{ display:flex; gap:8px; margin-top:8px; }
   .btn:hover{ border-color:var(--accent); color:var(--accent); }
   .btn.primary{ background:var(--accent); border-color:var(--accent); color:var(--surface); }
   .btn.primary:hover{ opacity:.88; color:var(--surface); }
@@ -415,11 +427,21 @@
   </header>
 
   <div class="bar">
-    <button type="button" class="btn primary" id="btn-import">匯入效期資料</button>
+    <label class="btn primary" for="file-input">匯入效期資料</label>
+    <button type="button" class="btn" id="btn-paste">改用貼上</button>
     <button type="button" class="btn" id="btn-export" hidden>匯出備份</button>
     <button type="button" class="btn" id="btn-clear" hidden>清除這台裝置的資料</button>
     <span class="hint" id="bar-hint"></span>
-    <input type="file" id="file-input" accept=".json,application/json" hidden>
+    <!-- 不設 accept：iPhone 的「檔案」App 會把 .json 變灰選不起來 -->
+    <input type="file" id="file-input" class="vh">
+  </div>
+
+  <div class="paste-box" id="paste-box" hidden>
+    <textarea id="paste-text" placeholder="把 JSON 內容整段貼進來"></textarea>
+    <div class="row">
+      <button type="button" class="btn primary" id="btn-paste-ok">載入</button>
+      <button type="button" class="btn" id="btn-paste-cancel">取消</button>
+    </div>
   </div>
 
   <div class="cat-tiles" id="cat-tiles"></div>
@@ -571,7 +593,22 @@
   }
 
   // ── 匯入 / 匯出 / 清除 ───────────────────────────────────
-  $('btn-import').addEventListener('click', ()=> $('file-input').click());
+  // 選檔由 <label for="file-input"> 直接觸發原生選檔。
+  // 不用 JS 的 .click()，因為 iOS Safari 對程式觸發的選檔常常沒反應。
+
+  // 文字 → 載入，檔案與貼上共用
+  function applyText(text, where){
+    let raw;
+    try{ raw = JSON.parse(String(text).replace(/^\uFEFF/, '').trim()); }
+    catch(err){ alert('讀不懂' + where + '的內容，不是合法的 JSON。'); return false; }
+    const norm = normalise(raw);
+    if(!norm){ alert('這份資料裡沒有可以用的效期項目。\n需要 project（或 model）、cert、due 三個欄位，due 格式 yyyy/MM/dd。'); return false; }
+    DATA = norm.items; STAMP = norm.stamp;
+    if(!save()) alert('資料已載入，但沒能存進這台裝置（瀏覽器可能擋住了儲存空間），重新整理後會消失。');
+    render();
+    return true;
+  }
+
   $('file-input').addEventListener('change', e=>{
     const f=e.target.files && e.target.files[0];
     e.target.value='';
@@ -579,17 +616,23 @@
     if(f.size > 8*1024*1024){ alert('檔案太大了，請確認選的是效期資料 JSON。'); return; }
     const fr=new FileReader();
     fr.onerror=()=>alert('讀取檔案失敗。');
-    fr.onload=()=>{
-      let raw;
-      try{ raw=JSON.parse(String(fr.result).replace(/^﻿/,'')); }
-      catch(err){ alert('讀不懂這個檔案，請選 .json。'); return; }
-      const norm=normalise(raw);
-      if(!norm){ alert('這個檔案裡沒有可以用的效期資料。\n需要 project（或 model）、cert、due 三個欄位，due 格式 yyyy/MM/dd。'); return; }
-      DATA=norm.items; STAMP=norm.stamp;
-      if(!save()) alert('資料已載入，但沒能存進這台裝置（瀏覽器可能擋住了儲存空間），重新整理後會消失。');
-      render();
-    };
+    fr.onload=()=>{ if(applyText(fr.result, '這個檔案')) $('paste-box').hidden = true; };
     fr.readAsText(f);
+  });
+
+  // 備案：iPhone 的「檔案」App 偶爾就是不讓你選 .json，這時候用貼的
+  $('btn-paste').addEventListener('click', ()=>{
+    const b=$('paste-box');
+    b.hidden = !b.hidden;
+    if(!b.hidden) $('paste-text').focus();
+  });
+  $('btn-paste-cancel').addEventListener('click', ()=>{
+    $('paste-text').value=''; $('paste-box').hidden = true;
+  });
+  $('btn-paste-ok').addEventListener('click', ()=>{
+    const t=$('paste-text').value.trim();
+    if(!t){ alert('還沒貼上任何東西。'); return; }
+    if(applyText(t, '貼上')){ $('paste-text').value=''; $('paste-box').hidden = true; }
   });
 
   $('btn-export').addEventListener('click', ()=>{

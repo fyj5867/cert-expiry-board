@@ -487,9 +487,14 @@
   function normalise(raw){
     let arr = null, stamp = '';
     if(Array.isArray(raw)) arr = raw;
-    else if(raw && Array.isArray(raw.items)){
-      arr = raw.items;
-      stamp = raw.sourceStamp || raw.asOf || raw.stamp || '';
+    else if(raw && typeof raw === 'object'){
+      // 空的 items 不算數：行動祕書的匯出檔 items 是空陣列、資料在 certs，
+      // 以前會被當成「有 items」而解出 0 筆，錯誤訊息就會指錯方向
+      const cand = [raw.items, raw.certs, raw.data, raw.rows].find(a => Array.isArray(a) && a.length);
+      if(cand){
+        arr = cand;
+        stamp = raw.sourceStamp || raw.asOf || raw.stamp || '';
+      }
     }
     if(!arr) return null;
     const out = arr.map(r => ({
@@ -501,6 +506,13 @@
       applies: r.applies
     })).filter(r => r.project && r.cert && /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(r.due));
     return out.length ? { items: out, stamp } : null;
+  }
+
+  // 行動祕書的匯出檔雖然也有 project/cert/due，但沒有 kind（Adapter 的 CB 會被錯歸成
+  // 系統本身），規格與適用機型也被併進 note 字串，而且含已停用的紀錄。
+  // 與其讓看板吃進一份會看錯的資料，不如直接說該用哪個檔。
+  function wrongAppFile(raw){
+    return raw && !Array.isArray(raw) && raw.app === 'mobile-secretary';
   }
 
   // ── 共用 ─────────────────────────────────────────────────
@@ -601,8 +613,21 @@
     let raw;
     try{ raw = JSON.parse(String(text).replace(/^\uFEFF/, '').trim()); }
     catch(err){ alert('讀不懂' + where + '的內容，不是合法的 JSON。'); return false; }
+    // 先擋掉行動祕書的匯出檔：它的 certs 解得出 project/cert/due，所以放在 normalise
+    // 後面就永遠不會觸發了，必須擋在前面
+    if(wrongAppFile(raw)){
+      alert('這是「行動祕書」的匯出檔，不是效期看板的資料。\n\n'
+          + '它少了分類（kind）欄位，Adapter 的 CB 證書會被錯歸到「系統本身」，\n'
+          + '而且含已停用的舊紀錄，所以看板不收。\n\n'
+          + '請改用 update-cert-board.ps1 -Json 產生的檔\n'
+          + '（檔名像「安規認證效期.json」或「安規認證效期_精簡.json」）。');
+      return false;
+    }
     const norm = normalise(raw);
-    if(!norm){ alert('這份資料裡沒有可以用的效期項目。\n需要 project（或 model）、cert、due 三個欄位，due 格式 yyyy/MM/dd。'); return false; }
+    if(!norm){
+      alert('這份資料裡沒有可以用的效期項目。\n需要 project（或 model）、cert、due 三個欄位，due 格式 yyyy/MM/dd。');
+      return false;
+    }
     DATA = norm.items; STAMP = norm.stamp;
     if(!save()) alert('資料已載入，但沒能存進這台裝置（瀏覽器可能擋住了儲存空間），重新整理後會消失。');
     render();

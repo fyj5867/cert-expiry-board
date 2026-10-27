@@ -18,9 +18,8 @@ tools/serve.js      本機預覽用的小型靜態伺服器
 .claude/launch.json 預覽設定（不進版控）
 ```
 
-**為什麼放在家目錄而不是 OneDrive**：`C:\Users\joyce_fan\OneDrive` 綁的是個人 Gmail 帳號
-（`durabookp2533@gmail.com`）的個人版 OneDrive，不是公司的 Microsoft 365。安規的程式碼與資料
-不應該同步到那裡。另外兩支 PWA 也都在家目錄。
+**為什麼放在家目錄而不是 OneDrive**：這台機器上的 OneDrive 綁的是個人帳號，不是公司的
+Microsoft 365，安規的程式碼與資料不應該同步到那裡。另外兩支 PWA 也都在家目錄。
 
 ## 本機預覽
 
@@ -34,9 +33,9 @@ node tools/serve.js . 8766
 
 比照另外兩支：
 
-1. 在 GitHub 建一個 repository（例如 `safety-tools`），把這個資料夾的檔案推到 `main`。
+1. repository：`fyj5867/cert-expiry-board`，把這個資料夾的檔案推到 `main`。
 2. repository → **Settings → Pages** → Source 選「Deploy from a branch」→ Branch `main`、資料夾 `/(root)` → Save。
-3. 約一分鐘後出現網址 `https://fyj5867.github.io/safety-tools/`。
+3. 約一分鐘後出現網址 `https://fyj5867.github.io/cert-expiry-board/`。
 4. 手機用 Safari（iPhone）或 Chrome（Android）開那個網址 → **加入主畫面**。
 
 改版後記得把 `sw.js` 的 `CACHE` 版本號 +1，手機才會拿到新版。

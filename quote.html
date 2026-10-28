@@ -446,8 +446,8 @@ button.x:hover{color:var(--alert)}
           「設定 → 下載 → 位置」改成這個路徑（Chrome 與 Edge 都在同一個地方），
           並把「下載前詢問每個檔案的儲存位置」關掉。之後每次輸出的檔案都會落在 OneDrive 並自動同步，
           另一台裝置登入同一個 OneDrive 帳號就讀得到。</p>
-        <p class="footnote">「雲端」存在這個 artifact 裡，換電腦開同一個連結就讀得到，也不受清瀏覽器資料影響。
-          「本機瀏覽器」只在雲端不可用時當備援。</p>
+        <p class="footnote">報價存檔要跨裝置，靠的是首頁的「跨裝置同步」——資料放在你自己 GitHub 帳號的私密 Gist，
+          上傳前先加密，報價存檔、準備頁存檔與效期資料會一起同步。沒開同步就只存在這台瀏覽器裡。</p>
       </div>
     </div>
 
@@ -2994,8 +2994,9 @@ const HELP_TOPICS = [
    d:"群組內共用、群組間不共用。峰值是各群組台數相加，不是總和。"
      + "未認可零件的送測樣品另計（群組 5），數量要自己填。"},
   {t:"存檔與跨裝置",
-   d:"預設存 Google Drive（我的雲端硬碟／safety-quote-saves.json），"
-     + "另一台裝置登入同一個 Google 帳號就讀得到。artifact 雲端與本機瀏覽器是備援。"
+   d:"存檔放在三支工具共用的那一份資料裡。回首頁開「跨裝置同步」之後，"
+     + "報價存檔、準備頁存檔與效期資料會一起同步到你自己 GitHub 帳號的私密 Gist（上傳前加密），"
+     + "其他裝置輸入同一組同步密語就讀得到。沒開同步就只存在這台瀏覽器。"
      + "匯出的檔案落在瀏覽器的下載資料夾。"},
   {t:"文件輸出",
    d:"每個大項欄位都能輸出 Word（.docx）或 PDF（列印版 HTML，開檔後 Ctrl+P 另存 PDF）。"
@@ -3679,7 +3680,7 @@ let unsubSaves = null;
    db 只在 claude.ai 的檢視裡有。共用磁碟上那份是**雙擊開啟的本機檔**，
    拿不到 db —— 沒有這層就完全不能存檔，只剩匯出 JSON。
    所以 db 不可用時自動退到 localStorage，UI 不變，只有狀態列不同。
-   本機存檔不跨裝置，這點要在畫面上講清楚。 */
+   本機這層是否跨裝置，取決於首頁的「跨裝置同步」有沒有連上，畫面上要照實講。 */
 const LS_KEY = "twinhead-safety-quote-v2";
 const LS_OK = (function(){ try { localStorage.setItem("__probe","1");
   localStorage.removeItem("__probe"); return true; } catch(e){ return false; } })();
@@ -3710,6 +3711,12 @@ const dbMsg = e => (DB_MSG[(e && e.code)] || DB_MSG.unavailable)
 
 const dbStatus = t => { const n = el("db-status"); if (n) n.textContent = t; };
 
+/* 存檔實際上走 SQStore（共用快照 sq.data.v1），首頁的「跨裝置同步」一連上就會跟著走。
+   所以狀態列不能寫死「不跨裝置」—— 要照同步有沒有連上講。 */
+const syncOn = () => !!(window.SQSync && SQSync.connected && SQSync.connected());
+const localStatus = () => !LS_OK ? "無法存檔"
+  : syncOn() ? "跨裝置同步 · 已連線" : "本機瀏覽器 · 尚未開啟同步";
+
 async function dbInit(){
   try { DB = (typeof claude !== "undefined" && claude && claude.use) ? await claude.use("db") : null; }
   catch(e){ DB = null; }
@@ -3720,12 +3727,14 @@ async function dbInit(){
     /* 退到本機 localStorage —— 共用磁碟那份雙擊開啟就是走這條 */
     dbReady = true; dbErr = {code:"not_granted"}; canWrite = LS_OK;
     lsLoad();
-    dbStatus(LS_OK ? "本機瀏覽器 · 不跨裝置" : "無法存檔");
+    dbStatus(localStatus());
     renderSaves();
     note(LS_OK
-      ? "這個檢視沒有雲端資料庫（直接開本機檔案，或未登入），已改用本機瀏覽器存檔 —— "
-        + "只存在這台這個瀏覽器裡，不會跨裝置。要跨裝置請開 claude.ai 上的線上版，或用「匯出／匯入 JSON 檔」。"
-      : "這個檢視既沒有雲端資料庫，瀏覽器也不允許本機存檔。請用下方的「匯出／匯入 JSON 檔」。");
+      ? (syncOn()
+          ? "存檔已接上跨裝置同步，其他裝置連同一組密語就讀得到。"
+          : "存檔目前只在這台瀏覽器裡。要跨裝置的話，回首頁開「跨裝置同步」，"
+            + "報價存檔會跟準備頁、效期資料一起同步；離線的逃生門仍是「匯出／匯入 JSON 檔」。")
+      : "這台瀏覽器不允許本機存檔。請用下方的「匯出／匯入 JSON 檔」。");
     return;
   }
 
@@ -3823,7 +3832,8 @@ async function doSave(){
     rows.push(Object.assign({id:(hit && hit.id) || ("ls-" + Date.now().toString(36))}, body));
     if (!lsPut(rows)) return;
     lsLoad(); renderSaves();
-    note((hit ? "已覆寫" : "已儲存") + "「" + name + "」到本機瀏覽器（不跨裝置）。");
+    note((hit ? "已覆寫" : "已儲存") + "「" + name + "」"
+       + (syncOn() ? "，會同步到其他裝置。" : "（只在這台瀏覽器，尚未開啟跨裝置同步）。"));
     return;
   }
 
@@ -4367,7 +4377,12 @@ function coInit(){
 /* db 是主存檔；Google Drive 只在階段一保留，單純當搬家來源（唯讀） */
 /* 接上跨裝置同步。一定要放在檔案最後 —— sync.js 的 init 會同步呼叫一次
    onChange，太早呼叫的話裡面用到的 lsLoad／renderSaves 還在 TDZ。 */
-if (window.SQStore) SQStore.attach(() => { coInit(); lsLoad(); renderSaves(); render(); }, m => note(m));
+if (window.SQStore) SQStore.attach(() => {
+  coInit(); lsLoad(); renderSaves(); render();
+  /* 同步一連上，狀態列要從「尚未開啟同步」翻成「已連線」。
+     只在沒有 artifact db 的情況下覆寫，不然會蓋掉 db 自己的狀態。 */
+  if (dbReady && !DB) dbStatus(localStatus());
+}, m => note(m));
 
 dbInit();
 gdInit().then(ok => {

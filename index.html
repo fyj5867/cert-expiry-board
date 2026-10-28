@@ -172,8 +172,11 @@
       </div><div class="row">
         <input id="pw" type="password" placeholder="同步密語（這份資料的加密金鑰）" autocomplete="off">
         <button class="btn pri" id="go">連線</button>
-        <a class="btn" href="${SQSync.TOKEN_URL}" target="_blank" rel="noopener">建立金鑰</a>
+        <button class="btn" id="tok">建立金鑰</button>
       </div>`);
+      H.push(`<div class="note">按鈕打不開的話（裝成 APP 之後常會被擋），
+        直接複製這個網址到瀏覽器：<br><code style="word-break:break-all">${esc(SQSync.TOKEN_URL)}</code><br>
+        開之前請先確認 GitHub 右上角登入的是建立這個站台的那個帳號。</div>`);
       H.push(`<div class="note"><b>同步密語請自己記住，沒有地方可以找回。</b>
         它是 AES-GCM 的金鑰來源 —— secret Gist 知道網址就讀得到，所以牌價與報價履歷一律加密後才上傳。
         忘記密語等於雲端那份永遠解不開（本機這份還在）。</div>`);
@@ -213,6 +216,13 @@
       const pw = document.getElementById('pw2').value;
       if (!pw) return toast('請輸入密語');
       try { await SQSync.setPassphrase(pw); } catch (err) { toast('密語不正確'); }
+    }
+    if (id === 'tok') {
+      /* 不用 <a target="_blank">：裝成 APP 之後會被無聲擋掉，按了完全沒反應。 */
+      const u = SQSync.TOKEN_URL;
+      let w = null;
+      try { w = window.open(u, '_blank', 'noopener'); } catch (err) {}
+      if (!w) location.href = u;          // 被擋就同分頁開；外部網址在 standalone 會跳回瀏覽器
     }
     if (id === 'now')  SQSync.now(true);
     if (id === 'off')  { if (confirm('中斷這台裝置的同步？資料仍保留在這台與雲端。')) SQSync.disconnect(); }

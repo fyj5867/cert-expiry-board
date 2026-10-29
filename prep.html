@@ -2979,6 +2979,16 @@ document.addEventListener("click", e => {
 });
 
 if (window.SQStore) {
+  /* 存檔改走 SQStore 之前，可能有新的存檔只寫進舊鍵。把搬家旗標清掉一次，
+     讓 migrate 再跑一遍 —— 它不會覆蓋共用快照裡已經有的同名存檔。 */
+  try {
+    if (!localStorage.getItem("sq.prep.remigrate.v1")){
+      const done = JSON.parse(localStorage.getItem("sq.migrated.v1") || "{}");
+      delete done["twinhead-cert-prep-v1"];
+      localStorage.setItem("sq.migrated.v1", JSON.stringify(done));
+      localStorage.setItem("sq.prep.remigrate.v1", new Date().toISOString());
+    }
+  } catch(e){}
   SQStore.migrate([
     { from: "twinhead-cert-prep-v1", col: "preps",
       toDocs: v => (v && typeof v === "object")
@@ -3051,14 +3061,32 @@ function restore(obj, label){
   return true;
 }
 
-/* ── 本機（localStorage）─────────────────────── */
+/* ── 本機存檔 ──────────────────────────────────
+   存檔本體走 SQStore（共用快照 sq.data.v1），首頁的「跨裝置同步」一連上就跟著走。
+   舊鍵 twinhead-cert-prep-v1 的資料由上面的 SQStore.migrate 搬過來，舊鍵保留不刪。 */
 const LS_OK = (function(){ try { localStorage.setItem("__probe","1");
   localStorage.removeItem("__probe"); return true; } catch(e){ return false; } })();
-const lsRead  = () => { if (!LS_OK) return {};
-  try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e){ return {}; } };
-const lsWrite = o => { if (!LS_OK){ note("此環境不允許瀏覽器內存檔。"); return false; }
-  try { localStorage.setItem(LS_KEY, JSON.stringify(o)); return true; }
-  catch(e){ note("瀏覽器儲存空間已滿。請改用「匯出 JSON 檔」。"); return false; } };
+const syncOn = () => !!(window.SQSync && SQSync.connected && SQSync.connected());
+const lsRead  = () => {
+  if (!LS_OK) return {};
+  if (!window.SQStore){
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch(e){ return {}; }
+  }
+  const out = {};
+  SQStore.all("preps").forEach(d => { if (d && d.id) out[d.id] = d; });
+  return out;
+};
+const lsWrite = o => {
+  if (!LS_OK){ note("此環境不允許瀏覽器內存檔。"); return false; }
+  if (!window.SQStore){
+    try { localStorage.setItem(LS_KEY, JSON.stringify(o)); return true; }
+    catch(e){ note("瀏覽器儲存空間已滿。請改用「匯出 JSON 檔」。"); return false; }
+  }
+  /* putAll 會逐筆比對，並幫這次沒出現的留墓碑 —— 刪掉的存檔才不會被同步復活 */
+  const docs = Object.keys(o).map(k => Object.assign({}, o[k], { id: k, name: k }));
+  if (SQStore.putAll("preps", docs)) return true;
+  note("瀏覽器儲存空間已滿。請改用「匯出 JSON 檔」。"); return false;
+};
 
 /* ── 雲端（artifact files publish）───────────── */
 let AF = null;            /* artifact 能力命名空間 */
@@ -3073,7 +3101,7 @@ async function cloudInit(){
   } catch(e){ AF = null; }
   if (!AF){
     cloudTried = true; store = "local"; renderStoreSeg(); renderSaves();
-    note("這個檢視取不到雲端存檔能力，已退回本機瀏覽器存檔。若要跨電腦，請用「匯出 JSON 檔」。");
+    note("這個檢視取不到雲端存檔能力，已退回本機存檔。要跨裝置，請到首頁開啟「跨裝置同步」。");
     return;
   }
   /* 讀取本 view 載入的那一版資料檔；第一次使用時檔案不存在是正常的 */
@@ -3346,6 +3374,10 @@ let savesAll = false;
 
 /* 直接開雲端存放位置，方便自己挑檔案 */
 function driveLink(){
+  if (store === "local")
+    return `<p class="footnote" style="margin:6px 0 0">存放位置：`
+      + (syncOn() ? "跨裝置同步 · 已連線（這些存檔在你其他裝置上也看得到）"
+                  : "本機瀏覽器 · 尚未開啟跨裝置同步（可在首頁開啟）") + `</p>`;
   if (store !== "gdrive") return "";
   const f = gdIds && gdIds[0]
     ? `<a href="https://drive.google.com/file/d/${esc(gdIds[0])}/view" target="_blank">開啟存檔檔案</a>　·　`
@@ -3367,7 +3399,8 @@ async function doSave(){
     note((existed ? "已覆寫" : "已儲存") + "「" + name + "」到" + STORE_NAME[store]
       + (store === "gdrive" ? "（我的雲端硬碟／Claude／" + GD_FILE + "，換裝置登入同一個 Google 帳號就讀得到）。"
        : store === "cloud"  ? "（換電腦開同一個連結就讀得到）。"
-                            : "。要跨裝置請改存 Google Drive 或匯出 JSON 檔。"));
+                            : (syncOn() ? "，會同步到其他裝置。"
+                                        : "（只在這台瀏覽器；要跨裝置請到首頁開「跨裝置同步」）。")));
   }
 }
 

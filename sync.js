@@ -111,6 +111,17 @@ async function readRemote(g, c = cfg) {
   return out;
 }
 
+/* 只讀出雲端那份的 kdf（salt／iter），不解密。
+   第二台裝置要用同一個 salt 推金鑰，同一組密語才會推出同一把。 */
+async function remoteKdf(g) {
+  const f = g && g.files && g.files[DATA_FILE];
+  if (!f) return null;
+  let txt = f.content;
+  if (f.truncated && f.raw_url) txt = await fetch(f.raw_url, { cache: 'no-store' }).then(r => r.text());
+  try { const d = JSON.parse(txt); return (d && d.enc && d.kdf && d.kdf.salt) ? d.kdf : null; }
+  catch (e) { return null; }
+}
+
 /* ══════ 合併：逐筆比 updatedAt，新的贏；墓碑比資料新就刪 ══════ */
 function mergeData(L, R) {
   if (!R) return L;
@@ -242,6 +253,19 @@ async function connect(raw, pass) {
 
   /* 金鑰：配對碼帶過來的優先，否則用密語推導 */
   let enc = encIn;
+  let gistObj = null;
+
+  /* 既有 Gist 要拿雲端那份的 salt 來推 —— 以前這裡每台都自己隨機一個 salt，
+     所以第二台就算密語打對也解不開，而且錯誤長得像「沒輸入密語」。 */
+  if (gistId && !enc) {
+    gistObj = await gh('GET', '/gists/' + gistId, null, token);
+    const kdf = await remoteKdf(gistObj);
+    if (kdf) {
+      if (!pass) throw syncErr('needpass', kdf);
+      const iter = kdf.iter || SYNC_ITER;
+      enc = { ek: await pbkdf2(pass, kdf.salt, iter), esalt: kdf.salt, eiter: iter };
+    }
+  }
   if (!enc) {
     if (!pass) throw syncErr('needpass', null);
     const salt = (cfg && cfg.esalt) || randB64(16);
@@ -252,7 +276,7 @@ async function connect(raw, pass) {
 
   if (gistId) {
     /* 既有 Gist：先確認這把金鑰解得開，解不開就不要覆寫人家的資料 */
-    const remote = await readRemote(await gh('GET', '/gists/' + gistId, null, token), next);
+    const remote = await readRemote(gistObj || await gh('GET', '/gists/' + gistId, null, token), next);
     if (remote) { cfg = next; saveCfg(); writeLocal(mergeData(readLocal(), remote)); }
     else { cfg = next; saveCfg(); }
   } else {

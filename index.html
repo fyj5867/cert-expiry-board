@@ -90,6 +90,8 @@
   .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
     background:var(--ink); color:var(--bg); font-size:13px; padding:10px 18px; border-radius:999px;
     box-shadow:var(--shadow); z-index:9; max-width:calc(100vw - 32px)}
+  .note.err{border-left-color:#c0392b; background:#fdf1f0; color:#7d231a}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .note.err{background:#3a1d1a;color:#ffb4a8}}
 </style>
 </head>
 <body>
@@ -174,6 +176,7 @@
         <button class="btn pri" id="go">連線</button>
         <button class="btn" id="tok">建立金鑰</button>
       </div>`);
+      H.push(`<div class="note err" id="syncerr" style="display:none"></div>`);
       H.push(`<div class="note">按鈕打不開的話（裝成 APP 之後常會被擋），
         直接複製這個網址到瀏覽器：<br><code style="word-break:break-all">${esc(SQSync.TOKEN_URL)}</code><br>
         開之前請先確認 GitHub 右上角登入的是建立這個站台的那個帳號。</div>`);
@@ -208,9 +211,24 @@
       e.target.disabled = true; e.target.textContent = '連線中…';
       try { const r = await SQSync.connect(tok, pw);
             toast(r.created ? `已在 ${r.login} 建立同步空間` : `已連線到 ${r.login}`); }
-      catch (err) { toast(err.status === 401 ? '金鑰無效或已過期'
-                        : err.status === 403 ? '金鑰權限不足：建立時要勾選 gist'
-                        : err.message || '連線失敗'); paint(); }
+      catch (err) {
+        /* 以前這裡直接 paint()，輸入的東西會整個被清掉，看起來就像「按了沒反應」。
+           改成把原因留在畫面上，輸入的內容不動。 */
+        const msg =
+            err.code === 'badpass'  ? '同步密語跟雲端那份不一樣。請改用當初第一台設的那組密語。'
+          : err.code === 'needpass' ? '請先輸入同步密語。'
+          : err.status === 401 ? '金鑰無效或已過期。請重新建一把，複製時整串都要帶到。'
+          : err.status === 403 ? '金鑰權限不足。建立時要勾 gist，而且要用 Tokens (classic)，不是 Fine-grained。'
+          : err.status === 404 ? '找不到雲端資料，Gist 可能被刪掉了。'
+          : err.status ? 'GitHub 回了 HTTP ' + err.status + '。'
+          : /fetch|network|load failed/i.test(err.message || '')
+              ? '連不到 GitHub（api.github.com）。可能是網路或公司防火牆擋住了。'
+          : (err.message || '連線失敗');
+        const box = document.getElementById('syncerr');
+        if (box){ box.innerHTML = '<b>連線失敗</b>　' + esc(msg); box.style.display = ''; }
+        toast(msg);
+        e.target.disabled = false; e.target.textContent = '連線';
+      }
     }
     if (id === 'setpw') {
       const pw = document.getElementById('pw2').value;

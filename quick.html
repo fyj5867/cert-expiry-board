@@ -126,6 +126,8 @@
     <div class="card"><h2>系統依組態推導的項目</h2><div id="lines"></div></div>
     <div class="card" id="c-tbq"><h2>待詢價（未計入）</h2><div id="tbq"></div></div>
     <div class="btns"><button class="btn pri" id="b-copy">複製報價摘要</button><button class="btn" id="b-export">分享</button></div>
+    <div class="btns"><button class="btn pri" id="b-full">帶入完整報價單</button></div>
+    <div class="info" id="full-note"></div>
     <p class="info">金額是牌價試算，不是實驗室報價。細項對帳、改價、輸出 Word／PDF 請用<a href="./quote.html">完整版報價試算器</a>。</p>
   </section>
 
@@ -436,6 +438,24 @@ function summary(){
 }
 function toast(m){ const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2200); }
 
+/* ── 帶入完整版報價單（quote.html）── */
+function handoff(){
+  const on = {}; derive().forEach(d => { if (!q.off[d.id]) on[d.id] = true; });
+  const notes = [];
+  if (q.batt > 3) notes.push("完整版電池最多 3 顆，已帶前 3 顆");
+  if (q.mb > 1 && !isNb()) notes.push("多 " + (q.mb - 1) + " 塊主板已併入追加 config");
+  if (q.plastic.on && !q.plastic.appr) notes.push("未認可塑料完整版沒有對應欄位，請另行備註");
+  const adapters = {}; Object.keys(q.adp).forEach(k => adapters[k] = {on: q.adp[k].on, unappr: q.adp[k].on && !q.adp[k].appr});
+  return {t: Date.now(), model: q.model, caseType: q.caseType, rate: q.rate, notes,
+    pclass: isNb() ? "nb4" : q.pclass, on, bsmiByCB: q.ex.bsmiByCB,
+    configs: Math.max(0, q.cfg) + (!isNb() ? Math.max(0, q.mb - 1) : 0),
+    batteries: Array.from({length: Math.min(3, q.batt)}, (_, i) => ({segs: parseInt(q.segs[i], 10) > 0 ? parseInt(q.segs[i], 10) : undefined})),
+    fan: {mode: q.fan, unappr: q.fan !== "none" && !q.fanAppr}, mxm: {mode: q.mxm},
+    m44: {on: q.m44, sources: q.m44src},
+    comps: {rtc: {on: q.coin.on, unappr: q.coin.on && !q.coin.appr}, scanner: {on: q.scanner.on, unappr: q.scanner.on && !q.scanner.appr},
+            ircam: {on: q.ircam.on, unappr: q.ircam.on && !q.ircam.appr}, led: {on: q.rearled.on, unappr: q.rearled.on && !q.rearled.appr}},
+    adapters};
+}
 /* ── 事件 ── */
 function tab(name){
   ["cfg","quote","plan"].forEach(k => { $("v-" + k).hidden = k !== name; });
@@ -461,6 +481,7 @@ document.addEventListener("click", e => {
   if (d.au){ q.adp[d.au].appr = false; return render(); }
   if (d.ca){ const [k, v] = d.ca.split(":"); q[k].appr = v === "1"; return render(); }
   if (d.bc !== undefined){ q.ex.bsmiByCB = d.bc === "1"; return render(); }
+  if (t.id === "b-full"){ try { localStorage.setItem("sq.handoff.v1", JSON.stringify(handoff())); } catch(e){ return toast("無法交接：瀏覽器不允許儲存"); } location.href = "./quote.html"; return; }
   if (t.id === "b-copy"){ const s = summary(); (navigator.clipboard ? navigator.clipboard.writeText(s) : Promise.reject()).then(() => toast("已複製報價摘要"), () => toast("無法複製，請改用「分享」")); return; }
   if (t.id === "b-export"){ const s = summary(); if (navigator.share) navigator.share({title:"報價試算", text:s}).catch(() => {}); else toast("這個瀏覽器不支援分享，請用「複製」"); return; }
 });

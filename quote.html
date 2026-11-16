@@ -4512,6 +4512,36 @@ if (window.SQStore) SQStore.attach(() => {
   if (dbReady && !DB) dbStatus(localStatus());
 }, m => note(m));
 
+/* 手機版「快速報價」帶入：10 分鐘內有效，套用後立即清掉 */
+function applyHandoff(){
+  let h = null;
+  try { h = JSON.parse(localStorage.getItem("sq.handoff.v1") || "null"); localStorage.removeItem("sq.handoff.v1"); } catch(e){}
+  if (!h || !h.t || Date.now() - h.t > 600000) return;
+  if (h.pclass === "nb4" && !NB4) { note("尚未匯入 NB 4版規則，請先匯入牌價檔再從手機版帶入。"); return; }
+  state.caseType = h.caseType === "delta" ? "delta" : "new";
+  state.model = h.model || state.model;
+  state.pclass = h.pclass; state.rate = h.rate || state.rate;
+  state.configs = h.configs || 0;
+  state.ov = {}; state.rov = {};
+  ITEMS.forEach(i => state.on[i.id] = false);
+  Object.keys(h.on || {}).forEach(id => { state.on[id] = !!h.on[id]; });
+  state.bsmiByCB = h.bsmiByCB !== false;
+  state.batteries.forEach((b, i) => { const x = (h.batteries || [])[i]; b.on = !!x; b.segs = x ? x.segs : undefined; });
+  state.fan.mode = h.fan.mode; state.fan.unappr = !!h.fan.unappr;
+  state.mxm.mode = h.mxm.mode;
+  state.m44 = {on: !!h.m44.on, sources: h.m44.sources || 1, note: ""};
+  state.comps.forEach(c => { const x = (h.comps || {})[c.id]; if (x){ c.on = !!x.on; c.unappr = !!x.unappr; } });
+  state.adapters.forEach(a => { const x = (h.adapters || {})[a.id]; if (x){ a.on = !!x.on; a.unappr = !!x.unappr; } });
+  state.scope.auto = true;
+  syncStatic(); render();
+  const b = document.createElement("div");
+  b.style.cssText = "margin:0 0 14px;padding:12px 15px;border-radius:8px;font-size:14px;line-height:1.7;background:#d7ece4;color:#0d5c4a;border-left:3px solid #0d5c4a";
+  b.textContent = "已從手機版快速報價帶入組態" + (h.notes && h.notes.length ? "：" + h.notes.join("；") : "") + "。金額可在下方報價表再調整。";
+  document.body.insertBefore(b, document.body.firstChild);
+  window.scrollTo(0, 0);
+}
+applyHandoff();
+
 dbInit();
 gdInit().then(ok => {
   if (ok) renderSaves();          /* 讓「匯入舊存檔」按鈕出現 */

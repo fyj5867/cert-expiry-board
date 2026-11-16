@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<title>快速報價</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1f4d5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#211d17;--sub:#6f6656;--line:#e6e0d3;--accent:#1f4d5c;--accent-ink:#fff;
+    --warn:#a35f00;--warn-bg:#fdf0d2;--ok:#0d5c4a;--ok-bg:#d7ece4;
+    --shadow:0 1px 2px rgba(33,29,23,.06),0 8px 24px -12px rgba(33,29,23,.18)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17140f;--card:#211c15;--ink:#f1ece0;--sub:#b3a891;
+    --line:#3a3225;--accent:#8fc2cf;--accent-ink:#10242b;--warn:#e0b063;--warn-bg:#3a2c16;--ok:#6fdcbe;--ok-bg:#15332a;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5)}}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:17px;line-height:1.5;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;-webkit-font-smoothing:antialiased;
+    padding-top:env(safe-area-inset-top,0);padding-bottom:calc(132px + env(safe-area-inset-bottom,0))}
+  .wrap{max-width:640px;margin:0 auto;padding:12px 16px}
+  header .eyebrow{font-size:12px;letter-spacing:.12em;font-weight:700;color:var(--accent)}
+  header h1{margin:2px 0 10px;font-size:26px;font-weight:900}
+  header a{color:var(--sub);font-size:14px;text-decoration:none}
+  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+  .seg button{flex:1;min-height:46px;font:inherit;font-size:16px;font-weight:700;border:0;border-radius:9px;background:none;color:var(--sub)}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin:14px 0;padding:6px 16px 12px}
+  .card h2{margin:12px 0 4px;font-size:13px;letter-spacing:.1em;color:var(--sub);font-weight:700}
+  .row{display:flex;align-items:center;gap:12px;min-height:60px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .t{flex:1;min-width:0}.row .t b{display:block;font-size:17px}.row .t small{display:block;color:var(--sub);font-size:13.5px;line-height:1.4}
+  .step{display:flex;align-items:center;gap:4px}
+  .step button{width:48px;height:48px;font-size:26px;font-weight:700;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+  .step output{min-width:34px;text-align:center;font-size:22px;font-weight:900}
+  .sw{position:relative;width:56px;height:34px;flex:none}
+  .sw input{position:absolute;inset:0;opacity:0;width:100%;height:100%;margin:0;z-index:2}
+  .sw i{position:absolute;inset:0;background:var(--line);border-radius:99px;transition:.15s}
+  .sw i::after{content:"";position:absolute;top:3px;left:3px;width:28px;height:28px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .sw input:checked+i{background:var(--accent)}.sw input:checked+i::after{left:25px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 0 10px}
+  .chip{min-height:44px;padding:0 16px;font:inherit;font-size:15.5px;font-weight:700;border:1px solid var(--line);border-radius:99px;background:var(--bg);color:var(--sub)}
+  .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .chip.bad[aria-pressed="true"]{background:var(--warn-bg);border-color:var(--warn);color:var(--warn)}
+  input[type=text],input[type=number]{font:inherit;font-size:17px;width:100%;min-height:50px;padding:0 14px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px}
+  .hero{background:var(--accent);color:var(--accent-ink);border-radius:18px;padding:18px;margin:14px 0;box-shadow:var(--shadow)}
+  .hero small{opacity:.85;font-size:13.5px}.hero .big{font-size:36px;font-weight:900;letter-spacing:-.02em;line-height:1.15}
+  .hero .sub{margin-top:4px;font-size:14.5px;opacity:.92}
+  .line{padding:12px 0;border-bottom:1px solid var(--line);display:flex;gap:10px}
+  .line:last-child{border-bottom:0}.line .t{flex:1;min-width:0}.line .t b{font-size:16.5px}.line .t small{display:block;color:var(--sub);font-size:13.5px;line-height:1.45}
+  .line .a{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .line .a small{display:block;font-weight:400;color:var(--sub);font-size:12.5px}
+  .tag{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:99px;margin-left:6px;vertical-align:1px}
+  .tag.w{background:var(--warn-bg);color:var(--warn)}.tag.o{background:var(--ok-bg);color:var(--ok)}
+  .btn{min-height:50px;padding:0 20px;font:inherit;font-size:16px;font-weight:700;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px}.btns .btn{flex:1}
+  .note{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:12px 14px;font-size:14.5px;line-height:1.6;margin:14px 0}
+  .info{color:var(--sub);font-size:13.5px;line-height:1.6;margin:8px 2px}
+  .bar{position:fixed;left:0;right:0;bottom:calc(64px + env(safe-area-inset-bottom,0));z-index:20;background:var(--card);border-top:2px solid var(--accent);
+    padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .bar b{font-size:20px;font-weight:900}.bar small{display:block;color:var(--sub);font-size:12.5px}
+  .bar button{min-height:44px;padding:0 16px;border:0;border-radius:10px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--card);border-top:1px solid var(--line);
+    padding-bottom:env(safe-area-inset-bottom,0)}
+  .tabs button{flex:1;min-height:64px;font:inherit;font-size:14px;font-weight:700;border:0;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .tabs button span{font-size:22px;line-height:1}.tabs button[aria-selected="true"]{color:var(--accent)}
+  .view[hidden]{display:none}
+  .toast{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14px;z-index:40;max-width:90vw}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="./index.html">‹ 安規工具</a>
+    <div class="eyebrow">QUICK QUOTE</div>
+    <h1>快速報價</h1>
+    <div class="seg" id="seg-case"><button data-v="new">全新申請</button><button data-v="delta">變更申請</button></div>
+  </header>
+  <div id="banner"></div>
+
+  <!-- ① 組態 -->
+  <section class="view" id="v-cfg">
+    <div class="card"><h2>機種</h2>
+      <div class="row"><div class="t" style="flex:1"><input type="text" id="f-model" list="models" placeholder="機種，例：R12" autocomplete="off"><datalist id="models"></datalist></div></div>
+      <div class="chips" id="chips-class"></div>
+      <div class="info" id="model-info"></div>
+    </div>
+
+    <div class="card"><h2>主板・電池・Config</h2>
+      <div class="row"><div class="t"><b>主板</b><small id="mb-sub"></small></div><div class="step" data-step="mb"></div></div>
+      <div class="row"><div class="t"><b>電池</b><small id="bt-sub">每顆 = 1 個 source</small></div><div class="step" data-step="batt"></div></div>
+      <div id="segs"></div>
+      <div class="row"><div class="t"><b>追加 Config</b><small>超出基準的配置數</small></div><div class="step" data-step="cfg"></div></div>
+      <div class="row"><div class="t"><b>M.4.4 加測</b><small>電池尚未搭配整機評估才需要</small></div>
+        <label class="sw"><input type="checkbox" data-sw="m44"><i></i></label></div>
+      <div id="m44src"></div>
+    </div>
+
+    <div class="card"><h2>風扇・MXM 結構</h2>
+      <div class="chips" id="chips-fan"></div>
+      <div class="row" id="fan-row"><div class="t"><b>風扇數量</b><small>認可 = 已有認證的模組</small></div><div class="step" data-step="fanqty"></div></div>
+      <div class="chips" id="chips-fanappr"></div>
+      <div class="chips" id="chips-mxm"></div>
+    </div>
+
+    <div class="card"><h2>Adapter</h2><div class="info" style="margin-top:0">Adapter 由 FSP 廠商負責，不計入報價；未認可會列待詢價。</div>
+      <div id="adp"></div></div>
+
+    <div class="card"><h2>零件（勾選有用到的）</h2><div id="comps"></div></div>
+
+    <div class="card"><h2>其他認證</h2><div id="extras"></div></div>
+  </section>
+
+  <!-- ② 報價 -->
+  <section class="view" id="v-quote" hidden>
+    <div class="hero"><small id="h-case"></small><div class="big" id="h-total">—</div><div class="sub" id="h-sub"></div></div>
+    <div class="card"><h2>系統依組態推導的項目</h2><div id="lines"></div></div>
+    <div class="card" id="c-tbq"><h2>待詢價（未計入）</h2><div id="tbq"></div></div>
+    <div class="btns"><button class="btn pri" id="b-copy">複製報價摘要</button><button class="btn" id="b-export">分享</button></div>
+    <p class="info">金額是牌價試算，不是實驗室報價。細項對帳、改價、輸出 Word／PDF 請用<a href="./quote.html">完整版報價試算器</a>。</p>
+  </section>
+
+  <!-- ③ 時程樣品 -->
+  <section class="view" id="v-plan" hidden>
+    <div class="card"><h2>預估時程</h2><div id="plan-lt"></div></div>
+    <div class="card"><h2>需要的樣品</h2><div id="plan-smp"></div></div>
+    <div class="card" id="c-docs"><h2>向電池廠索取</h2><div id="plan-docs"></div></div>
+  </section>
+</div>
+
+<div class="bar" id="bar"><div><b id="bar-total">—</b><small id="bar-sub"></small></div><button id="bar-go">看報價</button></div>
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="cfg" aria-selected="true"><span>🧩</span>組態</button>
+  <button role="tab" data-tab="quote" aria-selected="false"><span>💰</span>報價</button>
+  <button role="tab" data-tab="plan" aria-selected="false"><span>📅</span>時程樣品</button>
+</nav>
+
+<script src="./sync.js"></script>
+<script src="./store.js"></script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const NT = n => "NT$" + Math.round(n).toLocaleString("en-US");
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ── 資料（牌價一律由使用者匯入，與完整版共用同一份）── */
+let ITEMS = [], RATES = {}, SCOPE = {}, NB4 = null, PRICE = {}, BSMI = {};
+const GROUPS = {G1:2, G2:2, G3:2, G4:1, G5:0};
+const CLASSES = [["tablet","平板"],["notebook","筆電"],["nb4","NB 4版"],["acc","配件"]];
+const ACC_NO_RATE = ["ulcb","bcs","erp","ccc","iec62471","ul4200a","cdrh","c1d2","atex","ts","pse"];
+const EMPTY_SCOPE = {adapters:{}, fan:{}, mxm:{}, battery:2, schemes:{}};
+let HAVE = false;
+
+function applyData(d){
+  if (!d || typeof d !== "object" || !d.ITEMS) return false;
+  ITEMS = JSON.parse(JSON.stringify(d.ITEMS));
+  RATES = d.RATES || {}; SCOPE = d.SCOPE || {}; NB4 = d.NB4 || null;
+  PRICE = d.PCLASS_PRICE || {}; BSMI = d.BSMI_RULES || {};
+  if (NB4) (NB4.extraItems || []).forEach(x => { if (!ITEMS.some(i => i.id === x.id)) ITEMS.push(JSON.parse(JSON.stringify(x))); });
+  return true;
+}
+function loadData(){
+  let d = null;
+  try { if (window.SQStore) d = SQStore.getConfig("rates"); } catch(e){}
+  if (!d) try { d = JSON.parse(localStorage.getItem("sq.rates.v1") || "null"); } catch(e){}
+  HAVE = applyData(d); return HAVE;
+}
+
+/* ── 組態狀態 ── */
+const DEF = () => ({
+  caseType:"new", model:"", pclass:"tablet", rate:32.5, mb:1, batt:2, segs:[], cfg:0,
+  m44:false, m44src:1,
+  fan:"none", fanqty:1, fanAppr:true, mxm:"none",
+  adp:{"65":{on:false,appr:true},"90":{on:true,appr:true},"120":{on:false,appr:false},"240":{on:false,appr:false}},
+  plastic:{on:true, appr:true}, coin:{on:false, appr:true}, scanner:{on:false, appr:true},
+  ircam:{on:false, appr:true}, rearled:{on:false, appr:true},
+  ex:{bsmi:false, bsmiByCB:true, lvd:false, c1d2:false, atex:false, ts:false, pse:false},
+  off:{}
+});
+let q = DEF();
+const KEY = "sq.quick.v1";
+function saveQ(){ try { localStorage.setItem(KEY, JSON.stringify(q)); } catch(e){} }
+function loadQ(){ try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) q = Object.assign(DEF(), s); } catch(e){} }
+
+/* ── 計價引擎（規則與完整版 quote.html 的 calc() 相同；金額全來自資料檔）── */
+const isNb = () => !!NB4 && q.pclass === "nb4";
+const nbIt = id => (isNb() && NB4.items && NB4.items[id]) || null;
+const scopeOf = () => SCOPE[q.model] || EMPTY_SCOPE;
+const delta = () => q.caseType === "delta";
+const chargeable = st => !(delta() && st === "signed");
+const cov = (kind, key) => ((scopeOf()[kind === "scheme" ? "schemes" : kind] || {})[key]) || "none";
+const segTotal = () => Array.from({length:q.batt}, (_, i) => parseInt(q.segs[i], 10) || 0).reduce((a,b) => a+b, 0);
+const rbase = k => Object.assign({}, RATES[k] || {}, (isNb() && NB4.rates && NB4.rates[k]) || {});
+const accCls = () => q.pclass === "acc";
+const bsmiRule = () => BSMI[accCls() ? "D_woCB" : (q.ex.bsmiByCB ? "R_byCB" : "R_woCB")] || {fee:0, svc:0, how:""};
+const P = () => PRICE[q.pclass] || {fee:0, buf:0, bcs:0};
+
+function amt(o, key){
+  const n = nbIt(o.id);
+  if (n){
+    if (o.id === "ulcb"){ if (key === "fee") return n.fee || 0; if (key === "svc") return (n.svc||0) + (n.tempSvc||0) * segTotal(); }
+    if (o.id === "erp" && key === "all") return (n.all||0) + (NB4.erpConfig||0) * Math.max(0, q.cfg);
+    if (key in n) return n[key] || 0;
+  }
+  if (o.id === "ulcb" && key === "fee") return ((P().fee||0) + (P().buf||0)) * q.rate;
+  if (o.id === "bcs" && key === "all") return P().bcs || 0;
+  if (o.id === "bsmi" && key === "fee") return bsmiRule().fee;
+  if (o.id === "bsmi" && key === "svc") return bsmiRule().svc;
+  if (o.basis === "USD"){
+    if (key === "fee" && o.feeUSD !== undefined) return o.feeUSD * q.rate;
+    if (key === "all" && o.allUSD !== undefined) return o.allUSD * q.rate;
+  }
+  return o[key] || 0;
+}
+
+/* 組態 → 要申請哪些認證（含推導原因） */
+function derive(){
+  const out = [], add = (id, why) => out.push({id, why});
+  if (accCls()){ add("lvd", "配件通常只申請 LVD report"); }
+  else {
+    add("ulcb", "主案：UL + CB"); add("erp", "ErP"); add("bcs", "NrCAN / CEC / DOE"); add("ccc", "CCC（by CB）");
+    if (isNb()) add("cel", "CEL");
+  }
+  if (q.coin.on && !isNb()) add("ul4200a", "有 Coin battery（RTC）→ UL 4200A");
+  if (q.scanner.on) add("cdrh", "Barcode scanner（Laser class 2）→ CDRH");
+  const led = [q.ircam, q.rearled].filter(c => c.on && !c.appr).length;
+  if (led) add("iec62471", "有 " + led + " 個未認可 LED／IR source → IEC 62471");
+  const X = q.ex;
+  if (X.bsmi) add("bsmi", "BSMI · " + bsmiRule().how);
+  if (X.lvd && !accCls()) add("lvd", "LVD");
+  ["c1d2","atex","ts","pse"].forEach(k => { if (X[k]) add(k, "手動加選"); });
+  return out;
+}
+
+function calc(){
+  const lines = [], tbq = [];
+  const pushT = (what, why) => tbq.push({what, why});
+  const extraMb = Math.max(0, q.mb - 1);
+  let fee = 0, svc = 0, all = 0, aFee = 0, aSvc = 0;
+
+  /* ── 變更類加價項（adders）── */
+  const adders = [];
+  const add = (key, qty) => { if (qty > 0 && RATES[key]) adders.push(Object.assign({key}, rbase(key), {qty})); };
+  if (!accCls()){
+    if (q.fan === "both"){ if (chargeable(cov("fan","without"))) add("wofan", 1); }
+    if (q.mxm === "with" || q.mxm === "both"){ if (chargeable(cov("mxm","with"))) add("mxm", 1); }
+    if (q.mxm === "both") add("womxm", 1);
+    const bBase = delta() ? (scopeOf().battery == null ? 2 : scopeOf().battery) : 2;
+    const extraB = Math.max(0, q.batt - bBase);
+    if (extraB > 0){
+      if (isNb()) pushT("追加電池 source ×" + extraB, "超出 Based on 的 2 顆，需向實驗室詢價");
+      else add("battery", extraB);
+    }
+    if (q.m44) add("m44", Math.max(1, q.m44src));
+    const led = [q.ircam, q.rearled].filter(c => c.on && !c.appr).length;
+    if (led && chargeable(cov("scheme","iec62471"))) add("led", led);
+    let cfgN = Math.max(0, q.cfg);
+    if (extraMb > 0 && !isNb()) cfgN += extraMb;
+    add("config", cfgN);
+  }
+  if (isNb()){
+    for (let i = 0; i < q.batt; i++) if (!(parseInt(q.segs[i],10) > 0))
+      pushT("電池 " + (i+1) + " 溫度段數待確認", "需 Cell／Pack 規格書；每段 +" + NT((NB4.items.ulcb||{}).tempSvc || 0));
+    if (extraMb > 0) pushT("多 " + extraMb + " 塊主板", "超出 Based on 的 1 MB，需向實驗室詢價");
+  }
+  const struct = a => !!a.struct;
+  const tbqStruct = adders.filter(a => struct(a) && a.src === "todo").reduce((s,a) => s + a.qty, 0);
+  const structCount = adders.filter(struct).reduce((s,a) => s + a.qty, 0) - tbqStruct;
+  const solo = delta() && structCount === 1;
+
+  /* ── 認證項目 ── */
+  derive().forEach(d => {
+    if (q.off[d.id]) return;
+    const i = ITEMS.find(x => x.id === d.id); if (!i) return;
+    if ((nbIt(i.id) || {}).incl){ lines.push({id:i.id, name:i.name, why:"已含在 UL+CB 套裝內", state:"free", note:"含在套裝"}); return; }
+    const st = cov("scheme", i.id);
+    if (!chargeable(st)){ lines.push({id:i.id, name:i.name, why:d.why, state:"free", note:"已在認證範圍內，不計費"}); return; }
+    const nbT = (nbIt(i.id) || {}).tbq;
+    if (i.src === "todo" || nbT || (accCls() && ACC_NO_RATE.indexOf(i.id) >= 0)){
+      pushT(i.name, accCls() ? "配件無此牌價，需向實驗室詢價" : nbT ? "能效費用待 UL 確認" : "尚未詢價");
+      lines.push({id:i.id, name:i.name, why:d.why, state:"tbq"}); return;
+    }
+    const f = i.kind === "split" ? amt(i,"fee") : amt(i,"all");
+    const s = i.kind === "split" ? amt(i,"svc") : 0;
+    if (i.kind === "split"){ fee += f; svc += s; } else all += f;
+    lines.push({id:i.id, name:i.name, why:d.why, fee:f, svc:s, state:"ok",
+      note: i.id === "ulcb" && isNb() ? "含溫度 " + segTotal() + " 段" : ""});
+  });
+  adders.forEach(a => {
+    if (a.src === "todo"){ pushT(a.name, "尚未詢價"); lines.push({id:"mod:"+a.key, name:a.name, why:a.trig, state:"tbq"}); return; }
+    const f = (solo && a.feeSolo !== undefined ? a.feeSolo : a.fee) * a.qty;
+    const s = a.struct ? (solo && a.svcSolo ? a.svcSolo : 0) : (a.svc||0) * a.qty;
+    aFee += f; aSvc += s;
+    lines.push({id:"mod:"+a.key, name:a.name + (a.qty > 1 ? " ×" + a.qty : ""), why:a.trig, fee:f, svc:s, state:"ok", mod:true});
+  });
+  let tier = 0;
+  if (delta() && structCount > 0 && !solo){ tier = 25000; aSvc += tier;
+    lines.push({id:"mod:tier", name:"變更案開案級距", why:structCount + " 項結構變更 → ≥2 項", fee:0, svc:tier, state:"ok", mod:true}); }
+
+  /* ── 無牌價的未認可零件 ── */
+  const unap = (c, name) => { if (c.on && !c.appr) pushT("未認可 " + name, "需確認評估方式與費用"); };
+  if (!accCls()){
+    if (q.fan !== "none" && !q.fanAppr) pushT("未認可風扇 ×" + q.fanqty, "未認可零件的評估費用無牌價");
+    unap(q.plastic, "塑料／外殼材料"); unap(q.coin, "Coin battery"); unap(q.scanner, "Barcode scanner");
+    ["65","90","120","240"].forEach(k => { const a = q.adp[k]; if (a.on && !a.appr) pushT("未認可 Adapter " + k + "W", "Adapter 由 FSP 負責，需確認認證狀態"); });
+  }
+  return {lines, tbq, total: fee + svc + all + aFee + aSvc, fee: fee+aFee, svc: svc+aSvc, all};
+}
+
+/* 時程與樣品 */
+function plan(R){
+  const on = R.lines.filter(l => l.state !== "tbq" || true).filter(l => !l.mod);
+  const live = on.map(l => ITEMS.find(i => i.id === l.id)).filter(Boolean);
+  const lt = i => { const n = nbIt(i.id); return (n && n.lt) || i.lt; };
+  const anchor = live.find(i => i.id === "ulcb");
+  const rows = [];
+  let weeks = 0;
+  const after = live.filter(i => !i.anchor && i.after === "cb" && lt(i) && !i.bundled);
+  const indep = live.filter(i => i.after === null && lt(i));
+  if (anchor && lt(anchor)){ rows.push(["UL + CB", lt(anchor)]); weeks = lt(anchor)[1]; }
+  const aw = after.reduce((m,i) => Math.max(m, lt(i)[1]), 0);
+  after.forEach(i => rows.push([i.name + "（CB 後）", lt(i)]));
+  indep.forEach(i => rows.push([i.name + "（可同時）", lt(i)]));
+  const total = Math.max(weeks + aw, indep.reduce((m,i) => Math.max(m, lt(i)[1]), 0));
+  const grp = {};
+  live.forEach(i => { if (i.grp) grp[i.grp] = Math.max(grp[i.grp]||0, GROUPS[i.grp]||0); });
+  let smp = Object.keys(grp).reduce((s,g) => s + grp[g], 0);
+  const smpRows = [];
+  if (isNb()){
+    smp = 0;
+    live.forEach(i => { const n = nbIt(i.id); if (n && n.smp){ smp += n.smp; smpRows.push([i.name, n.smpNote || n.smp + " 台整機"]); } });
+    smpRows.push(["電池", "每款電芯 Battery 各 2 pc"]);
+  } else {
+    Object.keys(grp).forEach(g => smpRows.push(["群組 " + g.slice(1), grp[g] + " 台（群組內共用）"]));
+    if (q.m44){ smp += 1; smpRows.push(["M.4.4", "另送 1 台給電池廠"]); }
+  }
+  return {rows, total, smp, smpRows};
+}
+
+/* ── 畫面 ── */
+const step = (k, v, min, max) => `<button data-d="${k}:-1" aria-label="減">−</button><output>${v}</output><button data-d="${k}:1" aria-label="加">＋</button>`;
+const chipSet = (arr, cur, attr) => arr.map(([v,t]) => `<button class="chip" ${attr}="${v}" aria-pressed="${cur===v}">${t}</button>`).join("");
+const LIM = {mb:[1,9], batt:[0,9], cfg:[0,9], fanqty:[1,9]};
+
+function renderCfg(){
+  [...$("seg-case").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === q.caseType));
+  $("models").innerHTML = Object.keys(SCOPE).map(k => `<option value="${esc(k)}">`).join("");
+  if (document.activeElement !== $("f-model")) $("f-model").value = q.model;
+  $("chips-class").innerHTML = chipSet(CLASSES.filter(c => c[0] !== "nb4" || NB4), q.pclass, "data-cls");
+  $("model-info").textContent = delta()
+    ? (SCOPE[q.model] ? "變更申請：「" + q.model + "」已認證範圍內的項目不計費。" : "變更申請，但「" + q.model + "」沒有內建台帳，所有項目都會計費。")
+    : (isNb() ? "NB 4版套裝：金額依資料檔規則，不用匯率。" : "全新申請：全部項目照牌價。");
+  document.querySelectorAll("[data-step]").forEach(el => {
+    const k = el.dataset.step, v = k === "fanqty" ? q.fanqty : q[k]; el.innerHTML = step(k, v);
+  });
+  $("mb-sub").textContent = q.mb > 1 ? "多 " + (q.mb-1) + " 塊" + (isNb() ? "，列待詢價" : "，視為追加 config（待實驗室確認）") : "基準 1 塊";
+  $("segs").innerHTML = isNb() ? Array.from({length:q.batt}, (_, i) => `<div class="row"><div class="t"><b>電池 ${i+1} · Cell 溫度段數</b><small>每段加收服務費；依 Cell 規格書的充電溫度區間</small></div>
+    <div class="step"><button data-sg="${i}:-1">−</button><output>${q.segs[i] === undefined || q.segs[i] === "" ? "?" : q.segs[i]}</output><button data-sg="${i}:1">＋</button></div></div>`).join("") : "";
+  document.querySelector('[data-sw="m44"]').checked = q.m44;
+  $("m44src").innerHTML = q.m44 ? `<div class="row"><div class="t"><b>M.4.4 source 數</b></div><div class="step" data-step="m44src">${step("m44src", q.m44src)}</div></div>` : "";
+  $("chips-fan").innerHTML = chipSet([["none","無風扇"],["with","有風扇"],["both","有／無風扇兩款"]], q.fan, "data-fan");
+  $("fan-row").style.display = q.fan === "none" ? "none" : "";
+  $("chips-fanappr").innerHTML = q.fan === "none" ? "" : `<button class="chip" data-fa="1" aria-pressed="${q.fanAppr}">認可模組</button><button class="chip bad" data-fa="0" aria-pressed="${!q.fanAppr}">未認可模組</button>`;
+  $("chips-mxm").innerHTML = chipSet([["none","無 MXM"],["with","有 MXM"],["both","MXM 有／無兩款"]], q.mxm, "data-mxm");
+  $("adp").innerHTML = ["65","90","120","240"].map(k => { const a = q.adp[k]; return `<div class="row"><div class="t"><b>${k}W</b></div>
+    ${a.on ? `<button class="chip" data-aa="${k}" aria-pressed="${a.appr}" style="margin-right:4px">認可</button><button class="chip bad" data-au="${k}" aria-pressed="${!a.appr}">未認可</button>` : ""}
+    <label class="sw"><input type="checkbox" data-adp="${k}" ${a.on?"checked":""}><i></i></label></div>`; }).join("");
+  const COMP = [["plastic","塑料／外殼","外殼材料、金屬鍍膜等"],["coin","Coin battery（RTC）","→ UL 4200A"],["scanner","Barcode scanner","Laser class 2 → CDRH"],["ircam","IR cam（前鏡頭 IR LED）","未認可 → IEC 62471"],["rearled","Rear cam LED","未認可 → IEC 62471"]];
+  $("comps").innerHTML = COMP.map(([k,t,s]) => { const c = q[k]; return `<div class="row"><div class="t"><b>${t}</b><small>${s}</small></div>
+    <label class="sw"><input type="checkbox" data-comp="${k}" ${c.on?"checked":""}><i></i></label></div>
+    ${c.on ? `<div class="chips"><button class="chip" data-ca="${k}:1" aria-pressed="${c.appr}">認可</button><button class="chip bad" data-ca="${k}:0" aria-pressed="${!c.appr}">未認可</button></div>` : ""}`; }).join("");
+  const EX = [["bsmi","BSMI"],["lvd","LVD"],["c1d2","C1D2"],["atex","ATEX"],["ts","TS 防爆"],["pse","PSE"]];
+  $("extras").innerHTML = EX.map(([k,t]) => `<div class="row"><div class="t"><b>${t}</b>${k==="bsmi"?`<small>${accCls()?"配件走 D type":""}</small>`:""}</div>
+    <label class="sw"><input type="checkbox" data-ex="${k}" ${q.ex[k]?"checked":""}><i></i></label></div>`).join("")
+    + (q.ex.bsmi && !accCls() ? `<div class="chips"><button class="chip" data-bc="1" aria-pressed="${q.ex.bsmiByCB}">by CB</button><button class="chip" data-bc="0" aria-pressed="${!q.ex.bsmiByCB}">w/o CB</button></div>` : "");
+}
+
+let R = null;
+function renderQuote(){
+  const sub = R.total * 1.05;
+  $("h-case").textContent = (q.model || "未填機種") + " · " + (delta() ? "變更申請" : "全新申請") + " · " + (CLASSES.find(c => c[0] === q.pclass)||[,""])[1];
+  $("h-total").textContent = NT(R.total);
+  $("h-sub").textContent = "含稅 " + NT(sub) + "　·　規費 " + NT(R.fee) + "　服務費 " + NT(R.svc) + (R.all ? "　全包 " + NT(R.all) : "");
+  $("lines").innerHTML = R.lines.map(l => {
+    const a = l.state === "tbq" ? `<span class="tag w">待詢價</span>` : l.state === "free" ? `<span class="tag o">不計費</span>` : NT((l.fee||0)+(l.svc||0));
+    const det = l.state === "ok" && l.fee && l.svc ? `<small>規費 ${NT(l.fee)}<br>服務 ${NT(l.svc)}</small>` : "";
+    const sw = (!l.mod && !l.id.startsWith("mod:")) ? "" : "";
+    return `<div class="line"><div class="t"><b>${esc(l.name)}</b><small>${esc(l.why)}${l.note ? " · " + esc(l.note) : ""}</small></div><div class="a">${a}${det}</div></div>`;
+  }).join("") || `<p class="info">還沒有項目，請先在「組態」填寫。</p>`;
+  $("c-tbq").style.display = R.tbq.length ? "" : "none";
+  $("tbq").innerHTML = R.tbq.map(t => `<div class="line"><div class="t"><b>${esc(t.what)}</b><small>${esc(t.why)}</small></div><div class="a"><span class="tag w">?</span></div></div>`).join("");
+}
+function renderPlan(){
+  const p = plan(R);
+  $("plan-lt").innerHTML = (p.rows.map(([n, lt]) => `<div class="line"><div class="t"><b>${esc(n)}</b></div><div class="a">${lt[0] === lt[1] ? lt[0] : lt[0] + "–" + lt[1]} 週</div></div>`).join("")
+    || `<p class="info">沒有可估時程的項目。</p>`) + (p.total ? `<div class="line"><div class="t"><b>整體約</b><small>CB 之後的項目接在 UL+CB 後面，獨立項目可同時進行</small></div><div class="a">≤ ${p.total} 週</div></div>` : "");
+  $("plan-smp").innerHTML = (p.smpRows.map(([n, s]) => `<div class="line"><div class="t"><b>${esc(n)}</b></div><div class="a" style="font-weight:600">${esc(s)}</div></div>`).join("")
+    || `<p class="info">沒有樣品需求。</p>`) + `<div class="line"><div class="t"><b>整機合計約</b><small>群組內共用、群組間不共用</small></div><div class="a">${p.smp} 台</div></div>`;
+  $("c-docs").style.display = isNb() ? "" : "none";
+  $("plan-docs").innerHTML = isNb() ? (NB4.docs || []).map(d => `<div class="line"><div class="t"><b>${esc(d)}</b></div></div>`).join("") : "";
+}
+function render(){
+  if (!HAVE){ $("banner").innerHTML = `<div class="note"><b>尚未匯入牌價</b><br>請選擇 <code>安規牌價與履歷.json</code>（和完整版共用，匯入過就不用再匯）。<br><br><input type="file" id="co-file" accept="application/json,.json"></div>`;
+    $("co-file").onchange = e => { const f = e.target.files[0]; if (!f) return; const fr = new FileReader();
+      fr.onload = () => { try { const d = JSON.parse(fr.result); if (!applyData(d)) return toast("檔案裡找不到 ITEMS，確認是不是牌價檔"); HAVE = true;
+        if (window.SQStore) SQStore.setConfig("rates", d); else localStorage.setItem("sq.rates.v1", JSON.stringify(d)); $("banner").innerHTML = ""; render(); toast("牌價已匯入"); } catch(err){ toast("不是有效的 JSON"); } };
+      fr.readAsText(f); }; }
+  else $("banner").innerHTML = "";
+  R = calc();
+  renderCfg(); renderQuote(); renderPlan();
+  $("bar-total").textContent = NT(R.total);
+  $("bar-sub").textContent = "含稅 " + NT(R.total*1.05) + (R.tbq.length ? " · 待詢價 " + R.tbq.length + " 項" : "");
+  saveQ();
+}
+
+function summary(){
+  const L = [(q.model || "機種未填") + " " + (delta() ? "變更申請" : "全新申請") + "（" + ((CLASSES.find(c => c[0] === q.pclass)||[,""])[1]) + "）"];
+  R.lines.forEach(l => L.push("・" + l.name + "　" + (l.state === "tbq" ? "待詢價" : l.state === "free" ? "不計費" : NT((l.fee||0)+(l.svc||0)))));
+  L.push("合計（未稅）" + NT(R.total) + "　含稅 " + NT(R.total*1.05));
+  if (R.tbq.length) L.push("待詢價：" + R.tbq.map(t => t.what).join("、"));
+  L.push("※ 牌價試算，非實驗室報價");
+  return L.join("\n");
+}
+function toast(m){ const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2200); }
+
+/* ── 事件 ── */
+function tab(name){
+  ["cfg","quote","plan"].forEach(k => { $("v-" + k).hidden = k !== name; });
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === name));
+  $("bar").style.display = name === "quote" ? "none" : "";
+  scrollTo(0, 0);
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  const d = t.dataset;
+  if (d.tab) return tab(d.tab);
+  if (t.id === "bar-go") return tab("quote");
+  if (t.closest("#seg-case") && d.v){ q.caseType = d.v; return render(); }
+  if (d.cls){ q.pclass = d.cls; if (q.pclass === "nb4") q.caseType = "new"; return render(); }
+  if (d.d){ const [k, n] = d.d.split(":"); const cur = k === "fanqty" ? q.fanqty : q[k]; const [lo, hi] = LIM[k] || [1, 9];
+    const v = Math.max(lo, Math.min(hi, cur + +n)); if (k === "fanqty") q.fanqty = v; else q[k] = v; return render(); }
+  if (d.sg){ const [i, n] = d.sg.split(":"); const cur = parseInt(q.segs[+i], 10) || 0; q.segs[+i] = Math.max(0, Math.min(9, cur + +n)); return render(); }
+  if (d.fan){ q.fan = d.fan; return render(); }
+  if (d.fa !== undefined){ q.fanAppr = d.fa === "1"; return render(); }
+  if (d.mxm){ q.mxm = d.mxm; return render(); }
+  if (d.aa){ q.adp[d.aa].appr = true; return render(); }
+  if (d.au){ q.adp[d.au].appr = false; return render(); }
+  if (d.ca){ const [k, v] = d.ca.split(":"); q[k].appr = v === "1"; return render(); }
+  if (d.bc !== undefined){ q.ex.bsmiByCB = d.bc === "1"; return render(); }
+  if (t.id === "b-copy"){ const s = summary(); (navigator.clipboard ? navigator.clipboard.writeText(s) : Promise.reject()).then(() => toast("已複製報價摘要"), () => toast("無法複製，請改用「分享」")); return; }
+  if (t.id === "b-export"){ const s = summary(); if (navigator.share) navigator.share({title:"報價試算", text:s}).catch(() => {}); else toast("這個瀏覽器不支援分享，請用「複製」"); return; }
+});
+document.addEventListener("change", e => {
+  const d = e.target.dataset, c = e.target.checked;
+  if (d.sw === "m44"){ q.m44 = c; return render(); }
+  if (d.adp){ q.adp[d.adp].on = c; return render(); }
+  if (d.comp){ q[d.comp].on = c; return render(); }
+  if (d.ex){ q.ex[d.ex] = c; return render(); }
+});
+$("f-model").addEventListener("input", e => { q.model = e.target.value.trim(); R = calc(); renderQuote(); renderPlan(); $("bar-total").textContent = NT(R.total); saveQ();
+  $("model-info").textContent = delta() ? (SCOPE[q.model] ? "變更申請：「" + q.model + "」已認證範圍內的項目不計費。" : "沒有內建台帳，所有項目都會計費。") : ""; });
+$("f-model").addEventListener("change", render);
+
+loadQ(); loadData();
+if (window.SQStore) SQStore.attach(() => { loadData(); render(); }, () => {});
+render(); tab("cfg");
+if ("serviceWorker" in navigator && location.protocol !== "file:")
+  addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+</script>
+</body>
+</html>

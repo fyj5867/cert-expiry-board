@@ -82,6 +82,12 @@
 
   <!-- ① 組態 -->
   <section class="view" id="v-cfg">
+    <div class="card"><h2>從零件表帶入</h2>
+      <div class="info" style="margin-top:0">選 CB 報告（或含零件表的 PDF），自動讀 4.1.2 零件表來勾組態。檔案只在這支手機上解析，不會上傳。</div>
+      <div class="btns" style="margin-bottom:6px"><label class="btn pri" style="display:flex;align-items:center;justify-content:center;cursor:pointer">選擇 PDF<input type="file" id="f-cb" accept="application/pdf,.pdf" hidden></label></div>
+      <div class="info" id="cb-status"></div>
+      <div id="cb-review"></div>
+    </div>
     <div class="card"><h2>機種</h2>
       <div class="row"><div class="t" style="flex:1"><input type="text" id="f-model" list="models" placeholder="機種，例：R12" autocomplete="off"><datalist id="models"></datalist></div></div>
       <div class="chips" id="chips-class"></div>
@@ -137,6 +143,7 @@
   <button role="tab" data-tab="plan" aria-selected="false"><span>📅</span>時程樣品</button>
 </nav>
 
+<script src="./cbparse.js"></script>
 <script src="./sync.js"></script>
 <script src="./store.js"></script>
 <script>
@@ -462,6 +469,79 @@ document.addEventListener("change", e => {
 $("f-model").addEventListener("input", e => { q.model = e.target.value.trim(); R = calc(); renderQuote(); renderPlan(); $("bar-total").textContent = NT(R.total); saveQ();
   $("model-info").textContent = delta() ? (SCOPE[q.model] ? "變更申請：「" + q.model + "」已認證範圍內的項目不計費。" : "沒有內建台帳，所有項目都會計費。") : ""; });
 $("f-model").addEventListener("change", render);
+
+/* ── 零件表帶入 ──
+   pdf.js 只在使用者選檔時才從 cdnjs 載入（需要網路）；只讀零件表那幾頁。 */
+const PDFJS = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/";
+function loadPdfJs(){
+  return new Promise((ok, no) => {
+    if (window.pdfjsLib) return ok();
+    const s = document.createElement("script"); s.src = PDFJS + "pdf.min.js";
+    s.onload = () => { pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + "pdf.worker.min.js"; ok(); };
+    s.onerror = () => no(new Error("載入 PDF 元件失敗，請確認有網路"));
+    document.head.appendChild(s);
+  });
+}
+async function readCompPages(file, onProg){
+  await loadPdfJs();
+  const doc = await pdfjsLib.getDocument({data: new Uint8Array(await file.arrayBuffer())}).promise;
+  const pages = []; let on = false;
+  for (let n = 1; n <= doc.numPages; n++){
+    onProg(n, doc.numPages);
+    const tc = await (await doc.getPage(n)).getTextContent();
+    const items = tc.items.filter(i => i.str.trim()).map(i => ({x:i.transform[4], y:i.transform[5], s:i.str}));
+    const txt = items.map(i => i.s).join(" ");
+    if (!on && /critical\s+components?\s+information|list\s+of\s+critical\s+components/i.test(txt)) on = true;
+    if (on){ pages.push({n, items}); if (/supplementary information/i.test(txt)) break; }
+  }
+  return {pages, total: doc.numPages};
+}
+let CBF = null;                      /* 判讀結果（待使用者確認） */
+async function onCbFile(file){
+  const st = $("cb-status"); $("cb-review").innerHTML = "";
+  try {
+    st.textContent = "讀取中…";
+    const {pages, total} = await readCompPages(file, (n, t) => { if (n % 10 === 0) st.textContent = "讀取中… " + n + " / " + t + " 頁"; });
+    if (!pages.length){ st.textContent = "共 " + total + " 頁，找不到「Critical components」零件表。"; return; }
+    const rows = CBParse.extractRows(pages), inf = CBParse.infer(rows);
+    if (!inf.found.length){ st.textContent = "找到零件表（" + rows.length + " 列），但沒有辨識出可帶入的項目。"; return; }
+    CBF = inf.found.map(f => Object.assign({use:true}, f));
+    st.textContent = "零件表第 " + pages[0].n + "–" + pages[pages.length-1].n + " 頁，共 " + rows.length + " 列，辨識出 " + CBF.length + " 項。請確認後套用。";
+    renderCbReview();
+  } catch(err){ st.textContent = "解析失敗：" + (err && err.message || err); }
+}
+function renderCbReview(){
+  if (!CBF){ $("cb-review").innerHTML = ""; return; }
+  const seen = CBF.map(f => f.key);
+  const miss = [["coin","Coin battery"],["scanner","Barcode scanner"],["rearled","Rear cam LED"],["ircam","IR cam"],["fan","風扇"]].filter(m => seen.indexOf(m[0]) < 0).map(m => m[1]);
+  $("cb-review").innerHTML = CBF.map((f, i) => `<div class="row" style="align-items:flex-start"><div class="t"><b>${esc(f.label)}</b><small>${esc(f.ev)}（第 ${f.pg} 頁）</small>
+      ${f.key === "fan" && !f.appr ? `<small style="color:var(--warn)">CB 零件表沒標認證（--）；若 UL 零件表有 UL 證號，請改選「認可」</small>` : ""}</div>
+      ${f.key === "batt" ? "" : `<div style="display:flex;flex-direction:column;gap:6px"><button class="chip" data-cbr="${i}:1" aria-pressed="${f.appr}">認可</button><button class="chip bad" data-cbr="${i}:0" aria-pressed="${!f.appr}">未認可</button></div>`}
+      <label class="sw"><input type="checkbox" data-cbu="${i}" ${f.use ? "checked" : ""}><i></i></label></div>`).join("")
+    + (miss.length ? `<div class="info">零件表沒出現：${miss.join("、")}（套用後會關閉）</div>` : "")
+    + `<div class="btns"><button class="btn pri" id="cb-apply">套用到組態</button><button class="btn" id="cb-cancel">取消</button></div>`;
+}
+function applyCb(){
+  const use = {}; CBF.forEach(f => { if (f.use) use[f.key] = f; });
+  const old = q.adp; Object.keys(q.adp).forEach(k => q.adp[k].on = false);
+  if (use.adp){ const a = q.adp[String(use.adp.w)]; if (a){ a.on = true; a.appr = use.adp.appr; } }
+  if (use.batt){ q.batt = Math.max(0, Math.min(9, use.batt.n)); }
+  if (use.fan){ q.fan = q.fan === "both" ? "both" : "with"; q.fanAppr = use.fan.appr; } else q.fan = "none";
+  ["coin","scanner","rearled","ircam"].forEach(k => { q[k].on = !!use[k]; if (use[k]) q[k].appr = use[k].appr; });
+  if (use.plastic){ q.plastic.on = true; q.plastic.appr = use.plastic.appr; }
+  CBF = null; $("cb-status").textContent = "已套用到組態，下面的開關是帶入後的結果，可再手動調整。";
+  render(); toast("已從零件表帶入組態");
+}
+document.addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.cbr){ const [i, v] = t.dataset.cbr.split(":"); CBF[+i].appr = v === "1"; renderCbReview(); }
+  else if (t.id === "cb-apply") applyCb();
+  else if (t.id === "cb-cancel"){ CBF = null; $("cb-status").textContent = ""; renderCbReview(); }
+});
+document.addEventListener("change", e => {
+  if (e.target.dataset.cbu !== undefined){ CBF[+e.target.dataset.cbu].use = e.target.checked; }
+  if (e.target.id === "f-cb"){ const f = e.target.files[0]; e.target.value = ""; if (f) onCbFile(f); }
+});
 
 loadQ(); loadData();
 if (window.SQStore) SQStore.attach(() => { loadData(); render(); }, () => {});

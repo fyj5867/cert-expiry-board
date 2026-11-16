@@ -231,7 +231,7 @@ function derive(){
     if (isNb()) add("cel", "CEL");
   }
   if (q.coin.on && !isNb()) add("ul4200a", "有 Coin battery（RTC）→ UL 4200A");
-  if (q.scanner.on) add("cdrh", "Barcode scanner（Laser class 2）→ CDRH");
+  if (q.scanner.on) add("cdrh", "Barcode scanner 屬 FDA 管制品 → 須 CDRH 報備");
   const led = [q.ircam, q.rearled].filter(c => c.on && !c.appr).length;
   if (led) add("iec62471", "有 " + led + " 個未認可 LED／IR source → IEC 62471");
   const X = q.ex;
@@ -374,7 +374,7 @@ function renderCfg(){
   $("adp").innerHTML = ["65","90","120","240"].map(k => { const a = q.adp[k]; return `<div class="row"><div class="t"><b>${k}W</b></div>
     ${a.on ? `<button class="chip" data-aa="${k}" aria-pressed="${a.appr}" style="margin-right:4px">認可</button><button class="chip bad" data-au="${k}" aria-pressed="${!a.appr}">未認可</button>` : ""}
     <label class="sw"><input type="checkbox" data-adp="${k}" ${a.on?"checked":""}><i></i></label></div>`; }).join("");
-  const COMP = [["plastic","塑料／外殼","外殼材料、金屬鍍膜等"],["coin","Coin battery（RTC）","→ UL 4200A"],["scanner","Barcode scanner","Laser class 2 → CDRH"],["ircam","IR cam（前鏡頭 IR LED）","未認可 → IEC 62471"],["rearled","Rear cam LED","未認可 → IEC 62471"]];
+  const COMP = [["plastic","塑料／外殼","外殼材料、金屬鍍膜等"],["coin","Coin battery（RTC）","→ UL 4200A"],["scanner","Barcode scanner","FDA 管制品 → 須 CDRH 報備"],["ircam","IR cam（前鏡頭 IR LED）","未認可 → IEC 62471"],["rearled","Rear cam LED","未認可 → IEC 62471"]];
   $("comps").innerHTML = COMP.map(([k,t,s]) => { const c = q[k]; return `<div class="row"><div class="t"><b>${t}</b><small>${s}</small></div>
     <label class="sw"><input type="checkbox" data-comp="${k}" ${c.on?"checked":""}><i></i></label></div>
     ${c.on ? `<div class="chips"><button class="chip" data-ca="${k}:1" aria-pressed="${c.appr}">認可</button><button class="chip bad" data-ca="${k}:0" aria-pressed="${!c.appr}">未認可</button></div>` : ""}`; }).join("");

@@ -296,6 +296,21 @@ button.x:hover{color:var(--alert)}
   .dsum{grid-template-columns:1fr}
   .docs{columns:1}
 }
+/* NB 4版（手機優先） */
+.nbrow{padding:8px 0;border-bottom:1px solid var(--rule)}
+.nbchk{display:flex;align-items:center;gap:10px;min-height:44px;cursor:pointer}
+.nbchk input{width:22px;height:22px;flex:none}
+.nbmeta{display:block;font-size:var(--fs-xs);color:var(--ink-3);line-height:1.5;padding-left:32px;margin-top:-6px}
+.nblist{margin:4px 0 0;padding-left:20px;line-height:1.8;font-size:var(--fs-sm)}
+.nbseg{margin-top:8px}.nbseg label{display:block;font-size:var(--fs-xs);color:var(--ink-3);margin-bottom:4px}
+.step{display:flex;gap:6px}.step input{text-align:center;max-width:90px}
+.step button{width:48px;min-height:44px;font-size:22px;border:1px solid var(--rule);border-radius:6px;background:var(--inset);color:var(--ink);cursor:pointer}
+.nbbar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--surface);border-top:2px solid var(--accent)}
+.nbbar[hidden]{display:none}
+.nbbar b{display:block;font-size:20px}.nbbar small{display:block;font-size:12px;color:var(--ink-3)}
+.nbbar button{min-height:44px;padding:0 16px;border-radius:8px;border:0;background:var(--accent);color:var(--surface);font-weight:600;cursor:pointer}
+@media print{.nbbar{display:none!important}}
 /* SPEC 判讀 */
 .drop{border:2px dashed var(--rule);border-radius:10px;padding:var(--sp-4);text-align:center;
   background:var(--inset);cursor:pointer;transition:border-color .12s,background .12s}
@@ -477,6 +492,7 @@ button.x:hover{color:var(--alert)}
           <div class="seg" id="seg-class">
             <button data-v="tablet" aria-pressed="true">平板</button>
             <button data-v="notebook" aria-pressed="false">筆電</button>
+            <button data-v="nb4" aria-pressed="false">NB 4版</button>
             <button data-v="acc" aria-pressed="false">配件</button>
           </div>
           <span class="cap" id="class-note"
@@ -525,6 +541,11 @@ button.x:hover{color:var(--alert)}
     <div class="panel">
       <header><h2>Adapter（認可品）</h2></header>
       <div class="body" id="p-adapter"></div>
+    </div>
+
+    <div class="panel" id="panel-nb" hidden>
+      <header><h2>NB 4版 套裝</h2><span class="hint" id="nb-hint"></span></header>
+      <div class="body" id="p-nb"></div>
     </div>
 
     <div class="panel">
@@ -664,6 +685,8 @@ button.x:hover{color:var(--alert)}
 </div></div>
 
 
+<div id="nb-bar" class="nbbar" hidden><div><b id="nb-bar-total">—</b><small id="nb-bar-sub"></small></div>
+  <button type="button" onclick="document.getElementById('tbl-quote').scrollIntoView({behavior:'smooth'})">看報價表</button></div>
 <script src="./sync.js"></script>
 <script src="./store.js"></script>
 <script>
@@ -687,6 +710,20 @@ let QUOTES = {};
 
 /* 已認證範圍：由 QUOTES 的 signed 筆推導出來的可比對鍵值 */
 let SCOPE = {};
+
+/* ══════ NB 4版套裝規則 ══════
+   金額、時程、樣品數都在資料檔的 NB4 鍵（不進原始碼）；這裡只放計算邏輯。 */
+let NB4 = null;
+const nbOn  = () => !!NB4 && state.pclass === "nb4";
+const nbIt  = id => (NB4 && NB4.items && NB4.items[id]) || null;
+const nbSegs = () => state.batteries.filter(b => b.on).reduce((s,b) => s + (parseInt(b.segs,10) || 0), 0);
+function applyNbLt(){
+  ITEMS.forEach(i => {
+    const n = nbOn() && nbIt(i.id);
+    if (i._lt0 === undefined) i._lt0 = i.lt || null;
+    i.lt = (n && n.lt) ? n.lt : i._lt0;
+  });
+}
 
 /* ══════ 認證項目牌價 ══════ */
 let ITEMS = [];
@@ -763,6 +800,7 @@ const PCLASS = {
      BSMI 只在業務有需求時才加報（全新價 30,000）。
      fee / bcs 為 null 代表「配件沒有這個牌價」—— 勾了會列待詢價、不計入總價，
      絕不沿用平板值假裝有價。 */
+  nb4:      {name:"筆電 NB（4版）", fee:0, buf:0, bcs:null, erp:"Lot 6 and 26 (EU) 2023/826"},
   acc:      {name:"配件", fee:null, buf:0, bcs:null, erp:"（配件不適用 ErP）",
              lvdOnly:true}
 };
@@ -877,6 +915,17 @@ const ovKey   = (o, key) => ovScope(o) + ":" + key;
 function amt(o, key){
   const k = ovKey(o, key);
   if (state.ov[k] !== undefined) return state.ov[k];
+  if (nbOn()){
+    const n = nbIt(o.id);
+    if (n){
+      if (o.id === "ulcb"){
+        if (key === "fee") return n.fee || 0;
+        if (key === "svc") return (n.svc || 0) + (n.tempSvc || 0) * nbSegs();
+      }
+      if (o.id === "erp" && key === "all") return (n.all || 0) + (NB4.erpConfig || 0) * Math.max(0, state.configs || 0);
+      if (key in n) return n[key] || 0;
+    }
+  }
   /* ATEX 依申請版次取牌價：2021 版 750,000／2023 版 900,000（2023 版需新配方電芯樣品） */
   if (o.id === "atex" && key === "all") return ATEX_PRICE[state.ex.atex.rev] || o.all || 0;
   /* UL+CB 規費 = 類別牌價 ＋ 類別 buffer，兩者在報價表上分列 */
@@ -896,6 +945,11 @@ function amt(o, key){
 function stdOf(i){
   if (!i) return "";          /* 牌價未匯入時 ITEMS.find() 會是 undefined */
   const X = state.ex;
+  if (nbOn() && nbIt(i.id) && i.id !== "ul4200a"){
+    const n = nbIt(i.id), t = nbSegs();
+    const head = i.id === "ulcb" ? NB4.std + " · 溫度 " + t + " 段 × " + NT(n.tempSvc || 0) : (i.std || i.name);
+    return head + (n.based ? " · Based on：" + n.based : "");
+  }
   if (i.id === "ulcb"){
     const P = pcls(), b = ulcbBuf();
     return state.ulcbVer + " · " + P.name + "基準 US$" + N0(P.fee) + " / one configuration"
@@ -934,9 +988,10 @@ function sync(){
    欄位為 fee／svc／feeSolo／svcSolo。改過的值在牌價表上標「已改」，
    否則過幾個月分不出哪個是標準牌價、哪個是自己調過的。 */
 const RATE_FIELDS = ["fee","svc","feeSolo","svcSolo"];
+const rbase = key => Object.assign({}, RATES[key] || {}, (nbOn() && NB4.rates && NB4.rates[key]) || {});
 const rateVal = (key, f) => {
   const v = state.rov[key + ":" + f];
-  return v !== undefined ? v : (RATES[key] || {})[f];   /* 牌價未匯入時 RATES 是空的 */
+  return v !== undefined ? v : rbase(key)[f];   /* 牌價未匯入時 RATES 是空的 */
 };
 const rateEdited = key => RATE_FIELDS.some(f => state.rov[key + ":" + f] !== undefined);
 const rateOv = key => {
@@ -946,7 +1001,7 @@ const rateOv = key => {
 };
 function buildAdders(){
   const out = [];
-  const add = (key, qty) => { if (qty > 0) out.push({key, ...RATES[key], ...rateOv(key), qty}); };
+  const add = (key, qty) => { if (qty > 0) out.push({key, ...rbase(key), ...rateOv(key), qty}); };
 
   if (state.fan.mode === "both"){
     const st = covStatus("fan","without");
@@ -966,7 +1021,16 @@ function buildAdders(){
   bOn.forEach((b,ix) => pushDiff(
     ix < bBase ? (state.caseType === "delta" ? "signed" : "base") : "none",
     b.label + (b.pn ? "（" + b.pn + "）" : ""), "電池 source"));
-  if (extraB > 0) add("battery", extraB);
+  if (extraB > 0){
+    if (nbOn()) pushTBQ("追加電池 source ×" + extraB, "超出 Based on 的 2 顆 R/C Battery，需向實驗室詢價");
+    else add("battery", extraB);
+  }
+  if (nbOn()){
+    bOn.forEach(b => { if (!(parseInt(b.segs,10) > 0))
+      pushTBQ((b.label || "電池") + " 溫度段數待確認", "需 Cell／Pack 規格書；每段服務費 +" + NT((nbIt("ulcb")||{}).tempSvc || 0)); });
+    (NB4.checks || []).forEach(c => { if (state.nb && state.nb.dev && state.nb.dev[c.id] && state.on[c.pkg])
+      pushTBQ(c.label, "超出 Based on，需向實驗室詢價"); });
+  }
   if (state.m44.on) add("m44", Math.max(1, state.m44.sources));
 
   /* Adapter 由 FSP 廠商直接負責，不列入安規報價；認證狀態改在 Adapter 面板內標示 */
@@ -999,10 +1063,12 @@ function calc(){
   let fee=0, svc=0, all=0, aFee=0, aSvc=0;
   ITEMS.forEach(i => {
     if (!state.on[i.id]) return;
+    if (nbOn() && (nbIt(i.id) || {}).incl) return;      /* 已含在 UL+CB 套裝內 */
+    const nbTbq = nbOn() && (nbIt(i.id) || {}).tbq && state.ov[ovKey(i,"all")] === undefined;
     const st = covStatus("scheme", i.id);
     pushDiff(st, i.name, stdOf(i));
     if (!chargeable(st)){ rows.push({sect:"cert", i, free:true}); return; }
-    if (i.src === "todo" || noRate(i)){
+    if (i.src === "todo" || noRate(i) || nbTbq){
       pushTBQ(i.name, noRate(i) ? "配件無此牌價，需向實驗室詢價" : "尚未詢價");
       rows.push({sect:"cert", i, tbq:true}); return;
     }
@@ -1084,6 +1150,41 @@ function renderAdapters(){
       ${state.model} 已認證範圍內的狀態。</p>`;
 }
 
+function renderNb(){
+  const on = nbOn();
+  el("panel-nb").hidden = !on;
+  const bar = el("nb-bar"); if (bar) bar.hidden = !on;
+  if (!on) return;
+  if (!state.nb) state.nb = {dev:{}};
+  if (!state.nb.dev) state.nb.dev = {};
+  el("nb-hint").textContent = NB4.ver || "";
+  const u = nbIt("ulcb") || {};
+  const bOn = state.batteries.filter(b => b.on);
+  const known = bOn.filter(b => parseInt(b.segs,10) > 0).length;
+  const lines = ["ulcb","iec62471","erp","bcs","ccc","cel"].map(id => {
+    const n = nbIt(id), it = ITEMS.find(x => x.id === id); if (!n || !it) return "";
+    const lt = n.lt ? n.lt[0] + (n.lt[1] !== n.lt[0] ? "–" + n.lt[1] : "") + " 週" : "—";
+    const smp = n.smpNote || (n.smp !== undefined ? n.smp + " pc 整機" : "");
+    return `<div class="nbrow"><label class="nbchk"><input type="checkbox" data-on="${id}" ${state.on[id]?"checked":""}>
+      <span>${esc(it.name)}</span></label>
+      <span class="nbmeta">${lt}${smp ? " · " + esc(smp) : ""}</span></div>`;
+  }).join("");
+  const checks = (NB4.checks || []).map(c => `<label class="nbchk"><input type="checkbox" data-nbdev="${c.id}" ${state.nb.dev[c.id]?"checked":""}>
+    <span>${esc(c.label)}</span></label>`).join("");
+  el("p-nb").innerHTML = `
+    <div class="subhead first">① 勾選要申請的項目</div>${lines}
+    <div class="subhead">② 電池溫度段數</div>
+    <p class="footnote" style="margin-top:0">已填 ${known} / ${bOn.length} 顆電池，合計 <b>${nbSegs()}</b> 段 × ${NT(u.tempSvc||0)}（在下方「電池」卡片逐顆填寫）。</p>
+    <div class="subhead">③ 超出 Based on？（勾了列待詢價）</div>${checks}
+    <p class="footnote">追加 config、追加 LED source、M.4.4 已在左欄／電池卡片處理，會自動套 NB 牌價。</p>
+    <div class="subhead">④ 向電池廠索取</div>
+    <ul class="nblist">${(NB4.docs||[]).map(d => "<li>" + esc(d) + "</li>").join("")}</ul>`;
+}
+function renderNbBar(r){
+  const bar = el("nb-bar"); if (!bar || !nbOn()) return;
+  el("nb-bar-total").textContent = NT(r.total);
+  el("nb-bar-sub").textContent = "含稅 " + NT(r.total * 1.05) + " · 待詢價 " + TBQ.length + " 項 · 溫度 " + nbSegs() + " 段";
+}
 function renderBatteries(){
   const M = state.m44;
   el("p-batt").innerHTML = state.batteries.map((b,i) => `
@@ -1091,6 +1192,10 @@ function renderBatteries(){
       <div class="top"><input type="checkbox" data-bt="${i}" ${b.on?"checked":""}><span class="nm">${b.label}</span></div>
       <div class="detail">
         <input type="text" data-btpn="${i}" value="${esc(b.pn)}" placeholder="電池型號 / Battery P/N">
+        ${nbOn() ? `<div class="nbseg"><label>Cell 溫度段數（每段加收服務費）</label>
+          <div class="step"><button type="button" data-btsegd="${i}" aria-label="減一段">−</button>
+          <input type="number" inputmode="numeric" data-btseg="${i}" value="${b.segs===undefined?"":b.segs}" min="0" max="9" placeholder="?">
+          <button type="button" data-btsegu="${i}" aria-label="加一段">＋</button></div></div>` : ""}
       </div>
     </div>`).join("") +
     `<p class="footnote">已認證範圍涵蓋 ${sc().battery} 顆 source；「變更申請」只有超出的顆數計費。</p>
@@ -1356,6 +1461,7 @@ const usdNote = i => {
 const smpDefault = key => {
   if (key === "mod:m44") return 1;
   if (key.indexOf("mod:") === 0) return 0;
+  if (nbOn() && nbIt(key) && nbIt(key).smp !== undefined) return nbIt(key).smp;
   const i = ITEMS.find(x => x.id === key);
   return i && i.grp ? GROUPS[i.grp].qty : 0;
 };
@@ -3138,11 +3244,11 @@ function renderPrintHead(){
 
 function render(){
   const r = calc();
-  renderScheme(); renderCfg(); renderAdapters(); renderBatteries(); renderStruct(); renderPorts(); renderComps();
+  applyNbLt(); renderNb(); renderScheme(); renderCfg(); renderAdapters(); renderBatteries(); renderStruct(); renderPorts(); renderComps();
   renderExproof(); renderAccs(); renderModelNote(); renderScope(); syncBsmiField();
   renderQuote(r); renderRates(); renderHist(); renderGroups(); renderDates(); renderTL();
   renderSpec(); renderHelp();
-  renderPrintHead();
+  renderPrintHead(); renderNbBar(r);
   el("o-fee").textContent = NT(r.fee + r.aFee);
   el("o-fee-usd").textContent = "≈ US$" + N0((r.fee + r.aFee)/state.rate) + " @ " + state.rate;
   el("o-svc").textContent = NT(r.svc + r.aSvc);
@@ -3225,10 +3331,23 @@ el("btn-scope-auto").addEventListener("click", () => {
     ? "機種「" + state.model + "」沒有內建台帳，已清成空台帳。"
     : "已重新帶入機種「" + state.model + "」的內建台帳。");
 });
+document.addEventListener("click", e => {
+  const u = e.target.closest("[data-btsegu],[data-btsegd]"); if (!u) return;
+  const ix = +(u.dataset.btsegu !== undefined ? u.dataset.btsegu : u.dataset.btsegd);
+  const cur = parseInt(state.batteries[ix].segs,10) || 0;
+  state.batteries[ix].segs = Math.max(0, Math.min(9, cur + (u.dataset.btsegu !== undefined ? 1 : -1)));
+  render();
+});
 el("seg-class").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   const was = state.pclass;
+  if (b.dataset.v === "nb4" && !NB4){ note("尚未匯入 NB 4版規則：請重新匯入 _private\安規牌價與履歷.json。"); return; }
   state.pclass = b.dataset.v;
+  if (state.pclass === "nb4" && was !== "nb4"){
+    ["ulcb","erp","bcs","ccc","cel"].forEach(id => { if (ITEMS.some(i => i.id === id)) state.on[id] = true; });
+    state.caseType = "new";
+    note("已切到 NB 4版套裝：帶入 UL+CB、ErP、能效、CCC、CEL；請填電池的 Cell 溫度段數。");
+  }
   state.ulcbBuf = pcls().buf;        /* 換類別時 buffer 回到該類別的預設值 */
   /* 配件通常只申請 LVD report，其餘規費不帶入。BSMI 等業務有需求再自行勾選 */
   if (state.pclass === "acc" && was !== "acc"){
@@ -3315,6 +3434,7 @@ document.addEventListener("change", e => {
   if (d.adextra !== undefined){ state.adapters[+d.adextra].extra = t.value; return render(); }
   if (d.adlabel !== undefined){ state.adapters[+d.adlabel].label = t.value; return render(); }
   if (d.bt      !== undefined){ state.batteries[+d.bt].on = t.checked; return render(); }
+  if (d.btseg   !== undefined){ state.batteries[+d.btseg].segs = t.value === "" ? undefined : Math.max(0, Math.min(9, parseInt(t.value,10)||0)); return render(); }
   if (d.btpn    !== undefined){ state.batteries[+d.btpn].pn = t.value; return render(); }
   if (d.m44on   !== undefined){ state.m44.on = t.checked; return render(); }
   if (d.m44src  !== undefined){ state.m44.sources = Math.max(1, parseInt(t.value)||1); return render(); }
@@ -3511,8 +3631,9 @@ function syncStatic(){
     b.setAttribute("aria-pressed", b.dataset.v === state.pclass));
   const P = pcls(), b = ulcbBuf();
   el("f-ulcbbuf").value = b;
-  el("class-note").textContent =
-    "UL + CB 牌價 US$" + N0(P.fee) + " / one configuration　·　ErP 適用 " + P.erp;
+  el("class-note").textContent = nbOn()
+    ? "NB 4版套裝：金額依資料檔 NB4 規則，不用匯率、不加 buffer；超出 Based on 的條件會列待詢價"
+    : "UL + CB 牌價 US$" + N0(P.fee) + " / one configuration　·　ErP 適用 " + P.erp;
   el("ulcbbuf-note").textContent = (b
     ? "內部預估用，會與牌價分列。UL + CB 規費合計 US$" + N0(P.fee + b)
       + "（NT$" + N0(Math.ceil((P.fee + b) * state.rate)) + "）"
@@ -4320,9 +4441,16 @@ el("p-saves").addEventListener("click", e => {
 function applyCo(d){
   if (!d || typeof d !== "object") return false;
   let n = 0;
+  if (d.NB4) { NB4 = d.NB4; n++; }
   if (d.QUOTES)     { QUOTES     = d.QUOTES;     n++; }
   if (d.SCOPE)      { SCOPE      = d.SCOPE;      n++; }
   if (d.ITEMS)      { ITEMS      = d.ITEMS;      n++; }
+  if (NB4) {
+    /* NB 專屬項目（如 CEL）由資料檔帶入；原始 lt 先記下，離開 NB 模式才還得回去 */
+    (NB4.extraItems || []).forEach(x => { if (!ITEMS.some(i => i.id === x.id)) ITEMS.push(JSON.parse(JSON.stringify(x))); });
+    ITEMS.forEach(i => { if (i._lt0 === undefined) i._lt0 = i.lt || null; });
+    ITEMS.forEach(i => { if (state && state.on && state.on[i.id] === undefined) state.on[i.id] = !!i.on; });
+  }
   if (d.RATES)      { RATES      = d.RATES;      n++; }
   if (d.ATEX_PRICE) { ATEX_PRICE = d.ATEX_PRICE; n++; }
   if (d.EX_MARKS)   { EX_MARKS   = d.EX_MARKS;   n++; }

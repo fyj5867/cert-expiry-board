@@ -146,7 +146,7 @@ const NT = n => "NT$" + Math.round(n).toLocaleString("en-US");
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* ── 資料（牌價一律由使用者匯入，與完整版共用同一份）── */
-let ITEMS = [], RATES = {}, SCOPE = {}, NB4 = null, PRICE = {}, BSMI = {};
+let ITEMS = [], RATES = {}, SCOPE = {}, NB4 = null, PRICE = {}, BSMI = {}, TIER = 0;
 const GROUPS = {G1:2, G2:2, G3:2, G4:1, G5:0};
 const CLASSES = [["tablet","平板"],["notebook","筆電"],["nb4","NB 4版"],["acc","配件"]];
 const ACC_NO_RATE = ["ulcb","bcs","erp","ccc","iec62471","ul4200a","cdrh","c1d2","atex","ts","pse"];
@@ -157,7 +157,7 @@ function applyData(d){
   if (!d || typeof d !== "object" || !d.ITEMS) return false;
   ITEMS = JSON.parse(JSON.stringify(d.ITEMS));
   RATES = d.RATES || {}; SCOPE = d.SCOPE || {}; NB4 = d.NB4 || null;
-  PRICE = d.PCLASS_PRICE || {}; BSMI = d.BSMI_RULES || {};
+  PRICE = d.PCLASS_PRICE || {}; BSMI = d.BSMI_RULES || {}; TIER = d.TIER_SVC || 0;
   if (NB4) (NB4.extraItems || []).forEach(x => { if (!ITEMS.some(i => i.id === x.id)) ITEMS.push(JSON.parse(JSON.stringify(x))); });
   return true;
 }
@@ -296,7 +296,7 @@ function calc(){
     lines.push({id:"mod:"+a.key, name:a.name + (a.qty > 1 ? " ×" + a.qty : ""), why:a.trig, fee:f, svc:s, state:"ok", mod:true});
   });
   let tier = 0;
-  if (delta() && structCount > 0 && !solo){ tier = 25000; aSvc += tier;
+  if (delta() && structCount > 0 && !solo){ tier = TIER; aSvc += tier;
     lines.push({id:"mod:tier", name:"變更案開案級距", why:structCount + " 項結構變更 → ≥2 項", fee:0, svc:tier, state:"ok", mod:true}); }
 
   /* ── 無牌價的未認可零件 ── */

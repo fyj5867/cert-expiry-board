@@ -91,6 +91,7 @@
     <div class="card"><h2>機種</h2>
       <div class="row"><div class="t" style="flex:1"><input type="text" id="f-model" list="models" placeholder="機種，例：R12" autocomplete="off"><datalist id="models"></datalist></div></div>
       <div class="chips" id="chips-class"></div>
+      <div class="chips" id="chips-ver"></div>
       <div class="info" id="model-info"></div>
     </div>
 
@@ -155,7 +156,7 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;
 /* ── 資料（牌價一律由使用者匯入，與完整版共用同一份）── */
 let ITEMS = [], RATES = {}, SCOPE = {}, NB4 = null, PRICE = {}, BSMI = {}, TIER = 0;
 const GROUPS = {G1:2, G2:2, G3:2, G4:1, G5:0};
-const CLASSES = [["tablet","平板"],["notebook","筆電"],["nb4","NB 4版"],["acc","配件"]];
+const CLASSES = [["tablet","平板"],["notebook","筆電"],["acc","配件"]];
 const ACC_NO_RATE = ["ulcb","bcs","erp","ccc","iec62471","ul4200a","cdrh","c1d2","atex","ts","pse"];
 const EMPTY_SCOPE = {adapters:{}, fan:{}, mxm:{}, battery:2, schemes:{}};
 let HAVE = false;
@@ -177,22 +178,24 @@ function loadData(){
 
 /* ── 組態狀態 ── */
 const DEF = () => ({
-  caseType:"new", model:"", pclass:"tablet", rate:32.5, mb:1, batt:2, segs:[], cfg:0,
+  caseType:"new", model:"", pclass:"tablet", ver:"3", rate:32.5, mb:1, batt:2, segs:[], cfg:0,
   m44:false, m44src:1,
   fan:"none", fanqty:1, fanAppr:true, mxm:"none",
   adp:{"65":{on:false,appr:true},"90":{on:true,appr:true},"120":{on:false,appr:false},"240":{on:false,appr:false}},
   plastic:{on:true, appr:true}, coin:{on:false, appr:true}, scanner:{on:false, appr:true},
   ircam:{on:false, appr:true}, rearled:{on:false, appr:true},
-  ex:{bsmi:false, bsmiByCB:true, lvd:false, c1d2:false, atex:false, ts:false, pse:false},
+  ex:{cel:false, bsmi:false, bsmiByCB:true, lvd:false, c1d2:false, atex:false, ts:false, pse:false},
   off:{}
 });
 let q = DEF();
 const KEY = "sq.quick.v1";
 function saveQ(){ try { localStorage.setItem(KEY, JSON.stringify(q)); } catch(e){} }
-function loadQ(){ try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s) q = Object.assign(DEF(), s); } catch(e){} }
+function loadQ(){ try { const s = JSON.parse(localStorage.getItem(KEY) || "null"); if (s){ q = Object.assign(DEF(), s); if (q.pclass === "nb4"){ q.pclass = "notebook"; q.ver = "4"; } } } catch(e){} }
 
 /* ── 計價引擎（規則與完整版 quote.html 的 calc() 相同；金額全來自資料檔）── */
-const isNb = () => !!NB4 && q.pclass === "nb4";
+/* UL 4 版案件：依 X14 的 UL 及測試費用規則（資料檔 NB4）。
+   X14 是筆電報價，套到平板（R12 系列）屬暫用，等平板的 4 版報價出來再校正。 */
+const isNb = () => !!NB4 && q.ver === "4" && q.pclass !== "acc";
 const nbIt = id => (isNb() && NB4.items && NB4.items[id]) || null;
 const scopeOf = () => SCOPE[q.model] || EMPTY_SCOPE;
 const delta = () => q.caseType === "delta";
@@ -227,14 +230,14 @@ function derive(){
   const out = [], add = (id, why) => out.push({id, why});
   if (accCls()){ add("lvd", "配件通常只申請 LVD report"); }
   else {
-    add("ulcb", "主案：UL + CB"); add("erp", "ErP"); add("bcs", "NrCAN / CEC / DOE"); add("ccc", "CCC（by CB）");
-    if (isNb()) add("cel", "CEL");
+    add("ulcb", "主案：UL + CB"); add("erp", "ErP"); add("bcs", "NrCAN / CEC / DOE"); add("ccc", isNb() ? "CCC（by 3 版 CB，4 版案另需 3 版 CB）" : "CCC（by CB）");
   }
   if (q.coin.on && !isNb()) add("ul4200a", "有 Coin battery（RTC）→ UL 4200A");
   if (q.scanner.on) add("cdrh", "Barcode scanner 屬 FDA 管制品 → 須 CDRH 報備");
   const led = [q.ircam, q.rearled].filter(c => c.on && !c.appr).length;
   if (led) add("iec62471", "有 " + led + " 個未認可 LED／IR source → IEC 62471");
   const X = q.ex;
+  if (X.cel && isNb()) add("cel", "CEL（X14 報價含此項）");
   if (X.bsmi) add("bsmi", "BSMI · " + bsmiRule().how);
   if (X.lvd && !accCls()) add("lvd", "LVD");
   ["c1d2","atex","ts","pse"].forEach(k => { if (X[k]) add(k, "手動加選"); });
@@ -355,10 +358,11 @@ function renderCfg(){
   [...$("seg-case").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.v === q.caseType));
   $("models").innerHTML = Object.keys(SCOPE).map(k => `<option value="${esc(k)}">`).join("");
   if (document.activeElement !== $("f-model")) $("f-model").value = q.model;
-  $("chips-class").innerHTML = chipSet(CLASSES.filter(c => c[0] !== "nb4" || NB4), q.pclass, "data-cls");
+  $("chips-class").innerHTML = chipSet(CLASSES, q.pclass, "data-cls");
+  $("chips-ver").innerHTML = chipSet([["3","UL 3 版（現行牌價）"]].concat(NB4 ? [["4","UL 4 版（X14 規則）"]] : []), q.ver, "data-ver");
   $("model-info").textContent = delta()
     ? (SCOPE[q.model] ? "變更申請：「" + q.model + "」已認證範圍內的項目不計費。" : "變更申請，但「" + q.model + "」沒有內建台帳，所有項目都會計費。")
-    : (isNb() ? "NB 4版套裝：金額依資料檔規則，不用匯率。" : "全新申請：全部項目照牌價。");
+    : (isNb() ? "UL 4 版：依 X14 的 UL 及測試費用規則，不用匯率；" + (q.pclass === "tablet" ? "X14 是筆電報價，平板暫用，待平板 4 版報價校正。" : "能效費用待 UL 確認。") : "UL 3 版：照現行牌價。");
   document.querySelectorAll("[data-step]").forEach(el => {
     const k = el.dataset.step, v = k === "fanqty" ? q.fanqty : q[k]; el.innerHTML = step(k, v);
   });
@@ -378,7 +382,7 @@ function renderCfg(){
   $("comps").innerHTML = COMP.map(([k,t,s]) => { const c = q[k]; return `<div class="row"><div class="t"><b>${t}</b><small>${s}</small></div>
     <label class="sw"><input type="checkbox" data-comp="${k}" ${c.on?"checked":""}><i></i></label></div>
     ${c.on ? `<div class="chips"><button class="chip" data-ca="${k}:1" aria-pressed="${c.appr}">認可</button><button class="chip bad" data-ca="${k}:0" aria-pressed="${!c.appr}">未認可</button></div>` : ""}`; }).join("");
-  const EX = [["bsmi","BSMI"],["lvd","LVD"],["c1d2","C1D2"],["atex","ATEX"],["ts","TS 防爆"],["pse","PSE"]];
+  const EX = (isNb() ? [["cel","CEL"]] : []).concat([["bsmi","BSMI"],["lvd","LVD"],["c1d2","C1D2"],["atex","ATEX"],["ts","TS 防爆"],["pse","PSE"]]);
   $("extras").innerHTML = EX.map(([k,t]) => `<div class="row"><div class="t"><b>${t}</b>${k==="bsmi"?`<small>${accCls()?"配件走 D type":""}</small>`:""}</div>
     <label class="sw"><input type="checkbox" data-ex="${k}" ${q.ex[k]?"checked":""}><i></i></label></div>`).join("")
     + (q.ex.bsmi && !accCls() ? `<div class="chips"><button class="chip" data-bc="1" aria-pressed="${q.ex.bsmiByCB}">by CB</button><button class="chip" data-bc="0" aria-pressed="${!q.ex.bsmiByCB}">w/o CB</button></div>` : "");
@@ -387,7 +391,7 @@ function renderCfg(){
 let R = null;
 function renderQuote(){
   const sub = R.total * 1.05;
-  $("h-case").textContent = (q.model || "未填機種") + " · " + (delta() ? "變更申請" : "全新申請") + " · " + (CLASSES.find(c => c[0] === q.pclass)||[,""])[1];
+  $("h-case").textContent = (q.model || "未填機種") + " · " + (delta() ? "變更申請" : "全新申請") + " · " + (CLASSES.find(c => c[0] === q.pclass)||[,""])[1] + (isNb() ? " · UL 4版" : "");
   $("h-total").textContent = NT(R.total);
   $("h-sub").textContent = "含稅 " + NT(sub) + "　·　規費 " + NT(R.fee) + "　服務費 " + NT(R.svc) + (R.all ? "　全包 " + NT(R.all) : "");
   $("lines").innerHTML = R.lines.map(l => {
@@ -423,7 +427,7 @@ function render(){
 }
 
 function summary(){
-  const L = [(q.model || "機種未填") + " " + (delta() ? "變更申請" : "全新申請") + "（" + ((CLASSES.find(c => c[0] === q.pclass)||[,""])[1]) + "）"];
+  const L = [(q.model || "機種未填") + " " + (delta() ? "變更申請" : "全新申請") + "（" + ((CLASSES.find(c => c[0] === q.pclass)||[,""])[1]) + (isNb() ? "，UL 4版" : "") + "）"];
   R.lines.forEach(l => L.push("・" + l.name + "　" + (l.state === "tbq" ? "待詢價" : l.state === "free" ? "不計費" : NT((l.fee||0)+(l.svc||0)))));
   L.push("合計（未稅）" + NT(R.total) + "　含稅 " + NT(R.total*1.05));
   if (R.tbq.length) L.push("待詢價：" + R.tbq.map(t => t.what).join("、"));
@@ -445,7 +449,8 @@ document.addEventListener("click", e => {
   if (d.tab) return tab(d.tab);
   if (t.id === "bar-go") return tab("quote");
   if (t.closest("#seg-case") && d.v){ q.caseType = d.v; return render(); }
-  if (d.cls){ q.pclass = d.cls; if (q.pclass === "nb4") q.caseType = "new"; return render(); }
+  if (d.cls){ q.pclass = d.cls; return render(); }
+  if (d.ver){ q.ver = d.ver; if (q.ver === "4"){ q.caseType = "new"; q.ex.cel = q.pclass === "notebook"; } return render(); }
   if (d.d){ const [k, n] = d.d.split(":"); const cur = k === "fanqty" ? q.fanqty : q[k]; const [lo, hi] = LIM[k] || [1, 9];
     const v = Math.max(lo, Math.min(hi, cur + +n)); if (k === "fanqty") q.fanqty = v; else q[k] = v; return render(); }
   if (d.sg){ const [i, n] = d.sg.split(":"); const cur = parseInt(q.segs[+i], 10) || 0; q.segs[+i] = Math.max(0, Math.min(9, cur + +n)); return render(); }

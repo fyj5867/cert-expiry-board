@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<title>說明書產生器</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#1f4d5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<style>
+  :root{--bg:#f4f1ea;--card:#fff;--ink:#211d17;--sub:#6f6656;--line:#e6e0d3;--accent:#1f4d5c;--accent-ink:#fff;
+    --warn:#a35f00;--warn-bg:#fdf0d2;--bad:#a3261a;--bad-bg:#fbe3df;--ok:#0d5c4a;--ok-bg:#d7ece4;
+    --shadow:0 1px 2px rgba(33,29,23,.06),0 8px 24px -12px rgba(33,29,23,.18)}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17140f;--card:#211c15;--ink:#f1ece0;--sub:#b3a891;
+    --line:#3a3225;--accent:#8fc2cf;--accent-ink:#10242b;--warn:#e0b063;--warn-bg:#3a2c16;--bad:#f0a79d;--bad-bg:#431f1a;--ok:#6fdcbe;--ok-bg:#15332a;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -12px rgba(0,0,0,.5)}}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.5;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;-webkit-font-smoothing:antialiased;
+    padding-top:env(safe-area-inset-top,0);padding-bottom:calc(76px + env(safe-area-inset-bottom,0))}
+  .wrap{max-width:760px;margin:0 auto;padding:12px 16px}
+  header .eyebrow{font-size:12px;letter-spacing:.12em;font-weight:700;color:var(--accent)}
+  header h1{margin:2px 0 6px;font-size:26px;font-weight:900}
+  header a{color:var(--sub);font-size:14px;text-decoration:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin:14px 0;padding:6px 16px 14px}
+  .card h2{margin:12px 0 6px;font-size:13px;letter-spacing:.1em;color:var(--sub);font-weight:700}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px 0 8px}
+  .chip{min-height:44px;padding:0 16px;font:inherit;font-size:15px;font-weight:700;border:1px solid var(--line);border-radius:99px;background:var(--bg);color:var(--sub);cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .row{display:flex;align-items:center;gap:12px;min-height:56px;padding:6px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .t{flex:1;min-width:0}.row .t b{display:block;font-size:16px}.row .t small{display:block;color:var(--sub);font-size:13px;line-height:1.4}
+  .sw{position:relative;width:52px;height:32px;flex:none}
+  .sw input{position:absolute;inset:0;opacity:0;width:100%;height:100%;margin:0;z-index:2;cursor:pointer}
+  .sw i{position:absolute;inset:0;background:var(--line);border-radius:99px;transition:.15s}
+  .sw i::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .sw input:checked+i{background:var(--accent)}.sw input:checked+i::after{left:23px}
+  .fld{display:block;margin:8px 0}
+  .fld>span{display:block;font-size:13px;color:var(--sub);font-weight:700;margin-bottom:3px}
+  .fld input,.fld textarea{font:inherit;font-size:16px;width:100%;min-height:46px;padding:8px 12px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px}
+  .fld textarea{min-height:84px;resize:vertical}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr}}
+  .info{color:var(--sub);font-size:13.5px;line-height:1.6;margin:6px 2px}
+  .note{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.6;margin:10px 0}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+  .btn{flex:1;min-height:48px;padding:0 16px;font:inherit;font-size:15px;font-weight:700;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;white-space:nowrap}
+  .btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0)}
+  .tabs button{flex:1;min-height:64px;font:inherit;font-size:14px;font-weight:700;border:0;background:none;color:var(--sub);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer}
+  .tabs button span{font-size:22px;line-height:1}.tabs button[aria-selected="true"]{color:var(--accent)}
+  .view[hidden]{display:none}
+  .toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:14px;z-index:40;max-width:90vw}
+  .seg{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;margin:8px 0}
+  .seg button{flex:1;min-height:44px;font:inherit;font-size:15px;font-weight:700;border:0;border-radius:9px;background:none;color:var(--sub);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+  .miss-box{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.6;margin:10px 0}
+  .ok-box{background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:10px 14px;font-size:14px;margin:10px 0}
+
+  /* ── 文件本體（預覽／列印／匯出共用）── */
+  .doc{background:#fff;color:#111;border:1px solid var(--line);border-radius:6px;padding:22px 22px;font-family:Arial,"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:12.5px;line-height:1.55}
+  .doc h1{font-size:22px;margin:0 0 4px}.doc .meta{color:#444;font-size:12px;margin-bottom:14px}
+  .doc h2{font-size:15px;margin:20px 0 6px;padding-bottom:3px;border-bottom:2px solid #1f4d5c;color:#1f4d5c}
+  .doc h3{font-size:13px;margin:12px 0 4px}
+  .doc p{margin:4px 0 7px}
+  .doc .warn{border:2px solid #111;padding:6px 10px;margin:8px 0;font-weight:700}
+  .doc .warn.sub{border-width:1px;font-weight:400}
+  .doc table{border-collapse:collapse;width:100%;margin:6px 0 10px;font-size:11.5px}
+  .doc th,.doc td{border:1px solid #888;padding:3px 6px;text-align:left;vertical-align:top}
+  .doc th{background:#e9eef0}
+  .doc .cn{border:1px dashed #1f4d5c;background:#eef5f7;padding:6px 10px;margin:8px 0;font-size:11.5px}
+  .doc .cn b.k{color:#1f4d5c}
+  .doc .miss{background:#ffd9d4;color:#a3261a;font-weight:700;padding:0 3px;border-radius:3px}
+  .doc .fig{border:1px solid #888;padding:8px;margin:8px 0;text-align:center}
+  .doc .fig img{max-width:100%;max-height:340px}
+  .doc .fig .ph{border:2px dashed #a3261a;color:#a3261a;padding:34px 8px;font-weight:700}
+  .doc .fr{color:#333;font-style:italic}
+  .doc .pb{page-break-before:always}
+  @media print{
+    body{background:#fff;padding:0}
+    .wrap>header,.tabs,.toast,.noprint,.view:not(#v-out),#out-tools{display:none!important}
+    .wrap{max-width:none;padding:0}
+    .doc{border:0;border-radius:0;padding:0}
+    .doc .miss{background:none;color:#000}
+    @page{size:A4;margin:16mm}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="./index.html">‹ 安規工具</a>
+    <div class="eyebrow">USER MANUAL BUILDER</div>
+    <h1>說明書產生器</h1>
+    <p class="info" style="margin-top:0">勾選機型、選配與銷售區域，說明書所需的安規警語、雷射／防爆標示、EMI／RF、資安、環保能效內容自動帶入；分「出貨版」與「認證版」輸出。</p>
+  </header>
+
+  <!-- ① 配置 -->
+  <section class="view" id="v-cfg">
+    <div class="card"><h2>說明書版本</h2>
+      <div class="chips" id="c-variant"></div>
+      <div class="info" id="variant-info"></div>
+    </div>
+    <div class="card"><h2>產品類別</h2>
+      <div class="chips" id="c-pclass"></div>
+      <div class="info" id="pclass-info"></div>
+    </div>
+    <div class="card"><h2>選配與零件</h2><div id="c-opt"></div></div>
+    <div class="card"><h2>銷售／認證區域</h2><div class="chips" id="c-reg"></div>
+      <div class="info">區域決定帶入哪些 EMI／RF／環保法規聲明。歐美為主；其他區域之後再補。</div></div>
+    <div class="card"><h2>認證條件（兩個版本共用）</h2><div id="c-cond"></div></div>
+  </section>
+
+  <!-- ② 欄位 -->
+  <section class="view" id="v-fld" hidden>
+    <div class="note">以下是公司與機種資料，<b>只存在這台裝置</b>（同步開啟時加密後才上傳）。程式原始碼與公開網站不含任何公司名、證號。</div>
+    <div class="card" id="f-list"></div>
+    <div class="card"><h2>鐵件鎖附圖（ATEX 版必附）</h2>
+      <div class="info" style="margin-top:0">I/O port、battery latch、Pogo pin 的鐵件鎖附位置圖，請放 ME 提供的實際圖面（PNG／JPG）。圖片只存在本機。</div>
+      <label class="btn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">選擇圖片<input type="file" id="f-img" accept="image/*" hidden></label>
+      <div class="info" id="img-st"></div>
+      <div class="btns"><button class="btn" id="b-imgdel">移除圖片</button></div>
+    </div>
+    <div class="card"><h2>備份</h2>
+      <div class="btns"><button class="btn" id="b-exp">匯出配置 JSON</button>
+      <label class="btn" style="display:flex;align-items:center;justify-content:center;cursor:pointer">匯入配置<input type="file" id="f-imp" accept=".json,application/json" hidden></label></div>
+      <div class="btns"><button class="btn" id="b-reset">全部重設</button></div></div>
+  </section>
+
+  <!-- ③ 輸出 -->
+  <section class="view" id="v-out" hidden>
+    <div id="out-tools">
+      <div class="seg" id="seg-mode"><button data-v="ship">出貨版</button><button data-v="cert">認證版</button></div>
+      <div id="out-miss"></div>
+      <div class="btns">
+        <button class="btn pri" id="b-print">列印／存成 PDF</button>
+        <button class="btn" id="b-doc">下載 Word</button>
+        <button class="btn" id="b-html">下載 HTML</button>
+        <button class="btn" id="b-copy">複製文字</button>
+      </div>
+    </div>
+    <article class="doc" id="doc"></article>
+  </section>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="cfg" aria-selected="true"><span>🧩</span>配置</button>
+  <button role="tab" data-tab="fld" aria-selected="false"><span>✏️</span>欄位</button>
+  <button role="tab" data-tab="out" aria-selected="false"><span>📄</span>輸出</button>
+</nav>
+
+<script src="./sync.js"></script>
+<script src="./store.js"></script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ════════════════════════════════════════════════════════════════
+   資料：選項定義
+   ※ 這份檔案是公開網站的一部分，只放通用法規文字與欄位定義。
+     公司名、地址、證號、FCC ID、牌價一律由使用者在「欄位」頁自填。
+   ════════════════════════════════════════════════════════════════ */
+const VARIANTS = [["std","STD SKU + C1D2"],["atex","ATEX"]];
+const PCLASS   = [["tablet","平板"],["notebook","筆電"]];
+const OPTS = [
+  {k:"scanner", t:"Barcode scanner", s:"Laser class 2（平板選配）。必帶 CDRH 報備", only:"tablet"},
+  {k:"dvd",     t:"DVD／光碟機",     s:"Laser Class 1（筆電選配）",                 only:"notebook"},
+  {k:"wifi",    t:"Wi-Fi",           s:"2.4／5 GHz（含 6 GHz 時請在無線參數表註明）"},
+  {k:"bt",      t:"Bluetooth",       s:""},
+  {k:"wwan",    t:"WWAN（4G／5G）",  s:""},
+  {k:"nfc",     t:"NFC／RFID",       s:""},
+  {k:"ir",      t:"IR LED／LED 模組",s:"前鏡頭 IR、後鏡頭 LED → IEC 62471"},
+  {k:"coin",    t:"Coin／button cell（RTC）", s:"吞食警語、加州 perchlorate"},
+  {k:"estar",   t:"ENERGY STAR",     s:"有取得時才勾"},
+  {k:"p65",     t:"含 California Prop 65 警語", s:"依 RoHS／材質測試結果決定"},
+  {k:"figstd",  t:"STD 版也附鐵件鎖附圖", s:"C1D2 同樣要求鐵件加螺絲封住；預設只有 ATEX 版附圖", only:"std"}
+];
+const REGIONS = [["us","美國"],["ca","加拿大"],["eu","歐盟"],["uk","英國"],["tw","台灣"],["cn","中國"]];
+
+const DEF = () => ({
+  variant:"std", pclass:"tablet", mode:"ship",
+  opt:{scanner:false,dvd:false,wifi:true,bt:true,wwan:false,nfc:false,ir:false,coin:false,estar:false,p65:false,figstd:false},
+  reg:{us:true,ca:true,eu:true,uk:false,tw:false,cn:false},
+  cond:{noPD:true, pdShip:"info", emc:"B", z2:true, z22:true},
+  f:{ta:"40", exMark2:"II 3G Ex ic IIC T4 Gc", exMark22:"II 3D Ex ic IIIB T135°C Dc", date:new Date().toISOString().slice(0,10)},
+  img:""
+});
+let S = DEF();
+const KEY = "sq.manual.v1";
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){}
+  try { if (window.SQStore) SQStore.setConfig("manual", S); } catch(e){}
+}
+function load(){
+  let d = null;
+  try { d = JSON.parse(localStorage.getItem(KEY) || "null"); } catch(e){}
+  if (!d) try { if (window.SQStore) d = SQStore.getConfig("manual"); } catch(e){}
+  if (d && typeof d === "object") S = merge(DEF(), d);
+}
+function merge(a, b){
+  for (const k in b){
+    if (b[k] && typeof b[k] === "object" && !Array.isArray(b[k]) && a[k] && typeof a[k] === "object") merge(a[k], b[k]);
+    else a[k] = b[k];
+  }
+  return a;
+}
+
+/* 欄位（key, 標籤, 提示, 型態, 顯示條件） */
+const FIELDS = [
+  {g:"文件資訊"},
+  {k:"company", l:"公司名稱（Manufacturer）"},
+  {k:"address", l:"製造商地址"},
+  {k:"model",   l:"機種／型號（Model）"},
+  {k:"docno",   l:"文件編號"},
+  {k:"rev",     l:"版次（Version）", ph:"例：1.0"},
+  {k:"date",    l:"日期（yyyy-mm-dd）"},
+  {k:"rating",  l:"輸入額定（Rating）", ph:"例：19 VDC, 4.74 A"},
+  {k:"batt",    l:"允許使用的電池型號", ph:"逗號分隔"},
+  {g:"認證條件"},
+  {k:"ta",      l:"最高環境溫度 Ta（°C）", ph:"40"},
+  {k:"taMin",   l:"最低環境溫度 Ta（°C，以證書為準，沒有就留空）"},
+  {g:"雷射／光學", show:c => c.opt.scanner || c.opt.dvd || c.opt.ir},
+  {k:"lasWl",   l:"Scanner 雷射波長（nm）", ph:"依規格書", show:c => c.opt.scanner},
+  {k:"lasP",    l:"Scanner 最大輸出（mW）", ph:"依規格書", show:c => c.opt.scanner},
+  {k:"lasDiv",  l:"Scanner 光束發散角（水平／垂直）", ph:"依規格書", show:c => c.opt.scanner},
+  {k:"lasPulse",l:"Scanner 脈衝持續時間與重複率", ph:"依規格書", show:c => c.opt.scanner},
+  {k:"irRG",    l:"IR／LED Risk Group（IEC 62471）", ph:"例：Exempt／RG1", show:c => c.opt.ir},
+  {g:"防爆（ATEX）", show:c => c.variant === "atex"},
+  {k:"atexCert",l:"ATEX Certificate No.（實驗室提供）", show:c => c.variant === "atex"},
+  {k:"exMark2", l:"Zone 2 防爆標示（氣體）", show:c => c.variant === "atex" && c.cond.z2},
+  {k:"exMark22",l:"Zone 22 防爆標示（粉塵）", show:c => c.variant === "atex" && c.cond.z22},
+  {k:"exStd",   l:"證書列出的適用標準（含版本年份）", ph:"依證書", show:c => c.variant === "atex"},
+  {k:"holster", l:"抗靜電皮套（Leather case）名稱／型號", show:c => c.variant === "atex"},
+  {k:"holsterHow", l:"皮套安裝說明（步驟文字，證書要求提供）", area:true, show:c => c.variant === "atex"},
+  {k:"adapter", l:"指定充電 Adapter 型號與額定", ph:"型號、V、A、W", show:c => c.variant === "atex"},
+  {k:"chgTa",   l:"充電環境溫度範圍（°C）", ph:"依證書", show:c => c.variant === "atex"},
+  {g:"Coin cell", show:c => c.opt.coin},
+  {k:"coinType", l:"Coin cell 型號", ph:"例：CR2032", show:c => c.opt.coin},
+  {k:"coinV",    l:"Coin cell 標稱電壓（V）", show:c => c.opt.coin},
+  {g:"USB PD 說明（出貨版選用）", show:c => c.cond.pdShip === "info"},
+  {k:"pdMin",   l:"充電器最小功率（W，無線電設備所需）", show:c => c.cond.pdShip === "info"},
+  {k:"pdMax",   l:"充電器最大功率（W，達最快充電速度）", show:c => c.cond.pdShip === "info"},
+  {g:"EMI／RF", show:c => c.opt.wifi || c.opt.bt || c.opt.wwan || c.opt.nfc},
+  {k:"fccId",   l:"FCC ID", show:c => c.reg.us && hasRadio(c)},
+  {k:"icId",    l:"IC（ISED）ID", show:c => c.reg.ca && hasRadio(c)},
+  {k:"sar",     l:"SAR 值（W/kg，Body-worn）", ph:"依 SAR 報告", show:c => (c.reg.us || c.reg.ca || c.reg.eu) && hasRadio(c)},
+  {k:"radio",   l:"無線頻段與最大功率表（每行一組）", area:true, ph:"2.4 GHz Wi-Fi｜2400–2483.5 MHz｜max EIRP xx dBm\nBluetooth｜2400–2483.5 MHz｜xx dBm", show:c => (c.reg.eu || c.reg.uk) && hasRadio(c)},
+  {k:"docUrl",  l:"EU／UK Declaration of Conformity 公開網址", show:c => c.reg.eu || c.reg.uk},
+  {k:"impAddr", l:"EU／UK 進口商名稱與地址（如適用）", area:true, show:c => c.reg.eu || c.reg.uk},
+  {g:"資安", show:c => c.reg.eu || c.reg.uk},
+  {k:"supportEnd", l:"安全更新支援截止日（End of support）", ph:"yyyy-mm-dd", show:c => c.reg.eu || c.reg.uk},
+  {k:"secMail", l:"弱點通報窗口（Email 或網址）", show:c => c.reg.eu || c.reg.uk},
+  {g:"環保", show:c => c.reg.eu || c.reg.uk || c.reg.cn},
+  {k:"envUrl",  l:"REACH／RoHS 物質資訊網址", show:c => c.reg.eu || c.reg.uk}
+];
+const hasRadio = c => c.opt.wifi || c.opt.bt || c.opt.wwan || c.opt.nfc;
+
+/* ════════════════════════════════════════════════════════════════
+   文件引擎
+   ════════════════════════════════════════════════════════════════ */
+let MISS = new Set();
+const v = (k, label) => {
+  const x = (S.f[k] || "").toString().trim();
+  if (x) return esc(x);
+  MISS.add(label || k);
+  return `<span class="miss">[${esc(label || k)}]</span>`;
+};
+const lines = s => esc(s).split(/\n/).filter(Boolean);
+const P  = t => `<p>${t}</p>`;
+const W  = t => `<div class="warn">${t}</div>`;
+const Ws = t => `<div class="warn sub">${t}</div>`;
+const FR = t => `<p class="fr" lang="fr">${t}</p>`;
+const CN = (k, t) => `<div class="cn"><b class="k">${k}</b>　${t}</div>`;
+const R = k => S.reg[k];
+const taTxt = () => (S.f.taMin || "").trim() ? `${esc(S.f.taMin.trim())} °C to ${v("ta","Ta 上限")} °C` : `${v("ta","Ta 上限")} °C`;
+
+/* 每個 block：sec=章節、on=是否帶入、why=帶入原因（認證版對照表用）、
+   ship=出貨版內文（兩版都有）、cert=只在認證版出現的備註框、std=適用標準、ev=需附證據 */
+const SECS = [
+  ["s1","1. Safety Instructions"],
+  ["s2","2. Optical Safety"],
+  ["s3","3. Hazardous Locations"],
+  ["s4","4. EMC and Radio Equipment"],
+  ["s5","5. Cybersecurity"],
+  ["s6","6. Environment, Energy and Disposal"]
+];
+
+const BLOCKS = [
+/* ───────── 1. Safety ───────── */
+{id:"cond", sec:"s1", on:c => true, why:() => "所有組態（安規認證條件）",
+ std:"IEC／UL 62368-1", ev:"認證報告 Conditions of Acceptability 與說明書一致",
+ ship:c => `<h3>Operating conditions</h3>
+  <p>This equipment is intended to be operated at an ambient temperature of ${taTxt()}. Do not use it outside this range.</p>`
+  + (MODE === "ship" && c.cond.pdShip === "info"
+      ? `<h3>USB PD fast charging</h3><p>The power delivered by the charger must be between min ${v("pdMin","PD 最小功率")} Watts required by the radio equipment, and max ${v("pdMax","PD 最大功率")} Watts in order to achieve the maximum charging speed.</p>`
+      : (c.cond.noPD ? W(`Do not charge or power this device through USB Type-C (USB Power Delivery) or any other port. Use only the AC adapter supplied by the manufacturer.`) : "")),
+ cert:c => `認證條件：<b>No PD charge</b>${c.cond.noPD ? "（認證版已帶入警語）" : "（<b style=\"color:#a3261a\">已被關閉</b>，與安規申請條件不符，請確認）"}；操作環境 Ta ≤ ${esc(S.f.ta||"40")} °C。${c.cond.pdShip === "info" ? "出貨版目前選「USB PD 說明」，與認證版的 No PD 條件<b>不同</b>，兩版差異須有依據。" : "出貨版與認證版此段目前一致。"}`},
+
+{id:"batt", sec:"s1", on:c => true, why:() => "所有組態（含電池）",
+ std:"IEC 62133-2、IEC／UL 62368-1 Annex M", ev:"電池 CB／IEC 62133-2 證書，型號與本文一致",
+ ship:c => `<h3>Battery safety</h3>`
+  + W(`CAUTION: Risk of explosion if the battery is replaced by an incorrect type. Use only the battery model(s) specified by the manufacturer${(S.f.batt||"").trim() ? `: ${v("batt")}` : ""}.`)
+  + `<ul><li>Do not disassemble, crush, puncture, short-circuit or incinerate the battery, and do not expose it to fire or to temperatures above the operating range.</li>
+     <li>Dispose of used batteries according to local regulations. Do not dispose of them with unsorted waste.</li>
+     <li>Stop using the battery and contact the manufacturer if it swells, leaks or gives off an unusual smell.</li></ul>`,
+ cert:c => `電池型號清單須與電池證書、C1D2／ATEX 防爆電池型號一致${(S.f.batt||"").trim() ? "" : "；<b style=\"color:#a3261a\">尚未填電池型號</b>"}。`},
+
+{id:"gen", sec:"s1", on:c => true, why:() => "所有組態", std:"IEC／UL 62368-1 Clause 10.6、F", ev:"—",
+ ship:c => `<h3>General</h3><ul>
+  <li>Read all safety instructions before use and keep this manual for future reference.</li>
+  <li>Use only the AC adapter and accessories supplied or approved by the manufacturer.</li>
+  <li>Do not expose the equipment to water, rain or excessive moisture, and do not insert objects into any opening.</li>
+  <li>Do not open or modify the equipment. Refer servicing to qualified service personnel.</li>
+  <li>Keep small parts and batteries away from children.</li></ul>`
+  + W(`CAUTION: THE DEVICE IS FOR USE WITH THE DEDICATED AC ADAPTER.`)
+  + (R("ca") ? FR(`AVERTISSEMENT : L'APPAREIL DOIT ÊTRE UTILISÉ AVEC L'ADAPTATEUR SECTEUR CA DÉDIÉ.`) : "")},
+
+{id:"screen", sec:"s1", on:c => R("tw"), why:() => "區域＝台灣", std:"台灣 3C 視力保健警語", ev:"警語文字以現行公告為準",
+ ship:c => `<h3>螢幕使用警語 / Screen time</h3>`
+  + W(`Warning: Too much screen time might affect your vision and eye health.`)
+  + `<ol><li>Please take a break every 30 minutes when using the device.</li>
+     <li>Children younger than 2 years old are banned to use the device. Children over 2 years old are limited to one hour of screen time per day.</li></ol>`,
+ cert:c => `警語依台灣現行公告確認，送審前請對照最新版本。`},
+
+/* ───────── 2. Optical ───────── */
+{id:"las2", sec:"s2", on:c => c.opt.scanner && c.pclass === "tablet", why:() => "勾選 Barcode scanner（Laser class 2）",
+ std:"IEC 60825-1:2014；21 CFR 1040.10／1040.11（FDA Laser Notice 56）", ev:"CDRH 報備（Product report／Accession）、Scanner 模組證書與規格書、Class 2 標籤",
+ ship:c => `<h3>Laser safety — barcode scanner (Class 2)</h3>`
+  + W(`LASER RADIATION — DO NOT STARE INTO BEAM<br>CLASS 2 LASER PRODUCT`)
+  + `<p>This product contains a barcode scanner that is a Class 2 laser product (wavelength ${v("lasWl","雷射波長")} nm, maximum output ${v("lasP","雷射輸出")} mW) complying with IEC 60825-1:2014 and with 21 CFR 1040.10 and 1040.11 except for deviations pursuant to Laser Notice No. 56.</p>
+   <ul><li>Do not stare into the beam or point it at anyone's eyes. Do not view the beam with optical instruments.</li>
+   <li>Use of controls or adjustments or performance of procedures other than those specified in this manual may result in hazardous radiation exposure.</li>
+   <li>Do not open the scanner module. Refer servicing to qualified personnel.</li></ul>
+   <table><tr><th>Parameter</th><th>Value</th></tr>
+    <tr><td>Wavelength</td><td>${v("lasWl","雷射波長")} nm</td></tr>
+    <tr><td>Beam divergence</td><td>${v("lasDiv","光束發散角")}</td></tr>
+    <tr><td>Pulse duration and repetition rate</td><td>${v("lasPulse","脈衝持續時間與重複率")}</td></tr>
+    <tr><td>Maximum power or energy output</td><td>${v("lasP","雷射輸出")} mW</td></tr></table>`
+  + (R("ca") ? FR(`L'utilisation des commandes ou réglages ou l'exécution des procédures autres que celles spécifiées dans les présentes exigences peuvent être la cause d'une exposition à un rayonnement dangereux.`) : ""),
+ cert:c => `<b>Barcode scanner 為 FDA 管制品，一律須 CDRH 報備</b>（不需再評估）。須備：模組雷射規格（波長／功率）、Class 2 說明標籤與警告標籤的位置及文字、說明書雷射章節。`},
+
+{id:"las1", sec:"s2", on:c => c.opt.dvd && c.pclass === "notebook", why:() => "勾選 DVD／光碟機（Laser Class 1）",
+ std:"IEC 60825-1:2014", ev:"光碟機模組 Laser Class 1 證書／規格書、Class 1 標籤",
+ ship:c => `<h3>Laser safety — optical disc drive (Class 1)</h3>`
+  + W(`CLASS 1 LASER PRODUCT`)
+  + `<p>The optical disc drive in this product is a Class 1 laser product. It is safe under normal operating conditions.</p>`
+  + Ws(`CAUTION: Invisible laser radiation when open. Avoid direct exposure to the beam. Do not open the optical drive; refer servicing to qualified personnel.`),
+ cert:c => `光碟機屬雷射產品（Class 1）。<b>是否需另行 CDRH 報備請依光碟機模組廠提供的 FDA accession 資料確認。</b>NB 有／無 DVD 兩種配置請各備一份說明書或在同一份內分別標明。`},
+
+{id:"ir", sec:"s2", on:c => c.opt.ir, why:() => "勾選 IR LED／LED 模組",
+ std:"IEC 62471", ev:"IEC 62471 報告（或模組廠證明）與 Risk Group",
+ ship:c => `<h3>IR LED / LED illumination</h3>
+  <p>This product contains an infrared LED / LED light source (IEC 62471, Risk Group ${v("irRG","Risk Group")}). Do not stare at the light source from a short distance.</p>`},
+
+{id:"coin", sec:"s2", on:c => c.opt.coin, why:() => "勾選 Coin／button cell（RTC）",
+ std:"UL 4200A、IEC 62368-1 Annex（coin/button cell）", ev:"UL 4200A report；電池艙門鎖固說明",
+ ship:c => `<h3>Coin / button cell battery</h3>`
+  + W(`WARNING: INGESTION HAZARD — This product contains a coin / button cell battery. If swallowed, it can cause severe internal burns in as little as 2 hours and can lead to death. Keep new and used batteries away from children. If the battery compartment does not close securely, stop using the product and keep it away from children. If you think batteries might have been swallowed or placed inside any part of the body, seek immediate medical attention.`)
+  + `<ul><li>This product contains a non-replaceable button cell or coin battery. Consult an authorized service center for service or assistance with disassembly or assembly.</li>
+     <li>Non-rechargeable batteries are not to be recharged. Do not force discharge, recharge, disassemble, heat or incinerate; doing so may result in injury due to venting, leakage or explosion resulting in chemical burns.</li>
+     <li>Remove and immediately recycle or dispose of used batteries according to local regulations. Do not dispose of batteries in household trash.</li>
+     <li>Compatible battery type: ${v("coinType","Coin cell 型號")}; nominal voltage: ${v("coinV","Coin cell 電壓")} V DC.</li></ul>`
+  + (R("us") ? Ws(`Perchlorate Material — special handling may apply. See www.dtsc.ca.gov/hazardouswaste/perchlorate.`) : "")},
+
+/* ───────── 3. Hazardous locations ───────── */
+{id:"c1d2", sec:"s3", on:c => true, why:c => c.variant === "atex" ? "版本＝ATEX（ATEX 版同時含 C1D2／Zone 2 標示與警語）" : "版本＝STD SKU + C1D2",
+ std:"CAN/CSA C22.2 No. 213（C1D2）、ANSI/ISA-12.12.01", ev:"C1D2 證書；C1D2 label 位置與文字；防爆電池／Dummy 電池；IP54 方案",
+ ship:c => `<h3>WARNING — EXPLOSION HAZARD</h3>
+  <p>Class I, Division 2, Groups A, B, C, D, temperature code T5${c.variant === "atex" ? "<br>Class I, Zone 2, Groups IIC, T5" : ""}<br>Ambient temperature: ${taTxt()}. Suitable for Class I, Division 2 or non-hazardous locations only.</p>`
+  + W(`WARNING - EXPLOSION HAZARD - SUBSTITUTION OF COMPONENTS MAY IMPAIR SUITABILITY FOR CLASS I, DIVISION 2.`)
+  + W(`WARNING: TO PREVENT IGNITION OF A HAZARDOUS ATMOSPHERE, BATTERIES MUST ONLY BE CHARGED IN AN AREA KNOWN TO BE NON HAZARDOUS.`)
+  + W(`WARNING - EXPLOSION HAZARD - DO NOT CONNECT OR DISCONNECT WHILE CIRCUIT IS LIVE UNLESS AREA IS KNOWN TO BE NON-HAZARDOUS.`)
+  + (R("ca")
+     ? FR(`AVERTISSEMENT - RISQUE D'EXPLOSION - LA SUBSTITUTION DE COMPOSANTS PEUT RENDRE CE MATÉRIEL INACCEPTABLE POUR LES EMPLACEMENTS DE CLASSE I, DIVISION 2.`)
+     + FR(`AVERTISSEMENT - RISQUE D'EXPLOSION - AFIN D'ÉVITER TOUT RISQUE D'EXPLOSION, S'ASSURER QUE L'EMPLACEMENT EST DÉSIGNÉ NON DANGEREUX AVANT DE CHANGER LA BATTERIE.`)
+     + FR(`AVERTISSEMENT - RISQUE D'EXPLOSION. NE PAS BRANCHER OU DÉBRANCHER TANT QUE LE CIRCUIT EST SOUS TENSION, À MOINS QU'IL NE S'AGISSE D'UN EMPLACEMENT NON DANGEREUX.`) : ""),
+ cert:c => `C1D2 label 內容：Class I, Division 2, Groups A B C D, T5, Ta ≤ ${esc(S.f.ta||"40")} °C${c.variant === "atex" ? "；ATEX 版另含 Class I, Zone 2, Groups IIC, T5" : ""} ＋ 上列警語（文字對照 R10 已送審 ATEX 說明書）。${R("ca") ? "加拿大須英法雙語，法文請認證單位確認。" : ""}${c.variant === "std" ? `鐵件鎖附圖${c.opt.figstd ? "已附" : "目前<b>未附</b>（勾選「STD 版也附鐵件鎖附圖」可帶入；專案清單要求 I/O port、battery latch、Pogo pin 皆鐵件加螺絲封住）"}。` : ""}`},
+
+{id:"atex", sec:"s3", on:c => c.variant === "atex", why:() => "版本＝ATEX",
+ std:"Directive 2014/34/EU；EN IEC 60079-0、EN 60079-11（Ex ic）；UKCA（S.I. 2016/1107）", ev:"ATEX 證書與 Certificate No.；ATEX Rating Label；Special Conditions for Safe Use；CE／ATEX／UKCA DoC",
+ ship:c => `<h3>Explosive atmospheres (ATEX)</h3>
+  <p>This equipment is certified for use in potentially explosive atmospheres in accordance with Directive 2014/34/EU.</p>
+  <table><tr><th>Item</th><th>Marking</th></tr>
+   <tr><td>Applicable standard</td><td>${v("exStd","適用標準")}</td></tr>
+   <tr><td>CE / Ex marking</td><td><b>${c.cond.z2 ? v("exMark2","Zone 2 標示") : "—"}</b>${c.cond.z2 && c.cond.z22 ? "<br>" : ""}<b>${c.cond.z22 ? v("exMark22","Zone 22 標示") : ""}</b></td></tr>
+   <tr><td>Certificate No.</td><td>${v("atexCert","ATEX Certificate No.")}</td></tr>
+   <tr><td>Ambient temperature</td><td>${taTxt()}</td></tr>
+   <tr><td>Zones</td><td>${[c.cond.z2 ? "Zone 2 (gas)" : "", c.cond.z22 ? "Zone 22 (dust)" : ""].filter(Boolean).join(" / ") || "—"}</td></tr></table>`
+  + `<p>This certificate of conformity only relates to the design and testing of the specified device under Directive 2014/34/EU. Further requirements of this directive apply to manufacturing and the placing of this device on the market. These requirements are not covered by this certificate.</p>`
+  + `<h3>Instruction</h3><p>This is portable, battery-powered equipment in which the non-metallic materials are protected from charging or discharging by a dissipative protection (leather case). Install the anti-static leather case as follows:</p>`
+  + ((S.f.holsterHow||"").trim() ? `<p>${lines(S.f.holsterHow).join("<br>")}</p>` : `<p>${v("holsterHow","皮套安裝說明")}</p>`)
+  + `<h3>Special conditions for safe use</h3><ol>
+   <li>The device must be used with the leather case${(S.f.holster||"").trim() ? ` (${v("holster","皮套")})` : ""} provided by the manufacturer and fitted according to this manual.</li>
+   <li>The device shall not be connected to any external device in a hazardous area. The I/O ports may only be used outside the hazardous area; secure the bracket with the screws before entering it (see Figure 1).</li>
+   <li>The device battery can only be recharged in a non-hazardous area using the specified power adapter: ${v("adapter","Adapter 型號與額定")}. Charging is performed at an ambient temperature of ${v("chgTa","充電溫度範圍")} °C.</li></ol>`
+  + W(`USE ONLY ${v("batt","電池廠與型號")}.`)
+  + W(`DO NOT REPLACE OR CHARGE BATTERY IN EXPLOSIVE ENVIRONMENTS.`)
+  + W(`DO NOT USE THE DEVICE WITHOUT THE ATEX CASE IN EXPLOSIVE ENVIRONMENTS.`),
+ cert:c => `ATEX 版須 <b>w/o Fan 結構</b>。結構與用語對照 R10 已送審的 ATEX 說明書；<b>Special Conditions 須與實驗室證書的 Special Conditions for Safe Use（X）逐字一致</b>，證號與適用標準版本以證書為準。皮套相關文字證書有要求「提供使用者安裝說明」。文件須含文件編號／日期／Version。`},
+
+{id:"fig", sec:"s3", on:c => c.variant === "atex" || (c.variant === "std" && c.opt.figstd), why:c => c.variant === "atex" ? "版本＝ATEX（必附鐵件鎖附圖）" : "勾選 STD 版也附鐵件鎖附圖",
+ std:"ME 鐵件鎖附圖面", ev:"ME 提供的實際圖面，標示螺絲位置與數量",
+ ship:c => `<h3>Metal parts screw-lock</h3>
+  <p>The I/O ports can only be used outside the hazardous area. Secure the I/O port, battery latch and pogo-pin metal brackets with the screws before entering the hazardous area, and keep them fastened at all times while inside it.</p>
+  <div class="fig">${S.img ? `<img src="${S.img}" alt="Figure 1">` : `<div class="ph">[請上傳 ME 鐵件鎖附圖]</div>`}
+  <div>Figure 1. Metal parts and screw locations (I/O port, battery latch, pogo pin)</div></div>`
+  + (S.img ? "" : (MISS.add("鐵件鎖附圖"), ""))},
+
+/* ───────── 4. EMC / Radio ───────── */
+{id:"fcc15b", sec:"s4", on:c => R("us"), why:() => "區域＝美國",
+ std:"FCC 47 CFR Part 15 Subpart B；ANSI C63.4", ev:"FCC 15B 測試報告、SDoC（Supplier's Declaration of Conformity）",
+ ship:c => `<h3>United States — FCC</h3>`
+  + (c.cond.emc === "A"
+   ? P(`This equipment has been tested and found to comply with the limits for a Class A digital device, pursuant to part 15 of the FCC Rules. These limits are designed to provide reasonable protection against harmful interference when the equipment is operated in a commercial environment. This equipment generates, uses, and can radiate radio frequency energy and, if not installed and used in accordance with the instruction manual, may cause harmful interference to radio communications. Operation of this equipment in a residential area is likely to cause harmful interference, in which case the user will be required to correct the interference at his own expense.`)
+   : P(`This equipment has been tested and found to comply with the limits for a Class B digital device, pursuant to part 15 of the FCC Rules. These limits are designed to provide reasonable protection against harmful interference in a residential installation. This equipment generates, uses and can radiate radio frequency energy and, if not installed and used in accordance with the instructions, may cause harmful interference to radio communications. However, there is no guarantee that interference will not occur in a particular installation. If this equipment does cause harmful interference to radio or television reception, which can be determined by turning the equipment off and on, the user is encouraged to try to correct the interference by one or more of the following measures:`)
+     + `<ul><li>Reorient or relocate the receiving antenna.</li><li>Increase the separation between the equipment and receiver.</li><li>Connect the equipment into an outlet on a circuit different from that to which the receiver is connected.</li><li>Consult the dealer or an experienced radio/TV technician for help.</li></ul>`)
+  + P(`Changes or modifications not expressly approved by the party responsible for compliance could void the user's authority to operate the equipment.`),
+ cert:c => `EMC 等級：Class ${c.cond.emc}（可在「配置→認證條件」切換）。無線部分另見下方 FCC Part 15C。`},
+
+{id:"fcc15c", sec:"s4", on:c => R("us") && hasRadio(c), why:() => "區域＝美國 ＋ 有無線模組",
+ std:"FCC Part 15 Subpart C／E；KDB 447498（RF exposure）", ev:"模組 FCC grant 或整機 FCC 報告；FCC ID；SAR 報告",
+ ship:c => P(`This device complies with part 15 of the FCC Rules. Operation is subject to the following two conditions: (1) This device may not cause harmful interference, and (2) this device must accept any interference received, including interference that may cause undesired operation.`)
+  + P(`FCC ID: ${v("fccId","FCC ID")}`)
+  + (c.opt.wifi ? `<ul><li>Operation in the 5.15–5.25 GHz band is restricted to indoor use only; outdoor operation in 5150–5250 MHz is prohibited.</li>
+     <li>This device is slave equipment; it has no radar detection and does not support ad-hoc operation in the DFS bands.</li>
+     <li>Operation of transmitters in the 5.925–7.125 GHz band is prohibited for control of or communications with unmanned aircraft systems.</li></ul>` : "")
+  + P(`This equipment complies with FCC radiation exposure limits set forth for an uncontrolled environment. SAR (body-worn): ${v("sar","SAR 值")} W/kg (FCC limit 1.6 W/kg averaged over 1 g). This transmitter must not be co-located or operating in conjunction with any other antenna or transmitter unless authorized.`),
+ cert:c => `5 GHz 頻段（UNII）限制與 DFS 需在報告確認；FCC ID 須與機身標籤一致。`},
+
+{id:"ised", sec:"s4", on:c => R("ca"), why:() => "區域＝加拿大",
+ std:"ICES-003；RSS-Gen；RSS-102（RF exposure）", ev:"ISED 證書（含 IC ID）、ICES-003 聲明",
+ ship:c => `<h3>Canada — ISED</h3>`
+  + P(`CAN ICES-3 (${c.cond.emc})/NMB-3(${c.cond.emc})`)
+  + (hasRadio(c) ? P(`This device contains licence-exempt transmitter(s)/receiver(s) that comply with Innovation, Science and Economic Development Canada's licence-exempt RSS(s). Operation is subject to the following two conditions: (1) This device may not cause interference. (2) This device must accept any interference, including interference that may cause undesired operation of the device.`)
+    + FR(`L'émetteur/récepteur exempt de licence contenu dans le présent appareil est conforme aux CNR d'Innovation, Sciences et Développement économique Canada applicables aux appareils radio exempts de licence. L'exploitation est autorisée aux deux conditions suivantes : (1) L'appareil ne doit pas produire de brouillage; (2) L'appareil doit accepter tout brouillage radioélectrique subi, même si le brouillage est susceptible d'en compromettre le fonctionnement.`)
+    + P(`IC: ${v("icId","IC ID")}`) : "")},
+
+{id:"red", sec:"s4", on:c => R("eu"), why:() => "區域＝歐盟",
+ std:"EMC 2014/30/EU、LVD 2014/35/EU、RED 2014/53/EU；EN 55032／EN 55035；EN 301 489；EN 300 328／EN 301 893", ev:"EU DoC（含公開網址）、EMC／RF／LVD 報告、CE 標示",
+ ship:c => `<h3>European Union — CE</h3>`
+  + P(`Manufacturer: ${v("company","公司名稱")}, ${v("address","製造商地址")}.`)
+  + ((S.f.impAddr||"").trim() ? P(`Importer: ${lines(S.f.impAddr).join(", ")}`) : "")
+  + (hasRadio(c)
+   ? P(`Hereby, ${v("company","公司名稱")} declares that the radio equipment type ${v("model","機種")} is in compliance with Directive 2014/53/EU. The full text of the EU declaration of conformity is available at the following internet address: ${v("docUrl","DoC 公開網址")}`)
+     + `<table><tr><th>Radio technology</th><th>Frequency band</th><th>Maximum power</th></tr>${
+        lines(S.f.radio).map(l => { const p = l.split(/[｜|]/); return `<tr><td>${p[0]||""}</td><td>${p[1]||""}</td><td>${p[2]||""}</td></tr>`; }).join("")
+        || (MISS.add("無線頻段與功率表"), `<tr><td colspan="3"><span class="miss">[無線頻段與功率表]</span></td></tr>`)}</table>
+       <p>Restrictions: operation in the 5150–5350 MHz band is restricted to indoor use only in the EU member states.</p>`
+   : P(`Hereby, ${v("company","公司名稱")} declares that the equipment type ${v("model","機種")} is in compliance with the applicable EU directives (EMC 2014/30/EU, LVD 2014/35/EU). The full text of the EU declaration of conformity is available at: ${v("docUrl","DoC 公開網址")}`))
+  + (c.cond.emc === "A" ? P(`This is a Class A product. In a domestic environment this product may cause radio interference, in which case the user may be required to take adequate measures.`) : ""),
+ cert:c => `Art. 10(2)／10(10) 頻段與功率表、Art. 10 製造商／進口商名稱地址標示（機身或包裝）、SAR（EN 50566／EN 62311）。5 GHz 室內限制須依各會員國確認。`},
+
+{id:"uk", sec:"s4", on:c => R("uk"), why:() => "區域＝英國",
+ std:"UKCA：Radio Equipment Regulations 2017（S.I. 2017/1206）、EMC Regs 2016、Electrical Equipment (Safety) Regs 2016", ev:"UK DoC、UKCA 標示、UK 進口商資訊",
+ ship:c => `<h3>United Kingdom — UKCA</h3>`
+  + P(hasRadio(c)
+   ? `Hereby, ${v("company","公司名稱")} declares that the radio equipment type ${v("model","機種")} is in compliance with the Radio Equipment Regulations 2017. The full text of the UK declaration of conformity is available at: ${v("docUrl","DoC 公開網址")}`
+   : `Hereby, ${v("company","公司名稱")} declares that the equipment type ${v("model","機種")} is in compliance with the applicable UK statutory requirements. The full text of the UK declaration of conformity is available at: ${v("docUrl","DoC 公開網址")}`)
+  + ((S.f.impAddr||"").trim() ? P(`UK importer: ${lines(S.f.impAddr).join(", ")}`) : "")},
+
+{id:"ncc", sec:"s4", on:c => R("tw") && hasRadio(c), why:() => "區域＝台灣 ＋ 有無線模組",
+ std:"NCC 低功率射頻器材技術規範（LP0002）", ev:"NCC 審驗證明、CCAF 編號標示",
+ ship:c => `<h3>台灣 — NCC 警語</h3>
+  <p lang="zh-Hant">取得審驗證明之低功率射頻器材，非經核准，公司、商號或使用者均不得擅自變更頻率、加大功率或變更原設計之特性及功能。低功率射頻器材之使用不得影響飛航安全及干擾合法通信；經發現有干擾現象時，應立即停用，並改善至無干擾時方得繼續使用。前述合法通信，指依電信管理法規定作業之無線電通信。低功率射頻器材須忍受合法通信或工業、科學及醫療用電波輻射性電機設備之干擾。</p>`,
+ cert:c => `警語以 NCC 現行公告為準，送審前請對照最新版本。`},
+
+/* ───────── 5. Cybersecurity ───────── */
+{id:"red18031", sec:"s5", on:c => R("eu") && hasRadio(c), why:() => "歐盟 ＋ 有無線模組（RED 委任法規）",
+ std:"Delegated Reg. (EU) 2022/30；EN 18031-1／-2／-3（2025-08-01 起適用）", ev:"EN 18031 評估報告（或 Notified Body 審查）；技術文件中的資安說明",
+ ship:c => `<h3>Security of radio equipment</h3>
+  <ul><li>The device does not use a universal default password. Set your own password at first use and change it if you suspect it has been disclosed.</li>
+  <li>Keep the operating system and drivers up to date. Install security updates when they are offered.</li>
+  <li>Only install software from trusted sources and enable device encryption and screen lock.</li></ul>`,
+ cert:c => `<b>以下為模板，須對照產品實際功能由 RD 確認</b>：預設憑證、更新機制、資料保護等是否與 EN 18031 評估報告一致。說明書不得寫出產品實際沒有的資安功能。`},
+
+{id:"cra", sec:"s5", on:c => R("eu"), why:() => "區域＝歐盟（具數位元素產品）",
+ std:"Regulation (EU) 2024/2847（Cyber Resilience Act）Annex II 使用者資訊", ev:"弱點通報窗口、支援期限、SBOM 揭露位置、DoC",
+ ship:c => `<h3>Product security information</h3>
+  <ul><li>Manufacturer: ${v("company","公司名稱")}, ${v("address","製造商地址")}.</li>
+  <li>Vulnerability reporting contact: ${v("secMail","弱點通報窗口")}.</li>
+  <li>Security updates are provided until at least ${v("supportEnd","支援截止日")}.</li>
+  <li>The EU declaration of conformity is available at ${v("docUrl","DoC 公開網址")}.</li></ul>`,
+ cert:c => `CRA 通報義務自 2026-09-11 起適用、其餘主要義務自 2027-12-11 起適用（以法規原文為準，送審前請再確認）。此段是否納入須依產品是否屬 CRA 範圍與適用日期判斷。`},
+
+{id:"psti", sec:"s5", on:c => R("uk") && hasRadio(c), why:() => "區域＝英國 ＋ 可連網",
+ std:"Product Security and Telecommunications Infrastructure Act 2022 / Product Security Regs 2023", ev:"支援期限聲明、弱點通報窗口",
+ ship:c => `<h3>UK security statement</h3>
+  <ul><li>Minimum period for which security updates will be provided: until ${v("supportEnd","支援截止日")}.</li>
+  <li>To report a security issue contact: ${v("secMail","弱點通報窗口")}.</li></ul>`},
+
+/* ───────── 6. Environment / Energy / Disposal ───────── */
+{id:"rohs", sec:"s6", on:c => R("eu") || R("uk"), why:() => "區域＝歐盟／英國",
+ std:"RoHS 2011/65/EU＋(EU) 2015/863；UK S.I. 2012/3032；REACH Art. 33", ev:"RoHS 測試報告／材料宣告；SVHC 聲明",
+ ship:c => `<h3>Restricted substances</h3>
+  <p>This product complies with Directive 2011/65/EU (RoHS)${R("uk") ? " and the UK RoHS Regulations 2012" : ""}. Information on substances of very high concern (REACH Art. 33) is available at ${v("envUrl","物質資訊網址")}.</p>`},
+
+{id:"weee", sec:"s6", on:c => R("eu") || R("uk"), why:() => "區域＝歐盟／英國",
+ std:"WEEE 2012/19/EU；Battery Regulation (EU) 2023/1542", ev:"WEEE 登記；電池標示（含 QR code 適用日）",
+ ship:c => `<h3>Disposal and recycling</h3>
+  <p>The crossed-out wheeled bin symbol means that this product and its batteries must not be disposed of with unsorted municipal waste. Return them to a designated collection point for electrical and electronic equipment and batteries.</p>
+  <p>Batteries covered by Regulation (EU) 2023/1542 must be collected separately. Removal of the battery is described in the service instructions; do not attempt to remove it unless you are qualified to do so.</p>`,
+ cert:c => `電池法規（EU）2023/1542：標示、QR code 與可更換性要求各有不同適用日（約 2026-08 與 2027-02），且工業／專業用途可能有例外。<b>須依產品定位確認後再決定說明書與機身標示。</b>`},
+
+{id:"p65", sec:"s6", on:c => R("us") && c.opt.p65, why:() => "區域＝美國 ＋ 勾選 Prop 65",
+ std:"California Proposition 65", ev:"材質測試結果（鉛等）",
+ ship:c => `<h3>California Proposition 65</h3>`
+  + W(`WARNING: This product can expose you to chemicals including lead, which is known to the State of California to cause cancer and birth defects or other reproductive harm. For more information go to www.P65Warnings.ca.gov.`)},
+
+{id:"cnrohs", sec:"s6", on:c => R("cn"), why:() => "區域＝中國",
+ std:"SJ/T 11364（中國 RoHS 標示與有害物質表）", ev:"有害物質名稱及含量標示表（需實測資料）、EFUP 標示",
+ ship:c => `<h3>中國 RoHS</h3>
+  <p lang="zh-Hans">有害物质名称及含量标识须依 SJ/T 11364 提供，随产品附上。环保使用期限（EFUP）标识见产品铭牌。</p>
+  <p><span class="miss">[有害物質名稱及含量標示表]</span></p>` + (MISS.add("中國 RoHS 有害物質表"), "")},
+
+{id:"energy", sec:"s6", on:c => c.opt.estar && R("us"), why:() => "勾選 ENERGY STAR",
+ std:"ENERGY STAR Program Requirements for Computers", ev:"ENERGY STAR 證書與機種清單",
+ ship:c => `<h3>Energy efficiency</h3>
+  <p>This product qualifies for ENERGY STAR. Enabling the power management features reduces energy consumption and cost.</p>`}
+];
+
+/* 認證版附錄 B：標示（label）檢查表 */
+const LABELS = [
+  {on:c => true, t:"Rating label／機身銘牌", d:c => `Model、Rating（${esc(S.f.rating||"—")}）、製造商名稱與地址、S/N 與 date code、Ta ≤ ${esc(S.f.ta||"40")} °C`},
+  {on:c => true, t:"C1D2 label", d:c => `Class I, Division 2, Groups A B C D, T5；Ta；EXPLOSION HAZARD 警語`},
+  {on:c => c.variant === "atex", t:"ATEX Rating Label", d:c => `Ex marking（${[c.cond.z2 ? esc(S.f.exMark2||"") : "", c.cond.z22 ? esc(S.f.exMark22||"") : ""].filter(Boolean).join("／")}）、Certificate No.、Warning、Ambient、製造商名稱地址、Model、Rating（VDC／A）`},
+  {on:c => c.variant === "atex", t:"SN label with date code ＋ 空白條碼標籤", d:c => `提供機台 Serial No. label 與 Date Code 說明，空白標籤供轉印 S/N`},
+  {on:c => c.opt.scanner && c.pclass === "tablet", t:"Laser Class 2 標籤", d:c => `LASER RADIATION — DO NOT STARE INTO BEAM／CLASS 2 LASER PRODUCT ＋ 說明標籤（波長、功率、標準）`},
+  {on:c => c.opt.dvd && c.pclass === "notebook", t:"Laser Class 1 標籤", d:c => `CLASS 1 LASER PRODUCT；光碟機開啟警告`},
+  {on:c => R("us") && hasRadio(c), t:"FCC ID／FCC 聲明", d:c => `FCC ID：${esc(S.f.fccId||"—")}`},
+  {on:c => R("ca") && hasRadio(c), t:"IC ID", d:c => `IC：${esc(S.f.icId||"—")}`},
+  {on:c => R("eu"), t:"CE 標示", d:c => `CE（≥5 mm 高），${c.variant === "atex" ? "含 ATEX Ex 標示與公告機構編號" : ""}`},
+  {on:c => R("uk"), t:"UKCA 標示", d:c => `UKCA，含英國進口商資訊`},
+  {on:c => R("eu") || R("uk"), t:"WEEE 垃圾桶符號／電池標示", d:c => `打叉垃圾桶；電池 QR code 依適用日`},
+  {on:c => R("tw"), t:"BSMI／NCC 標示", d:c => `BSMI 商品檢驗標識、NCC 審驗標示（CCAF 編號）`},
+  {on:c => R("cn"), t:"CCC／EFUP／能效標示", d:c => `CCC 標誌、EFUP 環保使用期限、能效標示`},
+  {on:c => c.opt.coin, t:"Coin cell 警語", d:c => `吞食警語標示於電池艙或說明書`}
+];
+
+/* ════════════════════════════════════════════════════════════════
+   繪製
+   ════════════════════════════════════════════════════════════════ */
+let MODE = "ship";
+function buildDoc(mode){
+  MISS = new Set(); MODE = mode;
+  const c = S, cert = mode === "cert";
+  const on = BLOCKS.filter(b => b.on(c));
+  const vname = c.variant === "atex" ? "ATEX" : "STD SKU + C1D2";
+  const pname = c.pclass === "tablet" ? "Tablet" : "Notebook";
+  let h = `<h1>User Manual — Safety and Regulatory Information</h1>
+   <div class="meta">${v("model","機種")} · ${pname} · ${vname} · ${cert ? "Certification edition（認證版）" : "Shipping edition（出貨版）"}<br>
+   Document No.: ${v("docno","文件編號")} · Version: ${v("rev","版次")} · Date: ${v("date","日期")}<br>
+   Manufacturer: ${v("company","公司名稱")}, ${v("address","製造商地址")}</div>`;
+
+  SECS.forEach(([sid, title]) => {
+    const bs = on.filter(b => b.sec === sid);
+    if (!bs.length) return;
+    h += `<h2>${title}</h2>`;
+    bs.forEach(b => {
+      h += b.ship(c);
+      if (cert && b.cert) h += CN("認證備註", b.cert(c));
+    });
+  });
+
+  if (cert){
+    h += `<h2 class="pb">Appendix A — 配置對照表（誰觸發了哪段內容）</h2>
+     <table><tr><th>內容</th><th>帶入原因</th><th>適用標準／法規</th><th>需備證據</th></tr>${
+      on.map(b => `<tr><td>${esc(b.id)}</td><td>${esc(b.why(c))}</td><td>${esc(b.std)}</td><td>${esc(b.ev)}</td></tr>`).join("")}</table>`;
+    const ls = LABELS.filter(l => l.on(c));
+    h += `<h2>Appendix B — 標示（Label）檢查表</h2>
+     <table><tr><th style="width:26px">✓</th><th>標示</th><th>內容要點</th></tr>${
+      ls.map(l => `<tr><td>☐</td><td>${esc(l.t)}</td><td>${l.d(c)}</td></tr>`).join("")}</table>`;
+    h += `<h2>Appendix C — 待確認事項</h2>`;
+    const notes = [];
+    if (c.pclass === "tablet" && c.opt.scanner) notes.push("Barcode scanner → CDRH 報備（必要項目）。");
+    if (c.opt.dvd) notes.push("DVD（Class 1）是否另需 CDRH 報備，請依光碟機模組廠資料確認。");
+    if (c.variant === "atex") notes.push("ATEX Special Conditions 須與證書逐字一致；Certificate No. 由實驗室提供。");
+    if (R("eu")) notes.push("EU 電池法規、CRA、EN 18031 的適用日期與例外，送審前請對照法規原文與認證單位意見。");
+    if (R("ca")) notes.push("加拿大法文翻譯為草稿，須由認證單位或母語審稿確認。");
+    h += `<ul>${notes.map(n => `<li>${esc(n)}</li>`).join("") || "<li>無</li>"}</ul>`;
+  }
+  return {html:h, miss:[...MISS]};
+}
+
+function renderCfg(){
+  const chip = (id, list, key, cb) => {
+    $(id).innerHTML = list.map(([k,l]) => `<button class="chip" aria-pressed="${S[key] === k}" data-k="${k}">${l}</button>`).join("");
+    $(id).onclick = e => { const b = e.target.closest("button"); if (!b) return; S[key] = b.dataset.k; if (cb) cb(); save(); renderCfg(); };
+  };
+  chip("c-variant", VARIANTS, "variant");
+  chip("c-pclass", PCLASS, "pclass", () => { if (S.pclass === "tablet") S.opt.dvd = false; else S.opt.scanner = false; });
+  $("variant-info").textContent = S.variant === "atex"
+    ? "ATEX：含 Zone 2／22 Ex 標示、Special Conditions，並同時帶入 C1D2／Zone 2 T5 警語（與已送審說明書一致），鐵件鎖附圖必附。須 w/o Fan 結構。"
+    : "STD SKU + C1D2：Class I Division 2 Groups A B C D、T5 與 EXPLOSION HAZARD 警語。";
+  $("pclass-info").textContent = S.pclass === "tablet"
+    ? "平板選配：Barcode scanner → Laser class 2 警語與 CDRH。" : "筆電選配：DVD → Laser Class 1 警語。";
+
+  $("c-opt").innerHTML = OPTS.filter(o => !o.only || o.only === S.pclass || o.only === S.variant).map(o =>
+    `<div class="row"><div class="t"><b>${o.t}</b>${o.s ? `<small>${o.s}</small>` : ""}</div>
+     <label class="sw"><input type="checkbox" data-o="${o.k}" ${S.opt[o.k] ? "checked" : ""}><i></i></label></div>`).join("");
+  $("c-opt").onchange = e => { const k = e.target.dataset.o; if (!k) return; S.opt[k] = e.target.checked; save(); renderCfg(); };
+
+  $("c-reg").innerHTML = REGIONS.map(([k,l]) => `<button class="chip" aria-pressed="${!!S.reg[k]}" data-k="${k}">${l}</button>`).join("");
+  $("c-reg").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.reg[b.dataset.k] = !S.reg[b.dataset.k]; save(); renderCfg(); };
+
+  const cond = [
+    ["noPD","No PD charge","說明書帶入「不得經 USB Type-C／PD 充電」警語（安規申請條件，預設開）", "sw"],
+    ["z2","Zone 2（氣體）","ATEX 版標示", "sw", S.variant === "atex"],
+    ["z22","Zone 22（粉塵）","ATEX 版標示", "sw", S.variant === "atex"]
+  ].filter(x => x[4] === undefined || x[4]);
+  $("c-cond").innerHTML = `<div class="row"><div class="t"><b>出貨版的 PD 說明</b><small>「同認證版」＝出貨版也寫 No PD；「USB PD 說明」＝出貨版改寫充電器功率範圍（認證版仍是 No PD）</small></div>
+      <div class="chips" style="padding:0" id="c-pd">${[["same","同認證版"],["info","USB PD 說明"]].map(([k,l]) => `<button class="chip" aria-pressed="${S.cond.pdShip === k}" data-k="${k}">${l}</button>`).join("")}</div></div>`
+   + cond.map(([k,t,s]) => `<div class="row"><div class="t"><b>${t}</b><small>${s}</small></div>
+     <label class="sw"><input type="checkbox" data-c="${k}" ${S.cond[k] ? "checked" : ""}><i></i></label></div>`).join("")
+   + `<div class="row"><div class="t"><b>EMC 等級</b><small>FCC／ICES／EN 55032 聲明用</small></div>
+      <div class="chips" style="padding:0" id="c-emc">${["A","B"].map(k => `<button class="chip" aria-pressed="${S.cond.emc === k}" data-k="${k}">Class ${k}</button>`).join("")}</div></div>`
+   + `<div class="info">最高環境溫度與最低溫度在「欄位」頁填（Ta ≤ ${esc(S.f.ta || "40")} °C）。</div>`;
+  $("c-cond").onchange = e => { const k = e.target.dataset.c; if (!k) return; S.cond[k] = e.target.checked; save(); renderCfg(); };
+  $("c-pd").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.cond.pdShip = b.dataset.k; save(); renderCfg(); };
+  $("c-emc").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.cond.emc = b.dataset.k; save(); renderCfg(); };
+}
+
+function renderFld(){
+  let h = "";
+  FIELDS.forEach(f => {
+    if (f.g){ if (!f.show || f.show(S)) h += `<h2>${f.g}</h2>`; return; }
+    if (f.show && !f.show(S)) return;
+    h += `<label class="fld"><span>${esc(f.l)}</span>${f.area
+      ? `<textarea data-f="${f.k}" placeholder="${esc(f.ph||"")}">${esc(S.f[f.k]||"")}</textarea>`
+      : `<input type="text" data-f="${f.k}" value="${esc(S.f[f.k]||"")}" placeholder="${esc(f.ph||"")}">`}</label>`;
+  });
+  $("f-list").innerHTML = h;
+  $("img-st").textContent = S.img ? "已載入圖片（本機）" : "尚未上傳";
+}
+$("f-list").oninput = e => { const k = e.target.dataset.f; if (!k) return; S.f[k] = e.target.value; save(); };
+
+function renderOut(){
+  document.querySelectorAll("#seg-mode button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === S.mode));
+  const d = buildDoc(S.mode);
+  $("doc").innerHTML = d.html;
+  const m = $("out-miss");
+  if (d.miss.length){
+    m.className = "miss-box";
+    m.innerHTML = `<b>還有 ${d.miss.length} 個欄位沒填</b>（預覽中紅底標示）：${d.miss.map(esc).join("、")}。${S.mode === "ship" ? "<br>出貨版請全部補齊再輸出。" : ""}`;
+  } else { m.className = "ok-box"; m.textContent = "所有欄位都已填寫。"; }
+}
+
+/* ── 輸出 ── */
+const toast = t => { const e = document.createElement("div"); e.className = "toast"; e.textContent = t; document.body.appendChild(e); setTimeout(() => e.remove(), 2200); };
+function fname(ext){
+  const m = (S.f.model || "manual").replace(/[^\w\-]+/g, "_");
+  return `Manual_${m}_${S.variant === "atex" ? "ATEX" : "STDC1D2"}_${S.mode === "cert" ? "cert" : "ship"}.${ext}`;
+}
+function guardMiss(){
+  const d = buildDoc(S.mode);
+  if (S.mode === "ship" && d.miss.length) return confirm(`出貨版還有 ${d.miss.length} 個欄位沒填：\n${d.miss.join("、")}\n\n仍要輸出嗎？`);
+  return true;
+}
+function download(name, mime, body){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([body], {type:mime}));
+  a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+const CSS_DOC = `body{font-family:Arial,"Microsoft JhengHei",sans-serif;font-size:11pt;line-height:1.45}
+h1{font-size:18pt}h2{font-size:13pt;border-bottom:2px solid #1f4d5c;color:#1f4d5c;margin-top:18pt}h3{font-size:11pt}
+.meta{color:#444;font-size:10pt}.warn{border:2px solid #000;padding:5pt 8pt;margin:6pt 0;font-weight:bold}.warn.sub{border-width:1px;font-weight:normal}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #888;padding:3pt 5pt;font-size:10pt;vertical-align:top}th{background:#e9eef0}
+.cn{border:1px dashed #1f4d5c;background:#eef5f7;padding:5pt 8pt;margin:6pt 0;font-size:10pt}.miss{background:#ffd9d4;color:#a3261a;font-weight:bold}
+.fig{border:1px solid #888;padding:6pt;text-align:center}.fig img{max-width:15cm}.fr{font-style:italic}.pb{page-break-before:always}`;
+function pageHtml(){ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${esc(fname("").slice(0,-1))}</title><style>${CSS_DOC}</style></head><body>${buildDoc(S.mode).html}</body></html>`; }
+
+$("b-print").onclick = () => { if (guardMiss()) window.print(); };
+$("b-html").onclick  = () => { if (guardMiss()) download(fname("html"), "text/html;charset=utf-8", pageHtml()); };
+$("b-doc").onclick   = () => {
+  if (!guardMiss()) return;
+  const body = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><style>${CSS_DOC}</style></head><body>${buildDoc(S.mode).html}</body></html>`;
+  download(fname("doc"), "application/msword", "﻿" + body);
+};
+$("b-copy").onclick = async () => {
+  if (!guardMiss()) return;
+  try { await navigator.clipboard.writeText($("doc").innerText); toast("已複製"); } catch(e){ toast("無法複製，請改用下載"); }
+};
+$("seg-mode").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.mode = b.dataset.v; save(); renderOut(); };
+
+/* ── 圖片／備份 ── */
+$("f-img").onchange = e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => {   // 縮到最大 1200px，避免塞爆 localStorage
+      const s = Math.min(1, 1200 / Math.max(img.width, img.height));
+      const cv = document.createElement("canvas"); cv.width = img.width * s; cv.height = img.height * s;
+      cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+      S.img = cv.toDataURL("image/jpeg", .85); save(); renderFld(); toast("圖片已載入");
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(f); e.target.value = "";
+};
+$("b-imgdel").onclick = () => { S.img = ""; save(); renderFld(); };
+$("b-exp").onclick = () => download("manual-config.json", "application/json", JSON.stringify(S, null, 1));
+$("f-imp").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try { S = merge(DEF(), JSON.parse(await f.text())); save(); renderAll(); toast("已匯入"); } catch(err){ toast("檔案格式不對"); }
+  e.target.value = "";
+};
+$("b-reset").onclick = () => { if (confirm("所有配置與欄位都會清掉，確定？")) { S = DEF(); save(); renderAll(); } };
+
+/* ── 分頁 ── */
+function tab(t){
+  document.querySelectorAll(".view").forEach(s => s.hidden = s.id !== "v-" + t);
+  document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  if (t === "out") renderOut(); if (t === "fld") renderFld();
+  scrollTo(0, 0);
+}
+document.querySelector(".tabs").onclick = e => { const b = e.target.closest("button"); if (b) tab(b.dataset.tab); };
+function renderAll(){ renderCfg(); renderFld(); }
+
+load(); renderAll();
+if ("serviceWorker" in navigator && location.protocol !== "file:") addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+</script>
+</body>
+</html>

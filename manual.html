@@ -58,6 +58,33 @@
   .miss-box{background:var(--bad-bg);color:var(--bad);border-radius:12px;padding:10px 14px;font-size:14px;line-height:1.6;margin:10px 0}
   .ok-box{background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:10px 14px;font-size:14px;margin:10px 0}
 
+  /* ── 法規矩陣 ── */
+  .chip.sm{min-height:36px;padding:0 12px;font-size:13.5px}
+  .rule{border-top:1px solid var(--line);padding:10px 0 8px}
+  .rule:first-of-type{border-top:0}
+  .rh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+  .rh b{font-size:15px}
+  .rh .cl{color:var(--sub);font-size:13px}
+  .tag{font-size:11.5px;font-weight:800;letter-spacing:.04em;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--accent);white-space:nowrap}
+  .rq{margin:4px 0 6px;font-size:14.5px}
+  .bd{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+  .bd span{font-size:12px;padding:2px 8px;border-radius:6px;background:var(--bg);color:var(--sub);border:1px solid var(--line)}
+  .bd .w{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+  .bd .x{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+  .bd .o{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+  .vd{font-size:13.5px;background:var(--bg);border-radius:8px;padding:6px 10px;margin:6px 0}
+  .rule details{margin:4px 0}
+  .rule summary{cursor:pointer;color:var(--accent);font-size:13.5px;font-weight:700;min-height:32px;display:flex;align-items:center}
+  .orig{font-family:Arial,sans-serif;font-size:13px;line-height:1.55;background:var(--bg);border-left:3px solid var(--accent);padding:6px 10px;margin:4px 0;overflow-wrap:anywhere}
+  .nt{font-size:13px;color:var(--sub);margin-top:4px}
+  .gridwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .rgrid{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
+  .rgrid th,.rgrid td{border:1px solid var(--line);padding:6px 6px;text-align:center}
+  .rgrid th{background:var(--bg);color:var(--sub);font-weight:700}
+  .rgrid td:first-child,.rgrid th:first-child{text-align:left;white-space:nowrap}
+  .rgrid button{font:inherit;font-weight:800;min-width:40px;min-height:34px;border:0;border-radius:8px;background:var(--bg);color:var(--accent);cursor:pointer}
+  .rgrid button .u{color:var(--bad);font-size:11px;font-weight:700;margin-left:2px}
+
   /* ── 文件本體（預覽／列印／匯出共用）── */
   .doc{background:#fff;color:#111;border:1px solid var(--line);border-radius:6px;padding:22px 22px;font-family:Arial,"Noto Sans TC","Microsoft JhengHei",sans-serif;font-size:12.5px;line-height:1.55}
   .doc h1{font-size:22px;margin:0 0 4px}.doc .meta{color:#444;font-size:12px;margin-bottom:14px}
@@ -93,7 +120,7 @@
     <a href="./index.html">‹ 安規工具</a>
     <div class="eyebrow">USER MANUAL BUILDER</div>
     <h1>說明書產生器</h1>
-    <p class="info" style="margin-top:0">勾選機型、選配與銷售區域，說明書所需的安規警語、雷射／防爆標示、EMI／RF、資安、環保能效內容自動帶入；分「出貨版」與「認證版」輸出。</p>
+    <p class="info" style="margin-top:0">勾選機型、選配與銷售區域，說明書所需的安規警語、雷射／防爆標示、EMI／RF、資安、環保能效內容自動帶入；分「出貨版」與「認證版」輸出。「法規」分頁依同一組勾選，列出各國 Safety／EMC／RF／能源／環保／防爆／資安的條號與說明書原句。</p>
   </header>
 
   <!-- ① 配置 -->
@@ -108,8 +135,21 @@
     </div>
     <div class="card"><h2>選配與零件</h2><div id="c-opt"></div></div>
     <div class="card"><h2>銷售／認證區域</h2><div class="chips" id="c-reg"></div>
-      <div class="info">區域決定帶入哪些 EMI／RF／環保法規聲明。歐美為主；其他區域之後再補。</div></div>
+      <div class="info">區域決定帶入哪些 EMI／RF／環保法規聲明。日本、韓國、巴西、IECEx 目前只有「法規」分頁的條目（多為防爆），說明書本文還沒有對應段落。</div></div>
     <div class="card"><h2>認證條件（兩個版本共用）</h2><div id="c-cond"></div></div>
+  </section>
+
+  <!-- ①-2 法規矩陣 -->
+  <section class="view" id="v-reg" hidden>
+    <div class="card"><h2>依目前配置</h2>
+      <div class="info" id="reg-sum" style="margin-top:0"></div>
+      <div class="seg" id="seg-rmode"><button data-v="ship">出貨版</button><button data-v="cert">認證版</button></div>
+      <div class="chips" id="c-rcat"></div>
+      <div class="seg" id="seg-rview"><button data-v="area">依國家</button><button data-v="grid">總表</button></div>
+    </div>
+    <div id="reg-out"></div>
+    <div class="btns"><button class="btn" id="b-rcsv">下載 CSV（Excel 可開）</button></div>
+    <div class="info">「參考手冊」指已比對過的 3 個機種 STD／ATEX 出貨版與 EPR 認證版：<b>有</b>＝都有寫；<b>部分</b>＝有的手冊缺；<b>未見</b>＝都沒寫，要確認是否需要。條號標「待對原文」的，送審或改手冊前要先對過法規原文。</div>
   </section>
 
   <!-- ② 欄位 -->
@@ -146,12 +186,14 @@
 
 <nav class="tabs" role="tablist">
   <button role="tab" data-tab="cfg" aria-selected="true"><span>🧩</span>配置</button>
+  <button role="tab" data-tab="reg" aria-selected="false"><span>📋</span>法規</button>
   <button role="tab" data-tab="fld" aria-selected="false"><span>✏️</span>欄位</button>
   <button role="tab" data-tab="out" aria-selected="false"><span>📄</span>輸出</button>
 </nav>
 
 <script src="./sync.js"></script>
 <script src="./store.js"></script>
+<script src="./regs.js"></script>
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
@@ -167,22 +209,25 @@ const PCLASS   = [["tablet","平板"],["notebook","筆電"]];
 const OPTS = [
   {k:"scanner", t:"Barcode scanner", s:"Laser class 2（平板選配）。必帶 CDRH 報備", only:"tablet"},
   {k:"dvd",     t:"DVD／光碟機",     s:"Laser Class 1（筆電選配）",                 only:"notebook"},
-  {k:"wifi",    t:"Wi-Fi",           s:"2.4／5 GHz（含 6 GHz 時請在無線參數表註明）"},
+  {k:"wifi",    t:"Wi-Fi",           s:"2.4／5 GHz"},
+  {k:"wifi6",   t:"Wi-Fi 6 GHz（6E／7）", s:"帶入 6 GHz 室內限制與無人機禁用聲明"},
   {k:"bt",      t:"Bluetooth",       s:""},
   {k:"wwan",    t:"WWAN（4G／5G）",  s:""},
   {k:"nfc",     t:"NFC／RFID",       s:""},
   {k:"ir",      t:"IR LED／LED 模組",s:"前鏡頭 IR、後鏡頭 LED → IEC 62471"},
+  {k:"rj45",    t:"RJ45 LAN",        s:"「不可接電話線」警語"},
   {k:"coin",    t:"Coin／button cell（RTC）", s:"吞食警語、加州 perchlorate"},
   {k:"estar",   t:"ENERGY STAR",     s:"有取得時才勾"},
   {k:"p65",     t:"含 California Prop 65 警語", s:"依 RoHS／材質測試結果決定"},
   {k:"figstd",  t:"STD 版也附鐵件鎖附圖", s:"C1D2 同樣要求鐵件加螺絲封住；預設只有 ATEX 版附圖", only:"std"}
 ];
-const REGIONS = [["us","美國"],["ca","加拿大"],["eu","歐盟"],["uk","英國"],["tw","台灣"],["cn","中國"]];
+const REGIONS = [["us","美國"],["ca","加拿大"],["eu","歐盟"],["uk","英國"],["jp","日本"],["tw","台灣"],["cn","中國"],["kr","韓國"],["br","巴西"],["iecex","IECEx"]];
 
 const DEF = () => ({
-  variant:"std", pclass:"tablet", mode:"ship",
-  opt:{scanner:false,dvd:false,wifi:true,bt:true,wwan:false,nfc:false,ir:false,coin:false,estar:false,p65:false,figstd:false},
-  reg:{us:true,ca:true,eu:true,uk:false,tw:false,cn:false},
+  variant:"std", pclass:"tablet", mode:"ship", rview:"area",
+  rcat:{safety:true,emc:true,rf:true,energy:true,env:true,haz:true,cyber:true},
+  opt:{scanner:false,dvd:false,wifi:true,wifi6:false,bt:true,wwan:false,nfc:false,ir:false,rj45:false,coin:false,estar:false,p65:false,figstd:false},
+  reg:{us:true,ca:true,eu:true,uk:false,jp:false,tw:false,cn:false,kr:false,br:false,iecex:false},
   cond:{noPD:true, pdShip:"info", emc:"B", z2:true, z22:true},
   f:{ta:"40", exMark2:"II 3G Ex ic IIC T4 Gc", exMark22:"II 3D Ex ic IIIB T135°C Dc", date:new Date().toISOString().slice(0,10)},
   img:""
@@ -317,12 +362,12 @@ const BLOCKS = [
   + W(`CAUTION: THE DEVICE IS FOR USE WITH THE DEDICATED AC ADAPTER.`)
   + (R("ca") ? FR(`AVERTISSEMENT : L'APPAREIL DOIT ÊTRE UTILISÉ AVEC L'ADAPTATEUR SECTEUR CA DÉDIÉ.`) : "")},
 
-{id:"screen", sec:"s1", on:c => R("tw"), why:() => "區域＝台灣", std:"台灣 3C 視力保健警語", ev:"警語文字以現行公告為準",
+{id:"screen", sec:"s1", on:c => R("tw"), why:() => "區域＝台灣", std:"BSMI 資訊、通訊及消費性電子產品之加註警語規範（經標三字第10430007280號）", ev:"警語文字須與公告完全一致",
  ship:c => `<h3>螢幕使用警語 / Screen time</h3>`
-  + W(`Warning: Too much screen time might affect your vision and eye health.`)
-  + `<ol><li>Please take a break every 30 minutes when using the device.</li>
-     <li>Children younger than 2 years old are banned to use the device. Children over 2 years old are limited to one hour of screen time per day.</li></ol>`,
- cert:c => `警語依台灣現行公告確認，送審前請對照最新版本。`},
+  + W(`<span lang="zh-Hant">警語：使用過度恐傷害視力</span>`)
+  + `<p lang="zh-Hant">注意事項：（1）使用30分鐘請休息10分鐘。（2）未滿2歲幼兒不看螢幕，2歲以上每天看螢幕不要超過1小時。</p>`
+  + Ws(`Warning: Excessive use may damage your vision. (1) Rest for 10 minutes after every 30 minutes of use. (2) Children under 2 years old should not look at the screen; children 2 years and older should not look at the screen for more than 1 hour a day.`),
+ cert:c => `中文為公告原句，須完全一致；警語放本體、說明書、外包裝，注意事項放說明書、外包裝。英文為參考翻譯。`},
 
 /* ───────── 2. Optical ───────── */
 {id:"las2", sec:"s2", on:c => c.opt.scanner && c.pclass === "tablet", why:() => "勾選 Barcode scanner（Laser class 2）",
@@ -423,19 +468,22 @@ const BLOCKS = [
  std:"FCC Part 15 Subpart C／E；KDB 447498（RF exposure）", ev:"模組 FCC grant 或整機 FCC 報告；FCC ID；SAR 報告",
  ship:c => P(`This device complies with part 15 of the FCC Rules. Operation is subject to the following two conditions: (1) This device may not cause harmful interference, and (2) this device must accept any interference received, including interference that may cause undesired operation.`)
   + P(`FCC ID: ${v("fccId","FCC ID")}`)
-  + (c.opt.wifi ? `<ul><li>Operation in the 5.15–5.25 GHz band is restricted to indoor use only; outdoor operation in 5150–5250 MHz is prohibited.</li>
-     <li>This device is slave equipment; it has no radar detection and does not support ad-hoc operation in the DFS bands.</li>
-     <li>Operation of transmitters in the 5.925–7.125 GHz band is prohibited for control of or communications with unmanned aircraft systems.</li></ul>` : "")
+  + (c.opt.wifi ? `<ul><li>This device is slave equipment; it has no radar detection and does not support ad-hoc operation in the DFS bands.</li>${c.opt.wifi6
+     ? `<li>Operation of transmitters in the 5.925–7.125 GHz band is prohibited for control of or communications with unmanned aircraft systems.</li>` : ""}</ul>` : "")
   + P(`This equipment complies with FCC radiation exposure limits set forth for an uncontrolled environment. SAR (body-worn): ${v("sar","SAR 值")} W/kg (FCC limit 1.6 W/kg averaged over 1 g). This transmitter must not be co-located or operating in conjunction with any other antenna or transmitter unless authorized.`),
- cert:c => `5 GHz 頻段（UNII）限制與 DFS 需在報告確認；FCC ID 須與機身標籤一致。`},
+ cert:c => `美國現行 §15.407 對 5.15–5.25 GHz client 沒有室內限制，所以不寫 indoor-only（加拿大仍要寫）。6 GHz UAS 禁用依 §15.407(d)(1)(v)。FCC ID 須與機身標籤一致。`},
 
 {id:"ised", sec:"s4", on:c => R("ca"), why:() => "區域＝加拿大",
  std:"ICES-003；RSS-Gen；RSS-102（RF exposure）", ev:"ISED 證書（含 IC ID）、ICES-003 聲明",
  ship:c => `<h3>Canada — ISED</h3>`
-  + P(`CAN ICES-3 (${c.cond.emc})/NMB-3(${c.cond.emc})`)
+  + P(`CAN ICES-003(${c.cond.emc})/NMB-003(${c.cond.emc})`)
+  + (c.opt.wifi ? P(`Devices capable of operating in the band 5150–5250 MHz shall only be used indoors.`)
+    + FR(`Les appareils pouvant fonctionner dans la bande 5150-5250 MHz doivent être utilisés uniquement à l'intérieur.`) : "")
+  + (c.opt.wifi6 ? P(`Devices shall not be used for control of or communications with unmanned aircraft systems.`) : "")
   + (hasRadio(c) ? P(`This device contains licence-exempt transmitter(s)/receiver(s) that comply with Innovation, Science and Economic Development Canada's licence-exempt RSS(s). Operation is subject to the following two conditions: (1) This device may not cause interference. (2) This device must accept any interference, including interference that may cause undesired operation of the device.`)
     + FR(`L'émetteur/récepteur exempt de licence contenu dans le présent appareil est conforme aux CNR d'Innovation, Sciences et Développement économique Canada applicables aux appareils radio exempts de licence. L'exploitation est autorisée aux deux conditions suivantes : (1) L'appareil ne doit pas produire de brouillage; (2) L'appareil doit accepter tout brouillage radioélectrique subi, même si le brouillage est susceptible d'en compromettre le fonctionnement.`)
-    + P(`IC: ${v("icId","IC ID")}`) : "")},
+    + P(`IC: ${v("icId","IC ID")}`) : ""),
+ cert:c => `ICES-Gen Issue 2 §6.3.3：CAN ICES-003(B)/NMB-003(B) 等三種格式皆可，舊句「This Class B digital apparatus complies with Canadian ICES-003」不符現行規定。RSS-Gen Issue 6 §9.3.1：給使用者的說明要英法雙語。RSS-247 Issue 4 §7.3.7 的 5 GHz 法文句與 RSS-248 §7.1 的其他禁用場所（oil platform、飛機）請對原文補齊。`},
 
 {id:"red", sec:"s4", on:c => R("eu"), why:() => "區域＝歐盟",
  std:"EMC 2014/30/EU、LVD 2014/35/EU、RED 2014/53/EU；EN 55032／EN 55035；EN 301 489；EN 300 328／EN 301 893", ev:"EU DoC（含公開網址）、EMC／RF／LVD 報告、CE 標示",
@@ -450,7 +498,7 @@ const BLOCKS = [
        <p>Restrictions: operation in the 5150–5350 MHz band is restricted to indoor use only in the EU member states.</p>`
    : P(`Hereby, ${v("company","公司名稱")} declares that the equipment type ${v("model","機種")} is in compliance with the applicable EU directives (EMC 2014/30/EU, LVD 2014/35/EU). The full text of the EU declaration of conformity is available at: ${v("docUrl","DoC 公開網址")}`))
   + (c.cond.emc === "A" ? P(`This is a Class A product. In a domestic environment this product may cause radio interference, in which case the user may be required to take adequate measures.`) : ""),
- cert:c => `Art. 10(2)／10(10) 頻段與功率表、Art. 10 製造商／進口商名稱地址標示（機身或包裝）、SAR（EN 50566／EN 62311）。5 GHz 室內限制須依各會員國確認。`},
+ cert:c => `Art. 10(8) 頻段與最大功率表；Art. 10(9) 隨附 DoC 或簡化 DoC（Annex VII 句型，即上方 Hereby… 句）；Art. 10(10) 使用限制資訊要放在包裝上。6 GHz 依模式寫：LPI 限室內，VLP 可室內外但不可用於無人機（(EU) 2021/1067）。製造商／進口商名稱地址標示在機身或包裝；SAR（EN 50566／EN 62209-2）。`},
 
 {id:"uk", sec:"s4", on:c => R("uk"), why:() => "區域＝英國",
  std:"UKCA：Radio Equipment Regulations 2017（S.I. 2017/1206）、EMC Regs 2016、Electrical Equipment (Safety) Regs 2016", ev:"UK DoC、UKCA 標示、UK 進口商資訊",
@@ -484,11 +532,12 @@ const BLOCKS = [
   <li>The EU declaration of conformity is available at ${v("docUrl","DoC 公開網址")}.</li></ul>`,
  cert:c => `CRA 通報義務自 2026-09-11 起適用、其餘主要義務自 2027-12-11 起適用（以法規原文為準，送審前請再確認）。此段是否納入須依產品是否屬 CRA 範圍與適用日期判斷。`},
 
-{id:"psti", sec:"s5", on:c => R("uk") && hasRadio(c), why:() => "區域＝英國 ＋ 可連網",
- std:"Product Security and Telecommunications Infrastructure Act 2022 / Product Security Regs 2023", ev:"支援期限聲明、弱點通報窗口",
+{id:"psti", sec:"s5", on:c => R("uk") && c.opt.wwan, why:() => "區域＝英國 ＋ WWAN（只有 Wi-Fi 的平板不適用 PSTI）",
+ std:"Product Security and Telecommunications Infrastructure Act 2022 / Product Security Regs 2023（SI 2023/1007）", ev:"Statement of compliance（含 defined support period）；弱點通報窗口另行公開",
  ship:c => `<h3>UK security statement</h3>
   <ul><li>Minimum period for which security updates will be provided: until ${v("supportEnd","支援截止日")}.</li>
-  <li>To report a security issue contact: ${v("secMail","弱點通報窗口")}.</li></ul>`},
+  <li>To report a security issue contact: ${v("secMail","弱點通報窗口")}.</li></ul>`,
+ cert:c => `SI 2023/1007 Sch 3 para 5(1)(c)：沒有行動網路功能的平板不在 PSTI 範圍。Statement of compliance 要寫 defined support period（Sch 4）；弱點通報窗口是另一項公開義務（Sch 1 para 2），不屬於 statement。`},
 
 /* ───────── 6. Environment / Energy / Disposal ───────── */
 {id:"rohs", sec:"s6", on:c => R("eu") || R("uk"), why:() => "區域＝歐盟／英國",
@@ -501,7 +550,7 @@ const BLOCKS = [
  ship:c => `<h3>Disposal and recycling</h3>
   <p>The crossed-out wheeled bin symbol means that this product and its batteries must not be disposed of with unsorted municipal waste. Return them to a designated collection point for electrical and electronic equipment and batteries.</p>
   <p>Batteries covered by Regulation (EU) 2023/1542 must be collected separately. Removal of the battery is described in the service instructions; do not attempt to remove it unless you are qualified to do so.</p>`,
- cert:c => `電池法規（EU）2023/1542：標示、QR code 與可更換性要求各有不同適用日（約 2026-08 與 2027-02），且工業／專業用途可能有例外。<b>須依產品定位確認後再決定說明書與機身標示。</b>`},
+ cert:c => `WEEE 符號在 2012/19/EU Annex IX（舊手冊寫的 Annex IV 是 2002/96/EC 的編號）。電池法規 (EU) 2023/1542：可更換性（Art. 11）與 QR code 2027-02-18 起；標示（Art. 13）2026-08-18 或實施法規後 18 個月取較晚者；分類回收符號 2025-08-18 起。<b>ATEX／專業用途沒有豁免</b>，只有防水清洗、醫療影像／IVD、電力或資料連續性三種例外。`},
 
 {id:"p65", sec:"s6", on:c => R("us") && c.opt.p65, why:() => "區域＝美國 ＋ 勾選 Prop 65",
  std:"California Proposition 65", ev:"材質測試結果（鉛等）",
@@ -709,11 +758,96 @@ $("f-imp").onchange = async e => {
 };
 $("b-reset").onclick = () => { if (confirm("所有配置與欄位都會清掉，確定？")) { S = DEF(); save(); renderAll(); } };
 
+/* ════════════════════════════════════════════════════════════════
+   法規矩陣（資料在 regs.js）
+   ════════════════════════════════════════════════════════════════ */
+const RG = () => window.REGS || [];
+const CATN = Object.fromEntries(window.REG_CATS || []);
+const AREAN = Object.fromEntries(window.REG_AREAS || []);
+const VERN = {both:"兩版都寫", ship:"只寫在出貨版", cert:"只寫在認證版", diff:"兩版寫法不同"};
+const SEENN = {"有":"參考手冊都有", "部分":"參考手冊部分缺", "無":"參考手冊未見"};
+function regRows(){
+  const mode = S.mode;
+  return RG().filter(r => {
+    if (r.reg !== "all" && !S.reg[r.reg]) return false;
+    if (!S.rcat[r.cat]) return false;
+    if (r.ver === "ship" && mode !== "ship") return false;
+    if (r.ver === "cert" && mode !== "cert") return false;
+    try { return !!r.on(S); } catch(e){ return false; }
+  });
+}
+function regAreas(){ return (window.REG_AREAS || []).map(a => a[0]).filter(k => k === "all" || S.reg[k]); }
+function ruleHtml(r){
+  const seenCls = r.seen === "無" ? "x" : r.seen === "部分" ? "w" : "o";
+  return `<div class="rule">
+    <div class="rh"><span class="tag">${esc(CATN[r.cat] || r.cat)}</span><b>${esc(r.law)}</b><span class="cl">${esc(r.cl)}</span></div>
+    <div class="rq">${esc(r.req)}</div>
+    ${r.ver === "diff" ? `<div class="vd"><b>${S.mode === "ship" ? "出貨版" : "認證版"}：</b>${esc(S.mode === "ship" ? r.ship : r.cert)}<br><span style="color:var(--sub)">${S.mode === "ship" ? "認證版" : "出貨版"}：${esc(S.mode === "ship" ? r.cert : r.ship)}</span></div>` : ""}
+    <div class="bd"><span>觸發：${esc(r.trig)}</span><span>${esc(VERN[r.ver] || r.ver)}</span>
+      <span class="${seenCls}">${esc(SEENN[r.seen] || r.seen)}</span>
+      <span class="${r.chk === "已對原文" ? "o" : "w"}">${esc(r.chk)}</span></div>
+    <details><summary>說明書原句</summary><div class="orig">${esc(r.txt)}</div></details>
+    ${r.note ? `<div class="nt">${esc(r.note)}</div>` : ""}
+  </div>`;
+}
+function renderReg(){
+  if (!window.REGS){ $("reg-out").innerHTML = `<div class="miss-box">法規資料（regs.js）沒有載入，請重新整理。</div>`; return; }
+  const rows = regRows();
+  const vn = S.variant === "atex" ? "ATEX" : "STD SKU + C1D2";
+  const on = Object.entries(S.opt).filter(([k,x]) => x).map(([k]) => (OPTS.find(o => o.k === k) || {}).t || k);
+  $("reg-sum").innerHTML = `${esc(vn)}・${S.pclass === "tablet" ? "平板" : "筆電"}・區域：${esc(REGIONS.filter(([k]) => S.reg[k]).map(([,l]) => l).join("、") || "（未選）")}<br>選配：${esc(on.join("、") || "無")}　<a href="#" id="go-cfg" style="color:var(--accent)">改配置</a>`;
+  $("go-cfg").onclick = e => { e.preventDefault(); tab("cfg"); };
+  document.querySelectorAll("#seg-rmode button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === S.mode));
+  document.querySelectorAll("#seg-rview button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === S.rview));
+  $("c-rcat").innerHTML = (window.REG_CATS || []).map(([k,l]) => `<button class="chip sm" aria-pressed="${!!S.rcat[k]}" data-k="${k}">${esc(l)}</button>`).join("");
+
+  const areas = regAreas();
+  if (!rows.length){ $("reg-out").innerHTML = `<div class="card"><div class="info">目前的配置與篩選沒有對應條目。</div></div>`; return; }
+  if (S.rview === "grid"){
+    const cats = (window.REG_CATS || []).filter(([k]) => S.rcat[k]);
+    const cnt = (a, k) => rows.filter(r => r.reg === a && r.cat === k);
+    $("reg-out").innerHTML = `<div class="card"><h2>總表（條目數；紅字「缺」＝參考手冊未見或部分缺的條目數）</h2><div class="gridwrap"><table class="rgrid">
+      <tr><th>區域</th>${cats.map(([,l]) => `<th>${esc(l)}</th>`).join("")}</tr>
+      ${areas.map(a => `<tr><td>${esc(AREAN[a] || a)}</td>${cats.map(([k]) => {
+        const xs = cnt(a, k); if (!xs.length) return "<td>—</td>";
+        const gap = xs.filter(r => r.seen !== "有").length;
+        return `<td><button data-a="${a}" data-c="${k}">${xs.length}${gap ? ` <span class="u">缺${gap}</span>` : ""}</button></td>`;
+      }).join("")}</tr>`).join("")}
+    </table></div><div class="info">點數字看該格的條目。</div></div>`;
+    $("reg-out").querySelectorAll(".rgrid button").forEach(b => b.onclick = () => {
+      const xs = cnt(b.dataset.a, b.dataset.c);
+      const box = document.getElementById("reg-cell") || Object.assign(document.createElement("div"), {id:"reg-cell", className:"card"});
+      box.innerHTML = `<h2>${esc(AREAN[b.dataset.a] || b.dataset.a)}・${esc(CATN[b.dataset.c])}</h2>${xs.map(ruleHtml).join("")}`;
+      $("reg-out").appendChild(box); box.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+    return;
+  }
+  $("reg-out").innerHTML = areas.map(a => {
+    const xs = rows.filter(r => r.reg === a);
+    if (!xs.length) return "";
+    const order = (window.REG_CATS || []).map(c => c[0]);
+    xs.sort((p, q) => order.indexOf(p.cat) - order.indexOf(q.cat));
+    const gap = xs.filter(r => r.seen !== "有").length;
+    return `<div class="card"><h2>${esc(AREAN[a] || a)}・${xs.length} 項${gap ? `（${gap} 項參考手冊有缺）` : ""}</h2>${xs.map(ruleHtml).join("")}</div>`;
+  }).join("");
+}
+$("seg-rmode").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.mode = b.dataset.v; save(); renderReg(); };
+$("seg-rview").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.rview = b.dataset.v; save(); renderReg(); };
+$("c-rcat").onclick = e => { const b = e.target.closest("button"); if (!b) return; S.rcat[b.dataset.k] = !S.rcat[b.dataset.k]; save(); renderReg(); };
+$("b-rcsv").onclick = () => {
+  const q = s => `"${String(s == null ? "" : s).replace(/"/g, '""')}"`;
+  const head = ["區域","類別","法規／標準","條號","說明書要寫什麼","說明書原句","觸發條件","出貨版／認證版","參考手冊","原文核對","備註"];
+  const body = regRows().map(r => [AREAN[r.reg] || r.reg, CATN[r.cat] || r.cat, r.law, r.cl, r.req, r.txt, r.trig,
+    r.ver === "diff" ? `出貨版：${r.ship}／認證版：${r.cert}` : VERN[r.ver], SEENN[r.seen] || r.seen, r.chk, r.note].map(q).join(","));
+  const m = (S.f.model || "manual").replace(/[^\w\-]+/g, "_");
+  download(`法規矩陣_${m}_${S.variant === "atex" ? "ATEX" : "STDC1D2"}_${S.mode === "cert" ? "認證版" : "出貨版"}.csv`, "text/csv;charset=utf-8", "﻿" + [head.map(q).join(","), ...body].join("\r\n"));
+};
+
 /* ── 分頁 ── */
 function tab(t){
   document.querySelectorAll(".view").forEach(s => s.hidden = s.id !== "v-" + t);
   document.querySelectorAll(".tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
-  if (t === "out") renderOut(); if (t === "fld") renderFld();
+  if (t === "out") renderOut(); if (t === "fld") renderFld(); if (t === "reg") renderReg();
   scrollTo(0, 0);
 }
 document.querySelector(".tabs").onclick = e => { const b = e.target.closest("button"); if (b) tab(b.dataset.tab); };
